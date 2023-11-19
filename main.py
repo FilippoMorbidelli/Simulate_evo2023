@@ -10,10 +10,11 @@ import scipy as sc
 import numpy.random as rnd
 import plotly.graph_objects as go
 import torch
+from torch import nn
 
 
 # Class definition ----------------------------------
-class Wildlife:
+class Wildlife1:
     def __init__(self, stg, grid, genome, name=None):
 
         # Initialize attributes
@@ -185,6 +186,23 @@ class Wildlife:
     def reproduction(self):
 
         a = 2
+
+
+class Mind1(nn.Module):
+    def __init__(self, in_n, ly1, out_n):
+        super().__init__()
+        self.flatten = nn.Flatten()
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(in_n, 512),
+            nn.ReLU(),
+            nn.Linear(512, 512),
+            nn.ReLU(),
+        )
+
+    def forward(self, x):
+        x = self.flatten(x)
+        actions = self.linear_relu_stack(x)
+        return actions
 
 
 class SimGrid:
