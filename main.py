@@ -9,6 +9,7 @@ import numpy as np
 import scipy as sc
 import numpy.random as rnd
 import plotly.graph_objects as go
+import torch
 
 
 # Class definition ----------------------------------
@@ -244,7 +245,7 @@ class Resources:
         size_grs_mask = int(np.size(masks.grass_mask) / 2)
         grs_f_ind = rnd.choice(size_grs_mask, size=settings['resources']['init_food_grass'], replace=True)
         grs_f_grid = masks.grass_mask[grs_f_ind]
-        self.food.extend(np.hstack((rnd.uniform(grs_f_grid[:, 1], grs_f_grid[:, 1] - 1).reshape(-1, 1),
+        self.food.append(np.hstack((rnd.uniform(grs_f_grid[:, 1], grs_f_grid[:, 1] - 1).reshape(-1, 1),
                                     rnd.uniform(grs_f_grid[:, 0], grs_f_grid[:, 0] + 1).reshape(-1, 1))).tolist())
 
         # Spawn initial ponds on grass
