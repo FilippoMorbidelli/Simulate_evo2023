@@ -1,20 +1,17 @@
-# Evolution simulation project
+# Evolution simulation project - life module
 # Author: Filippo Morbidelli
-# Last update: 31/07/2023
-# Objectives:
-import random
+# Created on: 20/11/2023
+# Last update: 20/11/2023
+# Notes: This module contains every class and function needed by the main simulation to generate the creatures
 
-# Import packages -----------------------------------
+# Import packages------------------------------------
 import numpy as np
-import scipy as sc
 import numpy.random as rnd
-import plotly.graph_objects as go
-import torch
 from torch import nn
 
 
-# Class definition ----------------------------------
-class Wildlife1:
+# Life types----------------------------------------
+class MacroLife:
     def __init__(self, stg, grid, genome, name=None):
 
         # Initialize attributes
@@ -205,162 +202,16 @@ class Mind1(nn.Module):
         return actions
 
 
-class SimGrid:
-    def __init__(self, settings):
+# Utility functions---------------------------------
+def out_of_bound(x, low_lim, up_lim):
+    """Check and correct out of bound condition of input value, given the lower and upper limit"""
 
-        # Preallocate attributes
-        self.masks = type("Terrain masks", (), {})()
+    if x < low_lim:
+        x = low_lim  # Set x value to lower limit
+    elif x > up_lim:
+        x = up_lim  # Set x value to upper limit
 
-        # Preallocate grid
-        n = settings['terrain']['shape']
-        grid = np.ones(n, dtype=np.int32)
-
-        # Compute noise
-        noise = fractal_noise(settings)
-        noise = (noise - noise.min()) / (noise.max() - noise.min())
-
-        # Generate water
-        threshold = settings['terrain']['water_threshold']
-        grid[noise < threshold] = settings['terrain']['water_ID']
-
-        # Generate vegetation
-        potential = ((noise - threshold) / (1 - threshold)) ** 4 * 0.7
-        mask = (noise > threshold) * (rnd.rand(n[0], n[1]) < potential)
-        grid[mask] = settings['terrain']['vegetation_ID']
-        self.grid = grid
-
-        # Extract terrain masks
-        veg_mask = np.argwhere(mask)
-        veg_mask[:, 0] = veg_mask[:, 0] - n[0]/2  # change y values (on rows)
-        veg_mask[:, 0] = - veg_mask[:, 0]
-        veg_mask[:, 1] = veg_mask[:, 1] - n[1]/2  # change x values (on columns)
-        self.masks.veg_mask = veg_mask
-
-        grass_mask = np.argwhere(grid == 1)
-        grass_mask[:, 0] = grass_mask[:, 0] - n[0] / 2
-        grass_mask[:, 0] = - grass_mask[:, 0]
-        grass_mask[:, 1] = grass_mask[:, 1] - n[1] / 2
-        self.masks.grass_mask = grass_mask
-
-        water_mask = np.argwhere(grid == 0)
-        water_mask[:, 0] = water_mask[:, 0] - n[0] / 2
-        water_mask[:, 0] = - water_mask[:, 0]
-        water_mask[:, 1] = water_mask[:, 1] - n[1] / 2
-        self.masks.water_mask = water_mask
-
-
-class Resources:
-    def __init__(self, settings, masks):
-
-        # Spawn initial food on vegetation
-        size_veg_mask = int(np.size(masks.veg_mask) / 2)
-        veg_f_ind = rnd.choice(size_veg_mask, size=settings['resources']['init_food_veg'], replace=True)
-        veg_f_grid = masks.veg_mask[veg_f_ind]
-        self.food = np.hstack((rnd.uniform(veg_f_grid[:, 1], veg_f_grid[:, 1] - 1).reshape(-1, 1),
-                               rnd.uniform(veg_f_grid[:, 0], veg_f_grid[:, 0] + 1).reshape(-1, 1))).tolist()
-
-        # Spawn initial food on grass
-        size_grs_mask = int(np.size(masks.grass_mask) / 2)
-        grs_f_ind = rnd.choice(size_grs_mask, size=settings['resources']['init_food_grass'], replace=True)
-        grs_f_grid = masks.grass_mask[grs_f_ind]
-        self.food.append(np.hstack((rnd.uniform(grs_f_grid[:, 1], grs_f_grid[:, 1] - 1).reshape(-1, 1),
-                                    rnd.uniform(grs_f_grid[:, 0], grs_f_grid[:, 0] + 1).reshape(-1, 1))).tolist())
-
-        # Spawn initial ponds on grass
-        size_pnd_mask = int(np.size(masks.grass_mask) / 2)
-        pnd_f_ind = rnd.choice(size_pnd_mask, size=settings['resources']['init_pond'], replace=True)
-        pnd_f_grid = masks.grass_mask[pnd_f_ind]
-        self.pond = np.hstack((rnd.uniform(pnd_f_grid[:, 1], pnd_f_grid[:, 1] - 1).reshape(-1, 1),
-                               rnd.uniform(pnd_f_grid[:, 0], pnd_f_grid[:, 0] + 1).reshape(-1, 1))).tolist()
-
-    def spawn_resource(self, r_type, where, n, masks, settings):
-        # r_type: 0 = food, 1 = pond
-        # where: 0 = water, 1 = grass, 2 = vegetation
-        # n: number of resources to spawn
-
-        if r_type == 0:  # Spawn food
-            food_n_check = np.size(self.food)
-            if food_n_check < settings['resources']['food_max']:
-                match where:
-                    case 0:
-                        mask = masks.water_mask
-                    case 1:
-                        mask = masks.grass_mask
-                    case 2:
-                        mask = masks.veg_mask
-                    case _:
-                        mask = np.array([0, 0])
-                size_mask = int(np.size(mask) / 2)
-                res_ind = rnd.choice(size_mask, size=n, replace=True)
-                res_grid = mask[res_ind]
-                self.food.extend(np.hstack((rnd.uniform(res_grid[:, 1], res_grid[:, 1] - 1).reshape(-1, 1),
-                                            rnd.uniform(res_grid[:, 0], res_grid[:, 0] + 1).reshape(-1, 1))).tolist())
-        elif r_type == 1:  # Spawn pond
-            pond_n_check = np.size(self.pond)
-            if pond_n_check < settings['resources']['pond_max']:
-                mask = masks.grass_mask
-                size_mask = int(np.size(mask) / 2)
-                res_ind = rnd.choice(size_mask, size=n, replace=True)
-                res_grid = mask[res_ind]
-                self.pond.extend(np.hstack((rnd.uniform(res_grid[:, 1], res_grid[:, 1] - 1).reshape(-1, 1),
-                                            rnd.uniform(res_grid[:, 0], res_grid[:, 0] + 1).reshape(-1, 1))).tolist())
-
-    def remove_resource(self, r_type, r_coord):
-        # r_type: 0 = food, 1 = pond
-
-        if r_type == 0:  # Remove food
-            self.food.remove(r_coord)
-        elif r_type == 1:  # Remove pond
-            self.pond.remove(r_coord)
-
-
-# Grid generation functions-------------------------
-def generate_perlin_noise_2d(shape, res):
-
-    f = lambda tt: 6 * tt ** 5 - 15 * tt ** 4 + 10 * tt ** 3
-
-    delta = (res[0] / shape[0], res[1] / shape[1])
-    d = (shape[0] // res[0], shape[1] // res[1])
-    grid = np.mgrid[0:res[0]:delta[0], 0:res[1]:delta[1]].transpose(1, 2, 0) % 1
-
-    # Gradients
-    angles = 2 * np.pi * np.random.rand(res[0] + 1, res[1] + 1)
-    gradients = np.dstack((np.cos(angles), np.sin(angles)))
-    g00 = gradients[0:-1, 0:-1].repeat(d[0], 0).repeat(d[1], 1)
-    g10 = gradients[1:, 0:-1].repeat(d[0], 0).repeat(d[1], 1)
-    g01 = gradients[0:-1, 1:].repeat(d[0], 0).repeat(d[1], 1)
-    g11 = gradients[1:, 1:].repeat(d[0], 0).repeat(d[1], 1)
-
-    # Ramps
-    n00 = np.sum(grid * g00, 2)
-    n10 = np.sum(np.dstack((grid[:, :, 0] - 1, grid[:, :, 1])) * g10, 2)
-    n01 = np.sum(np.dstack((grid[:, :, 0], grid[:, :, 1] - 1)) * g01, 2)
-    n11 = np.sum(np.dstack((grid[:, :, 0] - 1, grid[:, :, 1] - 1)) * g11, 2)
-
-    # Interpolation
-    t = f(grid)
-    n0 = n00 * (1 - t[:, :, 0]) + t[:, :, 0] * n10
-    n1 = n01 * (1 - t[:, :, 0]) + t[:, :, 0] * n11
-    return np.sqrt(2) * ((1 - t[:, :, 1]) * n0 + t[:, :, 1] * n1)
-
-
-def fractal_noise(settings):
-
-    # Get grid settings
-    shape = settings['terrain']['shape']
-    res = settings['terrain']['resolution']
-    octaves = settings['terrain']['octaves']
-    persistence = settings['terrain']['persistence']
-
-    # Compute fractal noise
-    noise = np.zeros(shape)
-    frequency = 1
-    amplitude = 1
-    for _ in range(octaves):
-        noise += amplitude * generate_perlin_noise_2d(shape, (frequency * res[0], frequency * res[1]))
-        frequency *= 2
-        amplitude *= persistence
-    return noise
+    return x
 
 
 def check_grid_coord(pos, grid, stg):
@@ -375,127 +226,3 @@ def check_grid_coord(pos, grid, stg):
     grid_id = grid.grid[coord]
 
     return np.array([coord, grid_id])
-
-
-# Utility functions---------------------------------
-def out_of_bound(x, low_lim, up_lim):
-    """Check and correct out of bound condition of input value, given the lower and upper limit"""
-
-    if x < low_lim:
-        x = low_lim  # Set x value to lower limit
-    elif x > up_lim:
-        x = up_lim  # Set x value to upper limit
-
-    return x
-
-
-# Settings and genome-------------------------------
-def sim_settings():
-    """ """
-
-    # Values are reported in SI units if they have a dimension [m, s, kg, ...]
-    settings = {
-        'tick': 1,  # [s] tick conversion to seconds
-        'x_min': -128,  # [m]
-        'y_min': -128,  # [m]
-        'x_max': 128,  # [m]
-        'y_max': 128,  # [m]
-        'terrain': {
-            'shape': (256, 256),
-            'resolution': (1, 1),
-            'octaves': 6,
-            'persistence': 0.5,
-            'grass_ID': 1,
-            'grass_RGB': [],
-            'water_threshold': 0.2,
-            'water_ID': 0,
-            'water_RGB': [],
-            'vegetation_ID': 2,
-            'vegetation_RGB': [],
-        },
-        'resources': {
-            'init_food_veg': 50,
-            'init_food_grass': 10,
-            'init_pond': 25,
-            'food_max': 150,
-            'pond_max': 75,
-            'food_radius': 0.05,
-            'pond_radius': 0.2,
-            'food_sp_ticks': 2,
-            'pond_sp_ticks': 10,
-        },
-        'creatures': {
-            'spawn_creatures': 50,
-        },
-    }
-
-    return settings
-
-
-def basic_genome():
-
-    # The basic genome implemented is reported as dictionary
-    genome = {
-        'fix': {  # Fixed genome, cannot change randomly
-            'num_inputs': 9,  # Number of creature mind inputs
-            'num_hidden': 5,  # Number of creature mind hidden neurons
-            'num_outputs': 7,  # Number of creature mind outputs
-            'weights': {
-                'w_ih': rnd.uniform(low=-1 / np.sqrt(9), high=1 / np.sqrt(9), size=[9, 5]),
-                'w_ho': rnd.uniform(low=-1 / np.sqrt(5), high=1 / np.sqrt(5), size=[5, 7]),
-                'w_io': rnd.uniform(low=-1 / np.sqrt(9), high=1 / np.sqrt(9), size=[9, 7])
-            },
-        },
-        'cng': {  # Changeable genome through evolution
-            'max_vec': 1,  # Max velocity that a creature can make in a tick [m]
-            'max_age': 500,  # Max number of ticks the creature can survive
-            'num_sex': 2,  # Number of allowed sexes
-            'spawn_energy': 1000,
-            'spawn_water': 1000,
-            'en_loss_tick': 2,
-            'wt_loss_tick': 3,
-            'repr_cost': 500,
-            'max_energy': 1500,
-            'max_water': 1500,
-            'num_child': 1,
-            'pref_same_genome': 1,
-            'sight_distance': 10  # [m]
-        },
-    }
-    return genome
-
-
-# Main simulation-----------------------------------
-def simulate():
-    """Main simulation, here everything is contained"""
-
-    # Settings and genome
-    gen_settings = sim_settings()
-    init_genome = basic_genome()
-
-    # Spawn creatures, grid and resources
-    grid = SimGrid(gen_settings)
-    resources = Resources(gen_settings, grid.masks)
-    #creatures = [Wildlife(gen_settings, grid, genome) for i in range(gen_settings['creatures']['spawn_creatures'])]
-
-    # Simulation
-
-        # Plot frame (save each step)
-    food_x = [item[0] for item in resources.food]
-    food_y = [item[1] for item in resources.food]
-    fig = go.Figure(data=[go.Heatmap(z=grid.grid), go.Scatter(x=food_x, y=food_y, mode='markers')])
-    fig.update_layout(yaxis=dict(scaleanchor='x', scaleratio=1))
-    fig.show()
-
-        # Update inputs (perceive)
-
-        # Update mind (think)
-
-        # Update outputs (act)
-
-    return
-
-
-# Main ----------------------------------------------
-if __name__ == '__main__':
-    simulate()
