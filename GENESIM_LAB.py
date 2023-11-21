@@ -1,4 +1,4 @@
-# Evolution simulation project - GENESIM LAB 0.1
+# Evolution simulation project - GENESIM LAB v0.1
 # Author: Filippo Morbidelli
 # Created on: 31/07/2023
 # Last update: 20/11/2023

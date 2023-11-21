@@ -5,16 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/genetic_db.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/graphic_interface.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/life.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/resources.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/settings.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/world.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/life.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/life.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

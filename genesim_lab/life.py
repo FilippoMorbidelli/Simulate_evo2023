@@ -185,21 +185,29 @@ class MacroLife:
         a = 2
 
 
-class Mind1(nn.Module):
+class BasicMind(nn.Module):
     def __init__(self, in_n, ly1, out_n):
         super().__init__()
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(in_n, 512),
+            nn.Linear(in_n, ly1),
             nn.ReLU(),
-            nn.Linear(512, 512),
-            nn.ReLU(),
-        )
+            nn.Linear(ly1, out_n),
+            nn.ReLU(), )
 
     def forward(self, x):
         x = self.flatten(x)
         actions = self.linear_relu_stack(x)
         return actions
+
+    def update_neurons(self, new_in, new_ly1, new_out):
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(new_in, new_ly1),
+            nn.ReLU(),
+            nn.Linear(new_ly1, new_out),
+            nn.ReLU(), )
+
+    #def update_weight(self, ):
 
 
 # Utility functions---------------------------------
