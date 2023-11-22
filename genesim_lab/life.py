@@ -8,6 +8,7 @@
 import numpy as np
 import numpy.random as rnd
 from torch import nn
+import torch
 
 
 # Life types----------------------------------------
@@ -137,7 +138,7 @@ class MacroLife:
         self.inputs.need_repr = (self.parameters.food + self.parameters.water - 2000) / 1000  # Update "heat" level
 
         # Update follow pheromone (TBD)
-        #self.inputs.prm_nearby =  0# Update perceived nearest pherormone direction
+        # self.inputs.prm_nearby =  0# Update perceived nearest pheromone direction
 
         # Update age level
         self.inputs.age_level = self.parameters.age / self.genome.age_death  # Scaling factor with age [0, 1]
@@ -162,22 +163,22 @@ class MacroLife:
                 drt = self.parameters.dir
                 # Update randomly current velocity
                 self.parameters.curr_v += self.genome.v*np.random.uniform(-0.25, 0.25)
-                self.parameters.curr_v = out_of_bound(self.parameters.curr_v, 0, self.genome.v)
+                self.parameters.curr_v = out_of_bound(self.parameters.curr_v, [0], self.genome.v)
                 # Update position
                 self.parameters.xy += self.parameters.curr_v * stg['tick'] * [np.cos(drt), np.sin(drt)]
-                self.parameters.xy[0] = out_of_bound(self.parameters.xy[0], stg['x_min'], stg['x_max'])
-                self.parameters.xy[1] = out_of_bound(self.parameters.xy[1], stg['y_min'], stg['y_max'])
+                self.parameters.xy = out_of_bound(self.parameters.xy, [stg['x_min'], stg['y_min']],
+                                                  [stg['x_max'], stg['y_max']])
             else:  # Update movement as output of think
                 # Update head direction
                 self.parameters.dir = self.outputs.move_dir
                 drt = self.parameters.dir
                 # Update current velocity
                 self.parameters.curr_v += self.genome.v * self.outputs.move_qt
-                self.parameters.curr_v = out_of_bound(self.parameters.curr_v, 0, self.genome.v)
+                self.parameters.curr_v = out_of_bound(self.parameters.curr_v, [0], self.genome.v)
                 # Update position
                 self.parameters.xy += self.parameters.curr_v * stg['tick'] * [np.cos(drt), np.sin(drt)]
-                self.parameters.xy[0] = out_of_bound(self.parameters.xy[0], stg['x_min'], stg['x_max'])
-                self.parameters.xy[1] = out_of_bound(self.parameters.xy[1], stg['y_min'], stg['y_max'])
+                self.parameters.xy = out_of_bound(self.parameters.xy, [stg['x_min'], stg['y_min']],
+                                                  [stg['x_max'], stg['y_max']])
         #else:  # Perform action
 
     def reproduction(self):
@@ -189,37 +190,42 @@ class BasicMind(nn.Module):
     def __init__(self, in_n, ly1, out_n):
         super().__init__()
         self.flatten = nn.Flatten()
-        self.linear_relu_stack = nn.Sequential(
-            nn.Linear(in_n, ly1),
-            nn.ReLU(),
-            nn.Linear(ly1, out_n),
-            nn.ReLU(), )
+        self.mind = nn.Sequential(
+            nn.Linear(in_n, ly1, bias=True),  # First layer sum + bias
+            nn.ReLU(),  # First layer activation function (ReLu)
+            nn.Linear(ly1, out_n, bias=True),  # Output layer sum + bias
+            nn.ReLU(), )  # Output layer activation function (ReLu)
 
-    def forward(self, x):
+    def forward(self, x):  # Think action given x inputs
         x = self.flatten(x)
-        actions = self.linear_relu_stack(x)
+        actions = self.mind(x)
         return actions
 
     def update_neurons(self, new_in, new_ly1, new_out):
-        self.linear_relu_stack = nn.Sequential(
-            nn.Linear(new_in, new_ly1),
+        self.mind = nn.Sequential(
+            nn.Linear(new_in, new_ly1, bias=True),
             nn.ReLU(),
-            nn.Linear(new_ly1, new_out),
+            nn.Linear(new_ly1, new_out, bias=True),
             nn.ReLU(), )
 
-    #def update_weight(self, ):
+    def rand_update_weight(self, n):
+        with torch.no_grad():
+            # Randomly chose weights to change
+            # Apply changes
+            new_wgts = np.random.uniform(1, 1, 1)  # Define way to update weights!
 
 
 # Utility functions---------------------------------
-def out_of_bound(x, low_lim, up_lim):
-    """Check and correct out of bound condition of input value, given the lower and upper limit"""
+def out_of_bound(k, low_lim, up_lim):
+    """Check and correct out of bound condition of input value, given the lower and upper limit.
+       The function accepts k list of any length"""
 
-    if x < low_lim:
-        x = low_lim  # Set x value to lower limit
-    elif x > up_lim:
-        x = up_lim  # Set x value to upper limit
-
-    return x
+    for i in range(len(k)):
+        if k[i] < low_lim[i]:
+            k[i] = low_lim[i]  # Set k value to lower limit
+        elif k[i] > up_lim[i]:
+            k[i] = up_lim[i]  # Set k value to upper limit
+    return k
 
 
 def check_grid_coord(pos, grid, stg):
