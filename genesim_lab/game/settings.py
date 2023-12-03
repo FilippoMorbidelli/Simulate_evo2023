@@ -3,10 +3,14 @@
 # Last update: 31/07/2023
 # Objectives:
 
-# Import third party and game packages---------------
+# Import third party and game packages --------------|
+from numba import njit
+import numpy as np
+import glm
+import math
 
 
-# Settings-------------------------------------------
+# Settings ------------------------------------------|
 def sim_settings():
     """ """
 
@@ -48,3 +52,16 @@ def sim_settings():
 
     return settings
 
+
+def game_settings():
+    """ """
+
+    settings = {
+        'window': {
+            'h': 900,  # Height of window
+            'l': 1600,  # Length of window
+            'full_screen': True,  # Automatically opens game in full screen
+        }
+    }
+
+    return settings

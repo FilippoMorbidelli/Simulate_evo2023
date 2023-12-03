@@ -1,7 +1,7 @@
-# Evolution simulation project - init module
+# Evolution simulation project - init module for sounds
 # Author: Filippo Morbidelli
-# Created on: 20/11/2023
-# Last update: 20/11/2023
+# Created on: 02/12/2023
+# Last update: 02/12/2023
 # Notes: Import all modules
 
 # Import all ----------------------------------|

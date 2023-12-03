@@ -1,19 +1,21 @@
 # Evolution simulation project - GENESIM LAB v0.1
 # Author: Filippo Morbidelli
 # Created on: 31/07/2023
-# Last update: 20/11/2023
+# Last update: 02/12/2023
 # Notes: Main module to run simulation game
 
-# Import third party and game packages --------------
-import genesim_lab.life as lf
-import genesim_lab.world as wld
-import genesim_lab.resources as rsc
-import genesim_lab.settings as stg
-import genesim_lab.genetic_db as gdb
-import genesim_lab.graphic_interface as gph
+# Import third party and game packages --------------|
+from genesim_lab.game.world import *
+
+import genesim_lab.game.life as lf
+import genesim_lab.game.world as wld
+import genesim_lab.game.resources as rsc
+import genesim_lab.game.settings as stg
+import genesim_lab.game.genetic_db as gdb
+import genesim_lab.game.graphic_interface as gph
 
 
-# Main simulation-----------------------------------
+# Main simulation -----------------------------------|
 def simulate():
     """Main simulation, here everything is contained"""
 
@@ -44,6 +46,7 @@ def simulate():
     return
 
 
-# Main ----------------------------------------------
+# Main ----------------------------------------------|
 if __name__ == '__main__':
-    simulate()
+    app = BoxelEngine()
+    app.run()

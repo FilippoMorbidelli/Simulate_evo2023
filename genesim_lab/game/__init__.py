@@ -5,4 +5,4 @@
 # Notes: Import all modules
 
 # Import all ----------------------------------|
-__all__ = []
+__all__ = ["life", "world", "resources", "settings", "genetic_db", "graphic_interface"]

@@ -5,7 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/genesim_lab/game/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/game/graphic_interface.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/sound/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/genetic_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/genetic_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/graphic_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/life.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/life.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/resources.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/world.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -37,14 +48,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\game" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

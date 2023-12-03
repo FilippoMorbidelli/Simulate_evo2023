@@ -2,14 +2,77 @@
 # Author: Filippo Morbidelli
 # Created on: 20/11/2023
 # Last update: 20/11/2023
-# Notes: this module contains every class and function needed by the main simulation to generate the creatures
+# Notes: Contains the engine, game start and world generation
 
-# Import packages------------------------------------
+# Import packages ------------------------------|
 import numpy as np
 import numpy.random as rnd
 
+from genesim_lab.game.settings import *
+import moderngl as mgl
+import pygame as pg
+import sys
 
-# World generation-----------------------------------
+
+# Game start -----------------------------------|
+class BoxelEngine:  # Voxel engine inspired from Minecraft
+
+    def __init__(self):  # Initialize game
+        # Initialize game window
+        pg.init()
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)  # Max OpenGL version
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)  # Min OpenGL version
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)  #
+        pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #
+
+        # Initialize game settings
+        g_stg = game_settings()
+
+        # Set game window size (default: full screen)
+        if g_stg['window']['full_screen']:
+            pg.display.set_mode((0, 0), flags=pg.FULLSCREEN | pg.OPENGL | pg.DOUBLEBUF)
+        else:
+            pg.display.set_mode((g_stg['window']['l'], g_stg['window']['h']), flags=pg.OPENGL | pg.DOUBLEBUF)
+
+        # Call context for ModernGL
+        self.ctx = mgl.create_context()
+        self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.CULL_FACE | mgl.BLEND)
+        self.ctx.gc_mode = 'auto'  # Garbage collection
+
+        # Keep track of time and delta_time
+        self.clock = pg.time.Clock()
+        self.delta_time = 0
+        self.time = 0
+
+        # Game is running?
+        self.is_running = True
+
+    def update(self):
+        # Update time, delta_time and display fps on the top left part of the screen
+        self.delta_time = self.clock.tick()
+        self.time = pg.time.get_ticks() * 0.001
+        pg.display.set_mode().blit(pg.font.SysFont('Verdana', 20).render(
+            f'{self.clock.get_fps() :.0f}', True, (255, 255, 255)), (0, 0))
+
+    def render(self):
+        self.ctx.clear()
+        pg.display.flip()
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
+                self.is_running = False
+
+    def run(self):
+        while self.is_running:
+            self.handle_events()
+            self.update()
+            self.render()
+        pg.quit()
+        sys.exit()
+
+
+# World generator ------------------------------|
 class SimGrid:
     def __init__(self, settings):
 
