@@ -9,6 +9,8 @@ import numpy as np
 import numpy.random as rnd
 
 from genesim_lab.game.settings import *
+from genesim_lab.game.events import *
+from genesim_lab.game.shader_program import ShaderProgram
 import moderngl as mgl
 import pygame as pg
 import sys
@@ -26,13 +28,14 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #
 
         # Initialize game settings
-        g_stg = game_settings()
+        self.g_stg = game_settings()
 
         # Set game window size (default: full screen)
-        if g_stg['window']['full_screen']:
+        if self.g_stg['window']['full_screen']:
             pg.display.set_mode((0, 0), flags=pg.FULLSCREEN | pg.OPENGL | pg.DOUBLEBUF)
         else:
-            pg.display.set_mode((g_stg['window']['l'], g_stg['window']['h']), flags=pg.OPENGL | pg.DOUBLEBUF)
+            pg.display.set_mode((self.g_stg['window']['l'], self.g_stg['window']['h']),
+                                flags=pg.OPENGL | pg.DOUBLEBUF)
 
         # Call context for ModernGL
         self.ctx = mgl.create_context()
@@ -46,24 +49,35 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
 
         # Game is running?
         self.is_running = True
+        # Init shaders
+        self.shader_program = ShaderProgram(self)
 
     def update(self):
+        # Update shaders
+        self.shader_program.update()
+
         # Update time, delta_time and display fps on the top left part of the screen
         self.delta_time = self.clock.tick()
         self.time = pg.time.get_ticks() * 0.001
-        pg.display.set_mode().blit(pg.font.SysFont('Verdana', 20).render(
-            f'{self.clock.get_fps() :.0f}', True, (255, 255, 255)), (0, 0))
+        #self.screen.blit(pg.font.SysFont('Verdana', 20).render(
+        #    f'{self.clock.get_fps() :.0f}', True, (255, 255, 255)), (0, 0))
 
     def render(self):
+        # Clear and update frame
         self.ctx.clear()
         pg.display.flip()
 
     def handle_events(self):
+        # Handle all events
         for event in pg.event.get():
-            if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
+            # Secure "close game" event
+            if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_LALT and event.key == pg.K_F4):
                 self.is_running = False
+            # Quit game via button
+            #self.is_running = mouse_evt(event, pg.MOUSEBUTTONDOWN, 1, False)
 
     def run(self):
+        # Main gamer loop
         while self.is_running:
             self.handle_events()
             self.update()
@@ -75,7 +89,6 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
 # World generator ------------------------------|
 class SimGrid:
     def __init__(self, settings):
-
         # Preallocate attributes
         self.masks = type("Terrain masks", (), {})()
 
@@ -99,9 +112,9 @@ class SimGrid:
 
         # Extract terrain masks
         veg_mask = np.argwhere(mask)
-        veg_mask[:, 0] = veg_mask[:, 0] - n[0]/2  # change y values (on rows)
+        veg_mask[:, 0] = veg_mask[:, 0] - n[0] / 2  # change y values (on rows)
         veg_mask[:, 0] = - veg_mask[:, 0]
-        veg_mask[:, 1] = veg_mask[:, 1] - n[1]/2  # change x values (on columns)
+        veg_mask[:, 1] = veg_mask[:, 1] - n[1] / 2  # change x values (on columns)
         self.masks.veg_mask = veg_mask
 
         grass_mask = np.argwhere(grid == 1)
@@ -119,7 +132,6 @@ class SimGrid:
 
 # Utility functions----------------------------------
 def generate_perlin_noise_2d(shape, res):
-
     f = lambda tt: 6 * tt ** 5 - 15 * tt ** 4 + 10 * tt ** 3
 
     delta = (res[0] / shape[0], res[1] / shape[1])
@@ -148,7 +160,6 @@ def generate_perlin_noise_2d(shape, res):
 
 
 def fractal_noise(settings):
-
     # Get grid settings
     shape = settings['terrain']['shape']
     res = settings['terrain']['resolution']

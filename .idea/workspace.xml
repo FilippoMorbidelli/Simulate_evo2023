@@ -5,19 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/genesim_lab/game/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/game/graphic_interface.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/sound/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/game/events.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/game/menu.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/game/scene.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/game/shader_program.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/meshes/base_mesh.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/meshes/quad_mesh.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/quad.frag" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/quad.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/genetic_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/genetic_db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/graphic_interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/life.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/life.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/resources.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/world.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/world.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
