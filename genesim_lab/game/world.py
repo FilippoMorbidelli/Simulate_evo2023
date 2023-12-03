@@ -11,6 +11,7 @@ import numpy.random as rnd
 from genesim_lab.game.settings import *
 from genesim_lab.game.events import *
 from genesim_lab.game.shader_program import ShaderProgram
+from genesim_lab.game.scene import Scene
 import moderngl as mgl
 import pygame as pg
 import sys
@@ -22,8 +23,8 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
     def __init__(self):  # Initialize game
         # Initialize game window
         pg.init()
-        pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)  # Max OpenGL version
-        pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)  # Min OpenGL version
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)  # X. OpenGL version
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)  # .X OpenGL version
         pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)  #
         pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #
 
@@ -49,12 +50,15 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
 
         # Game is running?
         self.is_running = True
-        # Init shaders
+
+        # Init shaders and scene
         self.shader_program = ShaderProgram(self)
+        self.scene = Scene(self)
 
     def update(self):
-        # Update shaders
+        # Update shaders and scene
         self.shader_program.update()
+        self.scene.update()
 
         # Update time, delta_time and display fps on the top left part of the screen
         self.delta_time = self.clock.tick()
@@ -63,8 +67,9 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         #    f'{self.clock.get_fps() :.0f}', True, (255, 255, 255)), (0, 0))
 
     def render(self):
-        # Clear and update frame
+        # Clear, render and update frame
         self.ctx.clear()
+        self.scene.render()
         pg.display.flip()
 
     def handle_events(self):
