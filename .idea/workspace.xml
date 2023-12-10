@@ -5,11 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.frag" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/game/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/menu.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/game/scene.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/scene.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/world.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

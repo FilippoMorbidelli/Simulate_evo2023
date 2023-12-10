@@ -7,43 +7,90 @@
 # Import third party and game packages --------------|
 from genesim_lab.game.world import *
 
-import genesim_lab.game.life as lf
-import genesim_lab.game.world as wld
-import genesim_lab.game.resources as rsc
-import genesim_lab.game.settings as stg
-import genesim_lab.game.genetic_db as gdb
-import genesim_lab.game.graphic_interface as gph
+from genesim_lab.game.settings import *
+from genesim_lab.game.events import *
+from genesim_lab.game.shader_program import ShaderProgram
+from genesim_lab.game.scene import Scene
+from genesim_lab.game.menu import GLTextures2D
+import moderngl as mgl
+import pygame as pg
+import sys
 
 
-# Main simulation -----------------------------------|
-def simulate():
-    """Main simulation, here everything is contained"""
+# Game start -----------------------------------|
+class BoxelEngine:  # Voxel engine inspired from Minecraft
 
-    # Settings and genome
-    gen_settings = stg.sim_settings()
-    init_genome = gdb.basic_genome()
+    def __init__(self):  # Initialize game
+        # Initialize game window
+        pg.init()
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)  # X. OpenGL version
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)  # .X OpenGL version
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)  #
+        pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #
 
-    # Spawn creatures, grid and resources
-    grid = wld.SimGrid(gen_settings)
-    resources = rsc.Resources(gen_settings, grid.masks)
-    #creatures = [Wildlife(gen_settings, grid, genome) for i in range(gen_settings['creatures']['spawn_creatures'])]
+        # Initialize game settings
+        self.g_stg = game_settings()
 
-    # Simulation
+        # Set game window size (default: full screen)
+        if self.g_stg['window']['full_screen']:
+            self.screen = pg.display.set_mode((0, 0), flags=pg.FULLSCREEN | pg.OPENGL | pg.DOUBLEBUF)
+        else:
+            self.screen = pg.display.set_mode((self.g_stg['window']['l'], self.g_stg['window']['h']),
+                                              flags=pg.OPENGL | pg.DOUBLEBUF)
 
-        # Plot frame (save each step)
-    #food_x = [item[0] for item in resources.food]
-    #food_y = [item[1] for item in resources.food]
-    #fig = go.Figure(data=[go.Heatmap(z=grid.grid), go.Scatter(x=food_x, y=food_y, mode='markers')])
-    #fig.update_layout(yaxis=dict(scaleanchor='x', scaleratio=1))
-    #fig.show()
+        # Call context for ModernGL
+        self.ctx = mgl.create_context()
+        self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.CULL_FACE | mgl.BLEND)
+        self.ctx.gc_mode = 'auto'  # Garbage collection
 
-        # Update inputs (perceive)
+        # Keep track of time and delta_time
+        self.clock = pg.time.Clock()
+        self.delta_time = 0
+        self.time = 0
 
-        # Update mind (think)
+        # Game is running?
+        self.is_running = True
 
-        # Update outputs (act)
+        # Init shaders and scene
+        self.shader_program = ShaderProgram(self)
+        self.shader_program_2D = GLTextures2D(self)
+        self.scene = Scene(self)
 
-    return
+    def update(self):
+        # Update 3D shaders 2D shaders and scene
+        self.shader_program.update()
+        self.shader_program_2D.update()
+        self.scene.update()
+
+        # Update time, delta_time and display fps on the top left part of the screen
+        self.delta_time = self.clock.tick()
+        self.time = pg.time.get_ticks() * 0.001
+        #self.screen.blit(pg.font.SysFont('Verdana', 20).render(
+        #    f'{self.clock.get_fps() :.0f}', True, (255, 255, 255)), (0, 0))
+
+    def render(self):
+        # Clear, render and update frame
+        self.ctx.clear()
+        self.scene.render()
+        pg.display.flip()
+
+    def handle_events(self):
+        # Handle all events
+        for event in pg.event.get():
+            # Secure "close game" event
+            if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_LALT and event.key == pg.K_F4):
+                self.is_running = False
+            # Quit game via button
+            #self.is_running = mouse_evt(event, pg.MOUSEBUTTONDOWN, 1, False)
+
+    def run(self):
+        # Main game loop
+        while self.is_running:
+            self.handle_events()
+            self.update()
+            self.render()
+        pg.quit()
+        sys.exit()
 
 
 # Main ----------------------------------------------|
