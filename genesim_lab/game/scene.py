@@ -8,6 +8,7 @@
 import pygame as pg
 from genesim_lab.game.settings import *
 from genesim_lab.meshes.quad_mesh import QuadMesh
+from genesim_lab.game.menu import StaticSprite
 
 
 # Main -----------------------------------------|
@@ -15,12 +16,10 @@ class Scene:
 
     def __init__(self, app):
         self.app = app
-        # Initialize pygame surface on which 2D textures are applied
-        self.support_surface = pg.Surface((1920, 1080), pg.SRCALPHA)
         # Initialize always present features --> fps counter, version info
-        fps = self.support_surface.blit(pg.font.SysFont('Verdana', 20).render(f'{app.clock.get_fps() :.0f}',
+        fps_counter = StaticSprite(self.app, pg.font.SysFont('Verdana', 20).render(f'{app.clock.get_fps() :.0f}',
                                                                     True, (255, 255, 255)), (0, 0))
-        self.app.shader_program_2D.add(self.support_surface)
+        self.app.shader_program_2D.add(fps_counter)
 
         # Initialize main menu
 

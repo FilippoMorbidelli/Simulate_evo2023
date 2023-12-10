@@ -81,9 +81,22 @@ class GLTextures2D(pg.sprite.Group):
             *corners[3], 0.0, 0.0)
 
         self.get_buffer().write(vertices_quad_2d)
-        self.get_texture(sprite.image).use(0)
+        self.get_texture(sprite.image)
         self.get_vao().render()
 
     def draw2d(self):
         for sprite in self:
             self.render(sprite, self.app.screen)
+
+
+class StaticSprite(pg.sprite.Sprite):
+    def __init__(self, app, image, dest=(0, 0)):
+        super().__init__()
+        try:
+            self.image = pg.image.load(f'{image}.png').convert_alpha()
+        except:
+            #self.image = pg.Surface((1920, 1080), pg.SRCALPHA)
+            #self.image.blit(image, dest)
+            self.image = pg.Surface((100, 100), pg.SRCALPHA)
+            pg.draw.circle(self.image, (255, 255, 0), (50, 50), 50)
+        self.rect = self.image.get_rect(center=app.screen.get_rect().center)
