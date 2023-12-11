@@ -62,6 +62,7 @@ class GLTextures2D(pg.sprite.Group):
             texture = self.gl_context.texture(rgba_image.get_size(), 4, rgba_image.get_buffer())
             texture.swizzle = 'BGRA'
             self.gl_textures[image] = texture
+        return self.gl_textures[image]
 
     def convert_vertex(self, pt, surface):
         return pt[0] / surface.get_width() * 2 - 1, 1 - pt[1] / surface.get_height() * 2
@@ -81,7 +82,7 @@ class GLTextures2D(pg.sprite.Group):
             *corners[3], 0.0, 0.0)
 
         self.get_buffer().write(vertices_quad_2d)
-        self.get_texture(sprite.image)
+        self.get_texture(sprite.image).use(0)
         self.get_vao().render()
 
     def draw2d(self):
@@ -95,8 +96,6 @@ class StaticSprite(pg.sprite.Sprite):
         try:
             self.image = pg.image.load(f'{image}.png').convert_alpha()
         except:
-            #self.image = pg.Surface((1920, 1080), pg.SRCALPHA)
-            #self.image.blit(image, dest)
-            self.image = pg.Surface((100, 100), pg.SRCALPHA)
-            pg.draw.circle(self.image, (255, 255, 0), (50, 50), 50)
+            self.image = pg.Surface((1920, 1080), pg.SRCALPHA)
+            self.image.blit(image, dest)
         self.rect = self.image.get_rect(center=app.screen.get_rect().center)
