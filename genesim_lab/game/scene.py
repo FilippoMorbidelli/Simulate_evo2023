@@ -8,7 +8,7 @@
 import pygame as pg
 from genesim_lab.game.settings import *
 from genesim_lab.meshes.quad_mesh import QuadMesh
-from genesim_lab.game.menu import StaticSprite
+from genesim_lab.game.menu import *
 
 
 # Main -----------------------------------------|
@@ -16,10 +16,9 @@ class Scene:
 
     def __init__(self, app):
         self.app = app
-        # Initialize always present features --> fps counter, version info
-        fps_counter = StaticSprite(self.app, pg.font.SysFont('Verdana', 20).render(f'{app.clock.get_fps() :.0f}',
-                                                                    True, (255, 255, 255)), (0, 0))
-        self.app.shader_program_2D.add(fps_counter)
+
+        fps_counter = FpsSprite(app)
+        app.shader_program_2D.add(fps_counter)
 
         # Initialize main menu
 

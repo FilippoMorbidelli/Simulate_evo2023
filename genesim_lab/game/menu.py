@@ -12,10 +12,21 @@ from genesim_lab.game.settings import *
 
 
 # Main menu ------------------------------------|
-class MainMenu:
+class AllMenu:
 
-    def __init__(self):
+    def __init__(self, app):
+        self.app = app
+
+        # Init utility vision --> fps counter, version info
+        fps_counter = FpsSprite(app)
+        self.app.shader_program_2D.add(fps_counter)
+        # Init main menu
+
+    def init_shader(self):
+        # Init all shader groups
+        #shader_program_2D = GLTextures2D(app)
         pass
+        #return shader_program_2D
 
 
 # 2D texture function --------------------------|
@@ -89,6 +100,10 @@ class GLTextures2D(pg.sprite.Group):
         for sprite in self:
             self.render(sprite, self.app.screen)
 
+    def update(self, app):
+        for sprite in self:
+            sprite.update(app)
+
 
 class StaticSprite(pg.sprite.Sprite):
     def __init__(self, app, image, dest=(0, 0)):
@@ -98,4 +113,23 @@ class StaticSprite(pg.sprite.Sprite):
         except:
             self.image = pg.Surface((1920, 1080), pg.SRCALPHA)
             self.image.blit(image, dest)
+            self.dest = dest
         self.rect = self.image.get_rect(center=app.screen.get_rect().center)
+
+
+class FpsSprite(pg.sprite.Sprite):
+    def __init__(self, app):
+        super().__init__()
+        self.image = pg.Surface((1920, 1080), pg.SRCALPHA)
+        self.image.blit(pg.font.SysFont('Verdana', 20).render(f'{app.clock.get_fps() :.0f}',
+                                                              True, (255, 255, 255)), (0, 0))
+        self.rect = self.image.get_rect(center=app.screen.get_rect().center)
+
+    def update(self, app):
+        for event in pg.event.get():
+            if event.type == app.FPS_EVENT_ID:
+                self.image = pg.Surface((1920, 1080), pg.SRCALPHA)
+                self.image.blit(pg.font.SysFont('Verdana', 20).render(f'{app.clock.get_fps() :.0f}',
+                                                                      True, (255, 255, 255)), (0, 0))
+            else:
+                pass

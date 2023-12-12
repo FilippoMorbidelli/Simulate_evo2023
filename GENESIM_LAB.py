@@ -56,10 +56,14 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.shader_program_2D = GLTextures2D(self)
         self.scene = Scene(self)
 
+        # FPS event to update it every second only
+        self.FPS_EVENT_ID = pg.USEREVENT + 1
+        pg.time.set_timer(self.FPS_EVENT_ID, 1000)
+
     def update(self):
         # Update 3D shaders 2D shaders and scene
         self.shader_program.update()
-        self.shader_program_2D.update()
+        self.shader_program_2D.update(app)
         self.scene.update()
 
         # Update time, delta_time and display fps on the top left part of the screen
