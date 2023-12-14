@@ -8,7 +8,7 @@
 import pygame as pg
 from genesim_lab.game.settings import *
 from genesim_lab.meshes.quad_mesh import QuadMesh
-from genesim_lab.game.menu import *
+from genesim_lab.game.sprite import *
 
 
 # Main -----------------------------------------|
@@ -18,7 +18,9 @@ class Scene:
         self.app = app
 
         fps_counter = FpsSprite(app)
+        util_text = UtilityText(app, 'Genesim Lab - version alpha\nAuthor: F. Morbidelli\nTrial version', 300, (1620, 0))
         app.shader_program_2D.add(fps_counter)
+        app.shader_program_2D.add(util_text)
 
         # Initialize main menu
 

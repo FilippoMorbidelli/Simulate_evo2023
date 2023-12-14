@@ -8,6 +8,7 @@ from numba import njit
 import numpy as np
 import glm
 import math
+import pygame as pg
 
 
 # Settings ------------------------------------------|
@@ -57,11 +58,17 @@ def game_settings():
     """ """
 
     settings = {
-        'window': {
+        'window': {  # Game window
             'h': 900,  # Height of window
             'l': 1600,  # Length of window
             'full_screen': True,  # Automatically opens game in full screen
-        }
+            'rect': None,  # Current rect of main window
+        },
+        'util': {  # Utilities
+            'fps_limit': 144,  # Limit frame rate to value
+            'text_font': pg.font.SysFont('Verdana', 18),  # Font and size for utility text
+            'text_color': (255, 255, 255),  # Color of displayed text
+        },
     }
 
     return settings

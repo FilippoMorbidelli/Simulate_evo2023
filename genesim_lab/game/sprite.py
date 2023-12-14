@@ -1,8 +1,10 @@
-# Evolution simulation project - menu module
+# Evolution simulation project - sprite module
 # Author: Filippo Morbidelli
 # Created on: 03/12/2023
 # Last update: 03/12/2023
-# Notes: Handles main menu, settings, play and other menu
+# Notes: Handles all 2D sprites like text or images to render onto the main surface. There are two types of sprites
+#        used, the first one uses pygame surface.blit to apply 2D text to the surface, the second uses pygame image to
+#        load a png/jpg as a surface to render.
 
 # Import packages ------------------------------|
 import pygame as pg
@@ -11,25 +13,7 @@ import moderngl as mgl
 from genesim_lab.game.settings import *
 
 
-# Main menu ------------------------------------|
-class AllMenu:
-
-    def __init__(self, app):
-        self.app = app
-
-        # Init utility vision --> fps counter, version info
-        fps_counter = FpsSprite(app)
-        self.app.shader_program_2D.add(fps_counter)
-        # Init main menu
-
-    def init_shader(self):
-        # Init all shader groups
-        #shader_program_2D = GLTextures2D(app)
-        pass
-        #return shader_program_2D
-
-
-# 2D texture function --------------------------|
+# Sprite shader program ------------------------|
 class GLTextures2D(pg.sprite.Group):
 
     def __init__(self, app, sprites=None):
@@ -105,7 +89,8 @@ class GLTextures2D(pg.sprite.Group):
             sprite.update(app)
 
 
-class StaticSprite(pg.sprite.Sprite):
+# 2D Sprite classes ----------------------------|
+class GenericSprite(pg.sprite.Sprite):
     def __init__(self, app, image, dest=(0, 0)):
         super().__init__()
         try:
@@ -117,16 +102,41 @@ class StaticSprite(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=app.screen.get_rect().center)
 
 
+class UtilityText(pg.sprite.Sprite):
+    def __init__(self, app, text, width, pos=None, align="left"):
+        super().__init__()
+        self.rect = app.g_stg['window']['rect']
+        self.image = pg.Surface(self.rect.size, pg.SRCALPHA, 32)
+        collection = [line.split('\n') for line in text.splitlines()]
+        #space = app.g_stg['util']['text_font'].size(' ')[0]
+        x, y = pos
+        x += width
+        for lines in collection:
+            for words in lines:
+                w_surf = app.g_stg['util']['text_font'].render(words, True, app.g_stg['util']['text_color'])
+                w_width, w_height = w_surf.get_size()
+                #if x + w_width >= width:
+                #    x = pos[0]
+                #    y += w_height
+                x -= w_width
+                self.image.blit(w_surf, (x, y))
+            x = pos[0] + width
+            y += w_height
+
+    def update(self, app):
+        pass
+
+
 class FpsSprite(pg.sprite.Sprite):
     def __init__(self, app):
         super().__init__()
         self.image = pg.Surface((100, 100), pg.SRCALPHA, 32)
-        self.image.blit(pg.font.SysFont('Verdana', 20).render(f'{app.clock.get_fps() :.0f}',
-                                                              True, (255, 255, 255)), (0, 0))
+        self.image.blit(app.g_stg['util']['text_font'].render(f'{app.clock.get_fps() :.0f}',
+                                                              True, app.g_stg['util']['text_color']), (0, 0))
         self.rect = pg.Rect(0, 0, 100, 100)
 
     def update(self, app):
         if app.FPS_EVENT in [e.type for e in app.event_list]:
             self.image = pg.Surface((100, 100), pg.SRCALPHA, 32)
-            self.image.blit(pg.font.SysFont('Verdana', 20).render(f'{app.clock.get_fps() :.0f}',
-                                                                  True, (255, 255, 255)), (0, 0))
+            self.image.blit(app.g_stg['util']['text_font'].render(f'{app.clock.get_fps() :.0f}',
+                                                                  True, app.g_stg['util']['text_color']), (0, 0))

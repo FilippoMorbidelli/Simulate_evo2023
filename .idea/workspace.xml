@@ -5,10 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/genesim_lab/game/sprite.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/menu.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/menu.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/scene.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/scene.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,10 +21,10 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="shader-template" />
         <option value="fs-template" />
         <option value="vs-template" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -79,5 +82,16 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/genesim_lab/game/sprite.py</url>
+          <line>108</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

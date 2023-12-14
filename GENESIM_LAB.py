@@ -1,7 +1,7 @@
 # Evolution simulation project - GENESIM LAB v0.1
 # Author: Filippo Morbidelli
 # Created on: 31/07/2023
-# Last update: 02/12/2023
+# Last update: 14/12/2023
 # Notes: Main module to run simulation game
 
 # Import third party and game packages --------------|
@@ -11,7 +11,7 @@ from genesim_lab.game.settings import *
 from genesim_lab.game.events import *
 from genesim_lab.game.shader_program import ShaderProgram
 from genesim_lab.game.scene import Scene
-from genesim_lab.game.menu import GLTextures2D
+from genesim_lab.game.sprite import GLTextures2D
 import moderngl as mgl
 import pygame as pg
 import sys
@@ -37,6 +37,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         else:
             self.screen = pg.display.set_mode((self.g_stg['window']['l'], self.g_stg['window']['h']),
                                               flags=pg.OPENGL | pg.DOUBLEBUF)
+        self.g_stg['window']['rect'] = self.screen.get_rect()  # Get current rect of main window
 
         # Call context for ModernGL
         self.ctx = mgl.create_context()
@@ -69,11 +70,9 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.shader_program_2D.update(app)
         self.scene.update()
 
-        # Update time, delta_time and display fps on the top left part of the screen
-        self.delta_time = self.clock.tick(144)
+        # Update time, delta_time
+        self.delta_time = self.clock.tick(self.g_stg['util']['fps_limit'])
         self.time = pg.time.get_ticks() * 0.001
-        #self.screen.blit(pg.font.SysFont('Verdana', 20).render(
-        #    f'{self.clock.get_fps() :.0f}', True, (255, 255, 255)), (0, 0))
 
     def render(self):
         # Clear, render and update frame
