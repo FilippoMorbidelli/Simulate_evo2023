@@ -57,8 +57,11 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.scene = Scene(self)
 
         # FPS event to update it every second only
-        self.FPS_EVENT_ID = pg.USEREVENT + 1
-        pg.time.set_timer(self.FPS_EVENT_ID, 1000)
+        self.FPS_EVENT = pg.USEREVENT + 1
+        pg.time.set_timer(self.FPS_EVENT, 500)
+
+        # Instance event_list
+        self.event_list = None
 
     def update(self):
         # Update 3D shaders 2D shaders and scene
@@ -67,7 +70,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.scene.update()
 
         # Update time, delta_time and display fps on the top left part of the screen
-        self.delta_time = self.clock.tick()
+        self.delta_time = self.clock.tick(144)
         self.time = pg.time.get_ticks() * 0.001
         #self.screen.blit(pg.font.SysFont('Verdana', 20).render(
         #    f'{self.clock.get_fps() :.0f}', True, (255, 255, 255)), (0, 0))
@@ -79,8 +82,10 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         pg.display.flip()
 
     def handle_events(self):
+        # Get all events
+        self.event_list = pg.event.get()
         # Handle all events
-        for event in pg.event.get():
+        for event in self.event_list:
             # Secure "close game" event
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_LALT and event.key == pg.K_F4):
                 self.is_running = False

@@ -10,6 +10,6 @@ in vec2 v_uv;
 void main()
 {
     fragColor = texture(u_texture, v_uv);
-    if(fragColor.a < 0.1)
+    if(fragColor.a < 0.01)
         discard;
 }

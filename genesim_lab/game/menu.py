@@ -120,16 +120,13 @@ class StaticSprite(pg.sprite.Sprite):
 class FpsSprite(pg.sprite.Sprite):
     def __init__(self, app):
         super().__init__()
-        self.image = pg.Surface((1920, 1080), pg.SRCALPHA)
+        self.image = pg.Surface((100, 100), pg.SRCALPHA, 32)
         self.image.blit(pg.font.SysFont('Verdana', 20).render(f'{app.clock.get_fps() :.0f}',
                                                               True, (255, 255, 255)), (0, 0))
-        self.rect = self.image.get_rect(center=app.screen.get_rect().center)
+        self.rect = pg.Rect(0, 0, 100, 100)
 
     def update(self, app):
-        for event in pg.event.get():
-            if event.type == app.FPS_EVENT_ID:
-                self.image = pg.Surface((1920, 1080), pg.SRCALPHA)
-                self.image.blit(pg.font.SysFont('Verdana', 20).render(f'{app.clock.get_fps() :.0f}',
-                                                                      True, (255, 255, 255)), (0, 0))
-            else:
-                pass
+        if app.FPS_EVENT in [e.type for e in app.event_list]:
+            self.image = pg.Surface((100, 100), pg.SRCALPHA, 32)
+            self.image.blit(pg.font.SysFont('Verdana', 20).render(f'{app.clock.get_fps() :.0f}',
+                                                                  True, (255, 255, 255)), (0, 0))
