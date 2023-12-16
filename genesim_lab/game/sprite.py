@@ -102,25 +102,44 @@ class GenericSprite(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=app.screen.get_rect().center)
 
 
-class UtilityText(pg.sprite.Sprite):
-    def __init__(self, app, text, width, pos=None, align="left"):
+class UtilityStaticText(pg.sprite.Sprite):
+    def __init__(self, app, text, rect=None, align="left"):
         super().__init__()
-        self.rect = app.g_stg['window']['rect']
-        self.image = pg.Surface(self.rect.size, pg.SRCALPHA, 32)
-        collection = [line.split('\n') for line in text.splitlines()]
-        #space = app.g_stg['util']['text_font'].size(' ')[0]
-        x, y = pos
-        x += width
+
+        # Generate context window
+        self.rect = app.g_stg['window']['rect']  # Generate sprite rect from main window
+        self.image = pg.Surface(self.rect.size, pg.SRCALPHA, 32)  # Surface on which sprite is blit on
+        collection = [line.split('\n') for line in text.splitlines()]  # Get single lines from text
+        x, y = rect.topleft  # Initial blit coordinates
+
+        # adjust x blit position depending on align
+        if align == "left":
+            pass
+        elif align == "right":
+            x += rect.width
+        elif align == "center":
+            x = rect.centerx
+
+        # Extract each line and blit to surface
         for lines in collection:
             for words in lines:
                 w_surf = app.g_stg['util']['text_font'].render(words, True, app.g_stg['util']['text_color'])
                 w_width, w_height = w_surf.get_size()
-                #if x + w_width >= width:
-                #    x = pos[0]
-                #    y += w_height
-                x -= w_width
+
+                # adjust x blit position depending on line length
+                if align == "left":
+                    pass
+                elif align == "right":
+                    x -= w_width
+                elif align == "center":
+                    x -= w_width/2
                 self.image.blit(w_surf, (x, y))
-            x = pos[0] + width
+            if align == "left":
+                x = rect.topleft[0]
+            elif align == "right":
+                x = rect.topleft[0] + rect.width
+            elif align == "center":
+                x = rect.centerx
             y += w_height
 
     def update(self, app):

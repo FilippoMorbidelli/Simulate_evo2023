@@ -66,7 +66,7 @@ def game_settings():
         },
         'util': {  # Utilities
             'fps_limit': 144,  # Limit frame rate to value
-            'text_font': pg.font.SysFont('Verdana', 18),  # Font and size for utility text
+            'text_font': pg.font.SysFont('Verdana', 16),  # Font and size for utility text
             'text_color': (255, 255, 255),  # Color of displayed text
         },
     }

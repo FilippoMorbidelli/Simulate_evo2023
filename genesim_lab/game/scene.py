@@ -18,7 +18,7 @@ class Scene:
         self.app = app
 
         fps_counter = FpsSprite(app)
-        util_text = UtilityText(app, 'Genesim Lab - version alpha\nAuthor: F. Morbidelli\nTrial version', 300, (1620, 0))
+        util_text = UtilityStaticText(app, 'Genesim Lab - version alpha\nAuthor: F. Morbidelli\nTrial version', pg.Rect(1620, 0, 300, 100), "right")
         app.shader_program_2D.add(fps_counter)
         app.shader_program_2D.add(util_text)
 
