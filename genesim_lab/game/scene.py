@@ -7,8 +7,10 @@
 # Import packages ------------------------------|
 import pygame as pg
 from genesim_lab.game.settings import *
+from genesim_lab.game.surfaces import *
 from genesim_lab.meshes.quad_mesh import QuadMesh
 from genesim_lab.game.sprite import *
+from genesim_lab.game.shader_program import ShaderProgram
 
 
 # Main -----------------------------------------|
@@ -17,25 +19,21 @@ class Scene:
     def __init__(self, app):
         self.app = app
 
-        fps_counter = FpsSprite(app)
-        util_text = UtilityStaticText(app, 'Genesim Lab - version alpha\nAuthor: F. Morbidelli\nTrial version', pg.Rect(1620, 0, 300, 100), "right")
-        app.shader_prog_2D.utility.add(fps_counter)
-        app.shader_prog_2D.utility.add(util_text)
-
-        # Initialize main menu
+        # Initialize surfaces logic
+        self.surfaces = Surfaces(self.app)
 
         # Initialize quadrilateral
         self.quad = QuadMesh(self.app)
 
     def update(self):
-        pass
+        self.surfaces.update_current_scene()
+        self.app.shader_prog_3D.update()
         # Check current scene and render proper scene
         # Main menu
 
         # Main game
 
     def render(self):
-        # Render always active elements
-        self.app.shader_prog_2D.utility.draw2d()
+        self.surfaces.render_current_scene()
         # Render proper elements
         self.quad.render()

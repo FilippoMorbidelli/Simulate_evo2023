@@ -159,7 +159,7 @@ class FpsSprite(pg.sprite.Sprite):
         self.rect = pg.Rect(0, 0, 100, 100)
 
     def update(self, app):
-        if app.FPS_EVENT in [e.type for e in app.event_list]:
+        if app.custom_events.FPS_EVENT in [e.type for e in app.event_list]:
             self.image = pg.Surface((100, 100), pg.SRCALPHA, 32)
             self.image.blit(app.g_stg['util']['text_font'].render(f'{app.clock.get_fps() :.0f}',
                                                                   True, app.g_stg['util']['text_color']), (0, 0))

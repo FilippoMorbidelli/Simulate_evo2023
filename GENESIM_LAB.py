@@ -13,6 +13,7 @@ from genesim_lab.game.scene import Scene
 from genesim_lab.game.sprite import GLTextures2D
 from genesim_lab.game.surfaces import *
 from genesim_lab.game.shader_program import ShaderProgram
+from genesim_lab.game.events import *
 import moderngl as mgl
 import pygame as pg
 import sys
@@ -54,22 +55,16 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.is_running = True
 
         # Init scene and shader programs
-        self.surfaces = Surfaces(self)
-        self.shader_prog_2D = self.surfaces.init_shaders(self)
+        self.shader_prog_2D = init_shaders(self)
         self.shader_prog_3D = ShaderProgram(self)
         self.scene = Scene(self)
 
-        # FPS event to update it every second only
-        self.FPS_EVENT = pg.USEREVENT + 1
-        pg.time.set_timer(self.FPS_EVENT, 500)
-
-        # Instance event_list
+        # Init custom events and event list
+        self.custom_events = EventHandler(self)
         self.event_list = None
 
     def update(self):
         # Update 3D shaders 2D shaders and scene
-        self.shader_prog_3D.update()
-        self.shader_prog_2D.utility.update(app)
         self.scene.update()
 
         # Update time, delta_time
@@ -83,15 +78,11 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         pg.display.flip()
 
     def handle_events(self):
-        # Get all events
+        # Get all events each loop
         self.event_list = pg.event.get()
-        # Handle all events
-        for event in self.event_list:
-            # Secure "close game" event
-            if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_LALT and event.key == pg.K_F4):
-                self.is_running = False
-            # Quit game via button
-            #self.is_running = mouse_evt(event, pg.MOUSEBUTTONDOWN, 1, False)
+
+        # Check always functioning events (ALT+F4, ecc)
+        self.custom_events.check_events()
 
     def run(self):
         # Main game loop
