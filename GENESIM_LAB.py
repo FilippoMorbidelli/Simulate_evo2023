@@ -9,9 +9,10 @@ from genesim_lab.game.world import *
 
 from genesim_lab.game.settings import *
 from genesim_lab.game.events import *
-from genesim_lab.game.shader_program import ShaderProgram
 from genesim_lab.game.scene import Scene
 from genesim_lab.game.sprite import GLTextures2D
+from genesim_lab.game.surfaces import *
+from genesim_lab.game.shader_program import ShaderProgram
 import moderngl as mgl
 import pygame as pg
 import sys
@@ -52,9 +53,10 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         # Game is running?
         self.is_running = True
 
-        # Init shaders and scene
-        self.shader_program = ShaderProgram(self)
-        self.shader_program_2D = GLTextures2D(self)
+        # Init scene and shader programs
+        self.surfaces = Surfaces(self)
+        self.shader_prog_2D = self.surfaces.init_shaders(self)
+        self.shader_prog_3D = ShaderProgram(self)
         self.scene = Scene(self)
 
         # FPS event to update it every second only
@@ -66,8 +68,8 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
 
     def update(self):
         # Update 3D shaders 2D shaders and scene
-        self.shader_program.update()
-        self.shader_program_2D.update(app)
+        self.shader_prog_3D.update()
+        self.shader_prog_2D.utility.update(app)
         self.scene.update()
 
         # Update time, delta_time

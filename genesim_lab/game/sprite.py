@@ -122,18 +122,22 @@ class UtilityStaticText(pg.sprite.Sprite):
 
         # Extract each line and blit to surface
         for lines in collection:
-            for words in lines:
-                w_surf = app.g_stg['util']['text_font'].render(words, True, app.g_stg['util']['text_color'])
-                w_width, w_height = w_surf.get_size()
+            words = lines[0]
+            w_surf = app.g_stg['util']['text_font'].render(words, True, app.g_stg['util']['text_color'])
+            w_width, w_height = w_surf.get_size()
 
-                # adjust x blit position depending on line length
-                if align == "left":
-                    pass
-                elif align == "right":
-                    x -= w_width
-                elif align == "center":
-                    x -= w_width/2
-                self.image.blit(w_surf, (x, y))
+            # adjust x blit position depending on line length
+            if align == "left":
+                pass
+            elif align == "right":
+                x -= w_width
+            elif align == "center":
+                x -= w_width/2
+
+            # Blit line of text to surface
+            self.image.blit(w_surf, (x, y))
+
+            # Update blit x and y position for successive line
             if align == "left":
                 x = rect.topleft[0]
             elif align == "right":

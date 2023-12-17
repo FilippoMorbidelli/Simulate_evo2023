@@ -19,8 +19,8 @@ class Scene:
 
         fps_counter = FpsSprite(app)
         util_text = UtilityStaticText(app, 'Genesim Lab - version alpha\nAuthor: F. Morbidelli\nTrial version', pg.Rect(1620, 0, 300, 100), "right")
-        app.shader_program_2D.add(fps_counter)
-        app.shader_program_2D.add(util_text)
+        app.shader_prog_2D.utility.add(fps_counter)
+        app.shader_prog_2D.utility.add(util_text)
 
         # Initialize main menu
 
@@ -36,6 +36,6 @@ class Scene:
 
     def render(self):
         # Render always active elements
-        self.app.shader_program_2D.draw2d()
+        self.app.shader_prog_2D.utility.draw2d()
         # Render proper elements
         self.quad.render()

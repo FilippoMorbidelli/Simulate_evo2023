@@ -6,9 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/graphic_interface.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/game/scene.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/scene.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/game/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/sprite.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/quad_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/quad_mesh.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,9 +88,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/game/sprite.py</url>
-          <line>109</line>
-          <option name="timeStamp" value="4" />
+          <url>file://$PROJECT_DIR$/GENESIM_LAB.py</url>
+          <line>98</line>
+          <option name="timeStamp" value="5" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
