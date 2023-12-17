@@ -1,7 +1,7 @@
 # Evolution simulation project - shader_program module
 # Author: Filippo Morbidelli
 # Created on: 03/12/2023
-# Last update: 03/12/2023
+# Last update: 17/12/2023
 # Notes:
 
 # Import packages ------------------------------|
@@ -22,7 +22,7 @@ class ShaderProgram:
     def set_uniforms_on_init(self):
         pass
 
-    def update(self):
+    def update(self, *args):
         pass
 
     def get_program(self, shader_name):

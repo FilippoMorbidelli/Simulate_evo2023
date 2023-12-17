@@ -1,16 +1,14 @@
 # Evolution simulation project - GENESIM LAB v0.1
 # Author: Filippo Morbidelli
 # Created on: 31/07/2023
-# Last update: 14/12/2023
+# Last update: 17/12/2023
 # Notes: Main module to run simulation game
 
-# Import third party and game packages --------------|
+# Import third party and game packages ---------|
 from genesim_lab.game.world import *
-
 from genesim_lab.game.settings import *
 from genesim_lab.game.events import *
 from genesim_lab.game.scene import Scene
-from genesim_lab.game.sprite import GLTextures2D
 from genesim_lab.game.surfaces import *
 from genesim_lab.game.shader_program import ShaderProgram
 from genesim_lab.game.events import *
@@ -55,7 +53,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.is_running = True
 
         # Init scene and shader programs
-        self.shader_prog_2D = init_shaders(self)
+        self.shader_prog_2D = init_shaders_2d(self)
         self.shader_prog_3D = ShaderProgram(self)
         self.scene = Scene(self)
 

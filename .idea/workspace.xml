@@ -9,6 +9,7 @@
       <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/game/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/events.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/game/scene.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/scene.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/shader_program.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/shader_program.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/game/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/sprite.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" afterDir="false" />
     </list>

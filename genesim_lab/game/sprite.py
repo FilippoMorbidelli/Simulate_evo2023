@@ -7,9 +7,7 @@
 #        load a png/jpg as a surface to render.
 
 # Import packages ------------------------------|
-import pygame as pg
 import ctypes
-import moderngl as mgl
 from genesim_lab.game.settings import *
 
 
