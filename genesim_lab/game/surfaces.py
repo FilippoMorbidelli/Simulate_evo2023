@@ -24,15 +24,15 @@ class Surfaces:
             "Utility": True,
             "Main_game": True
         }
-        self.render = {
-            "Main_menu": self.app.shader_prog_2D.utility.draw2d,
-            "Utility": self.app.shader_prog_2D.utility.draw2d,
-            "Main_game": self.surf.main_game.quad.render
-        }
         self.update = {
             "Main_menu": self.app.shader_prog_2D.utility.update,
             "Utility": self.app.shader_prog_2D.utility.update,
             "Main_game": self.app.shader_prog_3D.update
+        }
+        self.render = {
+            "Main_menu": self.app.shader_prog_2D.utility.draw2d,
+            "Utility": self.app.shader_prog_2D.utility.draw2d,
+            "Main_game": self.surf.main_game.quad.render
         }
 
         # Init utility vision --> fps counter, version info
