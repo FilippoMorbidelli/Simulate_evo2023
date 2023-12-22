@@ -97,13 +97,14 @@ class ButtonSprite(pg.sprite.Sprite):
         self.image = self.button_F
         self.mask = pg.mask.from_surface(self.image)
         self.flag = self.mask.get_at(app.mouse)
+        self.name = f"button_{button}"
 
     def update(self, *args):
         pass
 
 
 class UtilityStaticText(pg.sprite.Sprite):
-    def __init__(self, app, text, rect=None, align="left"):
+    def __init__(self, app, name, text, rect=None, align="left"):
         super().__init__()
 
         # Generate context window
@@ -111,6 +112,7 @@ class UtilityStaticText(pg.sprite.Sprite):
         self.image = pg.Surface(self.rect.size, pg.SRCALPHA, 32)  # Surface on which sprite is blit on
         collection = [line.split('\n') for line in text.splitlines()]  # Get single lines from text
         x, y = rect.topleft  # Initial blit coordinates
+        self.name = name
 
         # adjust x blit position depending on align
         if align == "left":
@@ -157,6 +159,7 @@ class FpsSprite(pg.sprite.Sprite):
         self.image.blit(app.g_stg['util']['text_font'].render(f'{app.clock.get_fps() :.0f}',
                                                               True, app.g_stg['util']['text_color']), (0, 0))
         self.rect = pg.Rect(0, 0, 100, 100)
+        self.name = "fps_counter"
 
     def update(self, app):
         if app.custom_events.FPS_EVENT in [e.type for e in app.event_list]:

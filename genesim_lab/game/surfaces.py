@@ -20,19 +20,24 @@ class Surfaces:
 
         # Initialize flags and update/render for each scene
         self.flags = {  # Dictionary containing the scene flags
-            "Main_menu": True,
-            "Utility": True,
-            "Main_game": True
+            "main_menu": True,
+            "utility": True,
+            "main_game": False
+        }
+        self.handle = {
+            "main_menu": app.shader_prog_2D.main_menu,
+            "utility": app.shader_prog_2D.utility,
+            "main_game": None
         }
         self.update = {
-            "Main_menu": self.app.shader_prog_2D.main_menu.update,
-            "Utility": self.app.shader_prog_2D.utility.update,
-            "Main_game": self.app.shader_prog_3D.update
+            "main_menu": self.app.shader_prog_2D.main_menu.update,
+            "utility": self.app.shader_prog_2D.utility.update,
+            "main_game": self.app.shader_prog_3D.update
         }
         self.render = {
-            "Main_menu": self.app.shader_prog_2D.main_menu.draw2d,
-            "Utility": self.app.shader_prog_2D.utility.draw2d,
-            "Main_game": self.surf.main_game.quad.render
+            "main_menu": self.app.shader_prog_2D.main_menu.draw2d,
+            "utility": self.app.shader_prog_2D.utility.draw2d,
+            "main_game": self.surf.main_game.quad.render
         }
 
         # Init utility vision --> fps counter, version info
@@ -48,45 +53,36 @@ class Surfaces:
 
         return surf_group
 
+    def handle_current_scene(self):
+        self.active = [scene for scene, status in self.flags.items() if status is True]
+
     def update_current_scene(self):
-        self.active = [surf for surf, status in self.flags.items() if status is True]
-        for act_surf in self.active:
+        for act_surf in self.active:  # Search for active surface to update
             self.update[act_surf](self.app)
 
     def render_current_scene(self):
-        # Render always active elements
-        for act_surf in self.active:
+        for act_surf in self.active:  # Search for active surface to update
             self.render[act_surf]()
 
 
 class MainMenu:
 
     def __init__(self, app):
-        self.collide = None
-
         button_play = ButtonSprite(app, "main_menu", "play")
         app.shader_prog_2D.main_menu.add(button_play)
 
-    def check_events(self, app):
-        for sprite in app.shader_prog_2D.main_menu:
-            check_over = sprite.mask.get_at(app.mouse)
-            if sprite.flag != check_over:
-                sprite.flag = check_over
-                if sprite.flag:
-                    sprite.image = sprite.button_T  # Select sprite active
-                    pass  # check for mouse press
-                elif not sprite.flag:
-                    sprite.image = sprite.button_F  # Deselect sprite active
-            elif check_over:
-                pass  # check for mouse press
-            # Add check for scene active
+    def handle(self, sprite, event, app):
+        match sprite:
+            case "button_play":
+                if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                    app.scene.surfaces.flags["main_game"] = True
 
 
 class UtilityMenu:
 
     def __init__(self, app):
         fps_counter = FpsSprite(app)
-        util_text = UtilityStaticText(app, 'Genesim Lab - version alpha\nAuthor: F. Morbidelli\nTrial version',
+        util_text = UtilityStaticText(app, "version_info", 'Genesim Lab - version alpha\nAuthor: F. Morbidelli\nTrial version',
                                       pg.Rect(1620, 0, 300, 100), "right")
         app.shader_prog_2D.utility.add(fps_counter)
         app.shader_prog_2D.utility.add(util_text)

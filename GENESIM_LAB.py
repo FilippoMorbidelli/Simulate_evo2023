@@ -49,18 +49,20 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.delta_time = 0
         self.time = 0
 
+        # Keep track of mouse position
+        self.mouse = pg.mouse.get_pos()
+
         # Game is running?
         self.is_running = True
-
-        # Init custom events and event list and mouse position on screen
-        self.mouse = pg.mouse.get_pos()
-        self.custom_events = EventHandler(self)
-        self.event_list = None
 
         # Init scene and shader programs
         self.shader_prog_2D = init_shaders_2d(self)
         self.shader_prog_3D = ShaderProgram(self)
         self.scene = Scene(self)
+
+        # Init custom events and event list
+        self.custom_events = EventHandler(self)
+        self.event_list = None
 
     def update(self):
         # Update 3D shaders 2D shaders and scene
@@ -84,7 +86,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.event_list = pg.event.get()
 
         # Check always functioning events (ALT+F4, ecc)
-        self.custom_events.check_events()
+        self.custom_events.handle_events(self)
 
     def run(self):
         # Main game loop
