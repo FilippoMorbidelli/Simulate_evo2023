@@ -20,17 +20,17 @@ class Surfaces:
 
         # Initialize flags and update/render for each scene
         self.flags = {  # Dictionary containing the scene flags
-            "Main_menu": False,
+            "Main_menu": True,
             "Utility": True,
             "Main_game": True
         }
         self.update = {
-            "Main_menu": self.app.shader_prog_2D.utility.update,
+            "Main_menu": self.app.shader_prog_2D.main_menu.update,
             "Utility": self.app.shader_prog_2D.utility.update,
             "Main_game": self.app.shader_prog_3D.update
         }
         self.render = {
-            "Main_menu": self.app.shader_prog_2D.utility.draw2d,
+            "Main_menu": self.app.shader_prog_2D.main_menu.draw2d,
             "Utility": self.app.shader_prog_2D.utility.draw2d,
             "Main_game": self.surf.main_game.quad.render
         }
@@ -44,6 +44,7 @@ class Surfaces:
         # Initialize each surface alone
         surf_group.utility = UtilityMenu(self.app)
         surf_group.main_game = MainGame(self.app)
+        surf_group.main_menu = MainMenu(self.app)
 
         return surf_group
 
@@ -60,8 +61,25 @@ class Surfaces:
 
 class MainMenu:
 
-    def __init__(self):
-        pass
+    def __init__(self, app):
+        self.collide = None
+
+        button_play = ButtonSprite(app, "main_menu", "play")
+        app.shader_prog_2D.main_menu.add(button_play)
+
+    def check_events(self, app):
+        for sprite in app.shader_prog_2D.main_menu:
+            check_over = sprite.mask.get_at(app.mouse)
+            if sprite.flag != check_over:
+                sprite.flag = check_over
+                if sprite.flag:
+                    sprite.image = sprite.button_T  # Select sprite active
+                    pass  # check for mouse press
+                elif not sprite.flag:
+                    sprite.image = sprite.button_F  # Deselect sprite active
+            elif check_over:
+                pass  # check for mouse press
+            # Add check for scene active
 
 
 class UtilityMenu:

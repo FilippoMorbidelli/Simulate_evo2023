@@ -5,9 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Simulate_evo2023.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Simulate_evo2023.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_play_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_play_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/sprite.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

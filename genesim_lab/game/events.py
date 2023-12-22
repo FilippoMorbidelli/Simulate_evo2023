@@ -38,3 +38,9 @@ def mouse_evt(event, e_type, button, action, condition=True):
     # event.button = [1, 2, 3, 4, 5] == [left, middle, right, scroll up, scroll down]
     if event.type == e_type and event.button == button and condition:
         return action
+
+def button_evt(event, e_type, flag, collision_rect):
+    if collision_rect.colliderect(pg.mouse.get_pos()):
+        #
+        if event.type == e_type:
+            pass

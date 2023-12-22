@@ -88,16 +88,18 @@ class GLTextures2D(pg.sprite.Group):
 
 
 # 2D Sprite classes ----------------------------|
-class GenericSprite(pg.sprite.Sprite):
-    def __init__(self, app, image, dest=(0, 0)):
+class ButtonSprite(pg.sprite.Sprite):
+    def __init__(self, app, scene, button):
         super().__init__()
-        try:
-            self.image = pg.image.load(f'{image}.png').convert_alpha()
-        except:
-            self.image = pg.Surface((1920, 1080), pg.SRCALPHA)
-            self.image.blit(image, dest)
-            self.dest = dest
-        self.rect = self.image.get_rect(center=app.screen.get_rect().center)
+        self.rect = app.g_stg['window']['rect']  # Generate sprite rect from main window
+        self.button_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.svg').convert_alpha()
+        self.button_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.svg').convert_alpha()
+        self.image = self.button_F
+        self.mask = pg.mask.from_surface(self.image)
+        self.flag = self.mask.get_at(app.mouse)
+
+    def update(self, *args):
+        pass
 
 
 class UtilityStaticText(pg.sprite.Sprite):
