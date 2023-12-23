@@ -18,16 +18,17 @@ class Surfaces:
         self.surf = self.init_surfaces()
         self.active = None
 
-        # Initialize flags and update/render for each scene
-        self.flags = {  # Dictionary containing the scene flags
-            "main_menu": True,
-            "utility": True,
-            "main_game": False
+        # Init flags, handle, update and render for each scene
+        self.flags = {  # Dictionary containing the scene status flags
+            # Surface: [render, level, update]
+            "main_menu": [True, "Master", "Update"],
+            "utility": [True, "Secondary", "Update"],
+            "main_game": [False, "Null", "Frozen"]
         }
         self.handle = {
             "main_menu": app.shader_prog_2D.main_menu,
             "utility": app.shader_prog_2D.utility,
-            "main_game": None
+            "main_game": app.shader_prog_3D
         }
         self.update = {
             "main_menu": self.app.shader_prog_2D.main_menu.update,
@@ -54,15 +55,16 @@ class Surfaces:
         return surf_group
 
     def handle_current_scene(self):
-        self.active = [scene for scene, status in self.flags.items() if status is True]
+        self.active = [[scene, status] for scene, status in self.flags.items() if status[0] is True]
 
     def update_current_scene(self):
         for act_surf in self.active:  # Search for active surface to update
-            self.update[act_surf](self.app)
+            if act_surf[1][2]:
+                self.update[act_surf[0]](self.app)
 
     def render_current_scene(self):
         for act_surf in self.active:  # Search for active surface to update
-            self.render[act_surf]()
+            self.render[act_surf[0]]()
 
 
 class MainMenu:
@@ -70,12 +72,6 @@ class MainMenu:
     def __init__(self, app):
         button_play = ButtonSprite(app, "main_menu", "play")
         app.shader_prog_2D.main_menu.add(button_play)
-
-    def handle(self, sprite, event, app):
-        match sprite:
-            case "button_play":
-                if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                    app.scene.surfaces.flags["main_game"] = True
 
 
 class UtilityMenu:
