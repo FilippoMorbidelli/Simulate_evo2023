@@ -16,6 +16,10 @@ import moderngl as mgl
 import pygame as pg
 import sys
 
+import cProfile
+import pstats
+import io
+
 
 # Game start -----------------------------------|
 class BoxelEngine:  # Voxel engine inspired from Minecraft
@@ -95,10 +99,24 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
             self.update()
             self.render()
         pg.quit()
-        sys.exit()
+        sys.exit()  # Comment during profiling
+
+
+def profiling():
+    pr = cProfile.Profile()
+    pr.enable()
+    app.run()
+    pr.disable()
+    s = io.StringIO()
+    ps = pstats.Stats(pr, stream=s).sort_stats('tottime')
+    ps.print_stats()
+
+    with open('profiling/stats_23122023.txt', 'w+') as f:
+        f.write(s.getvalue())
 
 
 # Main ----------------------------------------------|
 if __name__ == '__main__':
     app = BoxelEngine()
     app.run()
+    # profiling()

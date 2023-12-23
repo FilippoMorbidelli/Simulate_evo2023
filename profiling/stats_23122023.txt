@@ -1,0 +1,96 @@
+         340293 function calls in 15.899 seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     2401   14.158    0.006   14.158    0.006 {method 'tick' of 'pygame.time.Clock' objects}
+     2401    0.423    0.000    0.423    0.000 {built-in method pygame.event.get}
+    10606    0.259    0.000    0.574    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:63(render)
+     2401    0.211    0.000    0.211    0.000 {built-in method pygame.display.flip}
+        1    0.163    0.163    0.163    0.163 {built-in method pygame.base.quit}
+    42424    0.106    0.000    0.132    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:60(convert_vertex)
+     2401    0.041    0.000   14.276    0.006 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\GENESIM_LAB.py:71(update)
+       41    0.034    0.001    0.034    0.001 {method 'convert_alpha' of 'pygame.surface.Surface' objects}
+     2401    0.034    0.000    0.103    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\events.py:44(handle_events)
+     3852    0.032    0.000    0.627    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:81(draw2d)
+       41    0.028    0.001    0.028    0.001 {method 'texture' of 'mgl.Context' objects}
+    11556    0.022    0.000    0.034    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:1141(render)
+    10606    0.020    0.000    0.020    0.000 {method 'write' of 'mgl.Buffer' objects}
+     9155    0.019    0.000    0.041    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\pygame\sprite.py:439(__iter__)
+     2401    0.019    0.000    0.033    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\events.py:25(find_active_sprite)
+     3852    0.019    0.000    0.051    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:85(update)
+     2401    0.018    0.000    0.901    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\GENESIM_LAB.py:82(render)
+     9155    0.016    0.000    0.016    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\pygame\sprite.py:381(sprites)
+     2401    0.016    0.000    0.542    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\GENESIM_LAB.py:88(handle_events)
+        1    0.016    0.016   15.899   15.899 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\GENESIM_LAB.py:95(run)
+     2401    0.015    0.000    0.015    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\surfaces.py:76(<listcomp>)
+     2401    0.015    0.000    0.031    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\surfaces.py:75(handle_current_scene)
+    10606    0.014    0.000    0.035    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:50(write)
+     2401    0.014    0.000    0.645    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\surfaces.py:83(render_current_scene)
+    42424    0.014    0.000    0.014    0.000 {method 'get_width' of 'pygame.surface.Surface' objects}
+    10606    0.013    0.000    0.023    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:704(use)
+    10606    0.013    0.000    0.077    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:52(get_texture)
+    42424    0.012    0.000    0.012    0.000 {method 'get_height' of 'pygame.surface.Surface' objects}
+    11556    0.012    0.000    0.012    0.000 {method 'render' of 'mgl.VertexArray' objects}
+     2401    0.012    0.000    0.012    0.000 {method 'clear' of 'mgl.Framebuffer' objects}
+     2401    0.012    0.000    0.063    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\surfaces.py:78(update_current_scene)
+    10606    0.010    0.000    0.010    0.000 {method 'use' of 'mgl.Texture' objects}
+     2401    0.010    0.000    0.016    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:164(update)
+     2401    0.009    0.000    0.022    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:1493(clear)
+     5792    0.007    0.000    0.007    0.000 {method 'get_at' of 'pygame.mask.Mask' objects}
+    10608    0.007    0.000    0.008    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:41(get_buffer)
+     2401    0.006    0.000    0.006    0.000 {built-in method pygame.mouse.get_pos}
+     2401    0.006    0.000    0.651    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\scene.py:27(render)
+    10606    0.006    0.000    0.008    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:46(get_vao)
+     9155    0.005    0.000    0.005    0.000 {built-in method builtins.iter}
+     2401    0.004    0.000    0.004    0.000 {built-in method pygame.time.get_ticks}
+       31    0.004    0.000    0.004    0.000 {method 'render' of 'pygame.font.Font' objects}
+     2401    0.004    0.000    0.067    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\scene.py:20(update)
+      952    0.003    0.000    0.003    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\events.py:91(quit_game_k)
+     2401    0.002    0.000    0.002    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:165(<listcomp>)
+     5804    0.002    0.000    0.002    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:102(update)
+     3353    0.002    0.000    0.002    0.000 {method 'items' of 'dict' objects}
+      950    0.002    0.000    0.004    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\meshes\base_mesh.py:33(render)
+     1071    0.001    0.000    0.001    0.000 {built-in method builtins.getattr}
+     2401    0.001    0.000    0.001    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:151(update)
+        2    0.001    0.000    0.001    0.000 {method 'program' of 'mgl.Context' objects}
+        4    0.001    0.000    0.001    0.000 {built-in method io.open}
+        2    0.000    0.000    0.000    0.000 {method 'buffer' of 'mgl.Context' objects}
+      950    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\shader_program.py:25(update)
+       41    0.000    0.000    0.029    0.001 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:1556(texture)
+       31    0.000    0.000    0.000    0.000 {method 'blit' of 'pygame.surface.Surface' objects}
+        4    0.000    0.000    0.000    0.000 {method 'read' of '_io.TextIOWrapper' objects}
+       41    0.000    0.000    0.000    0.000 {method 'get_buffer' of 'pygame.surface.Surface' objects}
+        4    0.000    0.000    0.000    0.000 {method '__exit__' of '_io._IOBase' objects}
+       41    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:642(swizzle)
+       81    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\events.py:82(change_scene)
+       47    0.000    0.000    0.000    0.000 {built-in method __new__ of type object at 0x00007FF9C8B1DF90}
+       41    0.000    0.000    0.000    0.000 {method 'get_size' of 'pygame.surface.Surface' objects}
+        2    0.000    0.000    0.000    0.000 {method 'vertex_array' of 'mgl.Context' objects}
+        2    0.000    0.000    0.002    0.001 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\sprite.py:29(get_program)
+       38    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\game\events.py:87(quit_game_m)
+        2    0.000    0.000    0.001    0.001 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:1678(program)
+        2    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:1638(_vertex_array)
+       31    0.000    0.000    0.000    0.000 {method 'get_fps' of 'pygame.time.Clock' objects}
+        2    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\_moderngl.py:319(make_uniform)
+        4    0.000    0.000    0.000    0.000 C:\Users\k1filo20\AppData\Local\Programs\Python\Python311\Lib\re\__init__.py:178(sub)
+        4    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\_moderngl.py:300(make_attribute)
+        4    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\_moderngl.py:617(resolve_includes)
+        2    0.000    0.000    0.001    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:1533(buffer)
+        2    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:1633(vertex_array)
+        4    0.000    0.000    0.000    0.000 C:\Users\k1filo20\AppData\Local\Programs\Python\Python311\Lib\encodings\cp1252.py:22(decode)
+        4    0.000    0.000    0.000    0.000 C:\Users\k1filo20\AppData\Local\Programs\Python\Python311\Lib\re\__init__.py:272(_compile)
+        4    0.000    0.000    0.000    0.000 {built-in method _codecs.charmap_decode}
+        4    0.000    0.000    0.000    0.000 {method 'sub' of 're.Pattern' objects}
+        6    0.000    0.000    0.000    0.000 {built-in method builtins.isinstance}
+        2    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\_moderngl.py:29(__init__)
+        4    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\_moderngl.py:6(__init__)
+        2    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:1647(<listcomp>)
+        6    0.000    0.000    0.000    0.000 {method 'get' of 'dict' objects}
+        4    0.000    0.000    0.000    0.000 <frozen codecs>:260(__init__)
+        3    0.000    0.000    0.000    0.000 {built-in method builtins.len}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+        2    0.000    0.000    0.000    0.000 C:\Users\k1filo20\Documents\venv_evolution\Lib\site-packages\moderngl\__init__.py:345(is_transform)
+        2    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
+
+
