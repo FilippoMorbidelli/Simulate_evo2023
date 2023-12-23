@@ -20,25 +20,40 @@ class Surfaces:
 
         # Init flags, handle, update and render for each scene
         self.flags = {  # Dictionary containing the scene status flags
-            # Surface: [render, level, update]
+            # Surface: render --> [True, False]
+            #          level  --> [Master, Secondary, Tertiary, None]
+            #          update --> [Update, Frozen, None]
             "main_menu": [True, "Master", "Update"],
             "utility": [True, "Secondary", "Update"],
-            "main_game": [False, "Null", "Frozen"]
+            "main_game": [False, None, None],
+            "saves_menu": [False, None, None],
+            "settings_menu": [False, None, None],
+            "pause_menu": [False, None, None],
+            "running": [1]
         }
         self.handle = {
             "main_menu": app.shader_prog_2D.main_menu,
             "utility": app.shader_prog_2D.utility,
-            "main_game": app.shader_prog_3D
+            "main_game": app.shader_prog_3D,
+            "saves_menu": app.shader_prog_2D.saves_menu,
+            "settings_menu": app.shader_prog_2D.settings_menu,
+            "pause_menu": app.shader_prog_2D.pause_menu
         }
         self.update = {
             "main_menu": self.app.shader_prog_2D.main_menu.update,
             "utility": self.app.shader_prog_2D.utility.update,
-            "main_game": self.app.shader_prog_3D.update
+            "main_game": self.app.shader_prog_3D.update,
+            "saves_menu": self.app.shader_prog_2D.saves_menu.update,
+            "settings_menu": self.app.shader_prog_2D.settings_menu.update,
+            "pause_menu": self.app.shader_prog_2D.pause_menu.update
         }
         self.render = {
             "main_menu": self.app.shader_prog_2D.main_menu.draw2d,
             "utility": self.app.shader_prog_2D.utility.draw2d,
-            "main_game": self.surf.main_game.quad.render
+            "main_game": self.surf.main_game.quad.render,
+            "saves_menu": self.app.shader_prog_2D.saves_menu.render,
+            "settings_menu": self.app.shader_prog_2D.settings_menu.render,
+            "pause_menu": self.app.shader_prog_2D.pause_menu.render
         }
 
         # Init utility vision --> fps counter, version info
@@ -51,6 +66,9 @@ class Surfaces:
         surf_group.utility = UtilityMenu(self.app)
         surf_group.main_game = MainGame(self.app)
         surf_group.main_menu = MainMenu(self.app)
+        surf_group.saves_menu = SavesMenu(self.app)
+        surf_group.settings_menu = SettingsMenu(self.app)
+        surf_group.pause_menu = PauseMenu(self.app)
 
         return surf_group
 
@@ -70,8 +88,19 @@ class Surfaces:
 class MainMenu:
 
     def __init__(self, app):
+        # Init each sprite for the main menu scene
+        # Play button
         button_play = ButtonSprite(app, "main_menu", "play")
         app.shader_prog_2D.main_menu.add(button_play)
+        # Continue button (with saves)
+        button_continue = ButtonSprite(app, "main_menu", "continue")
+        app.shader_prog_2D.main_menu.add(button_continue)
+        # Settings button
+        button_settings = ButtonSprite(app, "main_menu", "settings")
+        app.shader_prog_2D.main_menu.add(button_settings)
+        # Quit button
+        button_quit = ButtonSprite(app, "main_menu", "quit")
+        app.shader_prog_2D.main_menu.add(button_quit)
 
 
 class UtilityMenu:
@@ -86,7 +115,19 @@ class UtilityMenu:
 
 class PauseMenu:
 
-    def __init__(self):
+    def __init__(self, app):
+        pass
+
+
+class SavesMenu:
+
+    def __init__(self, app):
+        pass
+
+
+class SettingsMenu:
+
+    def __init__(self, app):
         pass
 
 
@@ -102,5 +143,8 @@ def init_shaders_2d(app):
     programs = type("Contains all subgroup related to same shader program", (), {})()
     programs.main_menu = GLTextures2D(app)
     programs.utility = GLTextures2D(app)
+    programs.pause_menu = GLTextures2D(app)
+    programs.settings_menu = GLTextures2D(app)
+    programs.saves_menu = GLTextures2D(app)
 
     return programs

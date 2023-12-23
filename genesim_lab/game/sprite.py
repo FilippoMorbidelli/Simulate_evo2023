@@ -92,11 +92,11 @@ class ButtonSprite(pg.sprite.Sprite):
     def __init__(self, app, scene, button):
         super().__init__()
         self.rect = app.g_stg['window']['rect']  # Generate sprite rect from main window
-        self.button_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.svg').convert_alpha()
-        self.button_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.svg').convert_alpha()
-        self.image = self.button_F
+        self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.svg').convert_alpha()
+        self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.svg').convert_alpha()
+        self.image = self.sprite_F
         self.mask = pg.mask.from_surface(self.image)
-        self.flag = self.mask.get_at(app.mouse)
+        self.flag = self.mask.get_at(app.mouse)  # Add check if mouse is over from start
         self.name = f"button_{button}"
 
     def update(self, *args):
