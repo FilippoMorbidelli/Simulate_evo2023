@@ -7,6 +7,11 @@
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_quit_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_quit_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_settings_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_settings_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/sprite.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,5 +93,12 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="self" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

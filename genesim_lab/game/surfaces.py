@@ -3,6 +3,7 @@
 # Created on: 03/12/2023
 # Last update: 17/12/2023
 # Notes: Handles main menu, settings, play and other menu
+import operator
 
 # Import packages ------------------------------|
 from genesim_lab.meshes.quad_mesh import QuadMesh
@@ -21,10 +22,10 @@ class Surfaces:
         # Init flags, handle, update and render for each scene
         self.flags = {  # Dictionary containing the scene status flags
             # Surface: render --> [True, False]
-            #          level  --> [Master, Secondary, Tertiary, None]
+            #          level  --> [1, 2, 3, ..., None]
             #          update --> [Update, Frozen, None]
-            "main_menu": [True, "Master", "Update"],
-            "utility": [True, "Secondary", "Update"],
+            "main_menu": [True, 1, "Update"],
+            "utility": [True, 5, "Update"],
             "main_game": [False, None, None],
             "saves_menu": [False, None, None],
             "settings_menu": [False, None, None],
@@ -51,9 +52,9 @@ class Surfaces:
             "main_menu": self.app.shader_prog_2D.main_menu.draw2d,
             "utility": self.app.shader_prog_2D.utility.draw2d,
             "main_game": self.surf.main_game.quad.render,
-            "saves_menu": self.app.shader_prog_2D.saves_menu.render,
-            "settings_menu": self.app.shader_prog_2D.settings_menu.render,
-            "pause_menu": self.app.shader_prog_2D.pause_menu.render
+            "saves_menu": self.app.shader_prog_2D.saves_menu.draw2d,
+            "settings_menu": self.app.shader_prog_2D.settings_menu.draw2d,
+            "pause_menu": self.app.shader_prog_2D.pause_menu.draw2d
         }
 
         # Init utility vision --> fps counter, version info
@@ -74,6 +75,7 @@ class Surfaces:
 
     def handle_current_scene(self):
         self.active = [[scene, status] for scene, status in self.flags.items() if status[0] is True]
+        self.active = sorted(self.active, key=lambda x: x[1][1])
 
     def update_current_scene(self):
         for act_surf in self.active:  # Search for active surface to update
@@ -116,7 +118,19 @@ class UtilityMenu:
 class PauseMenu:
 
     def __init__(self, app):
-        pass
+        # Init each sprite for the pause menu scene
+        # Return to main menu button
+        button_return_main = ButtonSprite(app, "pause_menu", "return_main")
+        app.shader_prog_2D.pause_menu.add(button_return_main)
+        # Save button
+        button_save = ButtonSprite(app, "pause_menu", "save")
+        app.shader_prog_2D.pause_menu.add(button_save)
+        # Settings button
+        button_settings = ButtonSprite(app, "pause_menu", "settings")
+        app.shader_prog_2D.pause_menu.add(button_settings)
+        # Quit button
+        button_quit = ButtonSprite(app, "pause_menu", "quit")
+        app.shader_prog_2D.pause_menu.add(button_quit)
 
 
 class SavesMenu:

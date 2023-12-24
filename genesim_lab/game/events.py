@@ -45,7 +45,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
         # Search for master scene and sprite on which mouse is currently over
         app.scene.surfaces.handle_current_scene()  # Extract active surfaces from flags
         for act_surf in app.scene.surfaces.active:  # Iter over all active surfaces
-            if act_surf[1][1] == "Master":  # Select master surface
+            if act_surf[1][1] == 1:  # Select master surface
                 scene = app.scene.surfaces.handle[act_surf[0]]  # Retrieve sprite group related to surface
                 self.master_scene = act_surf[0]  # Save master surface
                 self.find_active_sprite(app, scene)  # Find active sprite on scene
@@ -56,22 +56,42 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                 # Check always active and on condition events
                 for event in self.app.event_list:
                     for name, data in self.catalog["other"].items():  # Extract event data
-                        if self.app.scene.surfaces.flags[data[1][0]][data[1][1]] == data[1][2]:  # Condition validity
+                        if data[3][0]:
+                            pass
+                        else:
+                            self.catalog["other"][name][3][0] = True
+                            continue
+                        if isinstance(self.app.scene.surfaces.flags[data[1][0]][data[1][1]], data[1][2]):  # Condition validity
                             event_to_check = getattr(self.event_types, data[0])  # Get event type
-                            event_to_check(event, *data[2])  # search if event is present
+                            search = event_to_check(event, *data[2])  # search if event is present
+                            if search == "found":
+                                try:
+                                    self.catalog["other"][data[3][1]][3][0] = data[3][2]
+                                except:
+                                    pass
 
             case str():
                 # Check always active and on condition events
                 for event in self.app.event_list:
                     for name, data in self.catalog["other"].items():
-                        if self.app.scene.surfaces.flags[data[1][0]][data[1][1]] == data[1][2]:
+                        if data[3][0]:
+                            pass
+                        else:
+                            self.catalog["other"][name][3][0] = True
+                            continue
+                        if isinstance(self.app.scene.surfaces.flags[data[1][0]][data[1][1]], data[1][2]):
                             event_to_check = getattr(self.event_types, data[0])  # Get event type
-                            event_to_check(event, *data[2])  # search if event is present
+                            search = event_to_check(event, *data[2])  # search if event is present
+                            if search == "found":
+                                try:
+                                    self.catalog["other"][data[3][1]][3][0] = data[3][2]
+                                except:
+                                    pass
 
                     # check for action/event possible with active sprite
                     event_data = self.catalog[self.master_scene][self.active_sprite]  # Extract event data
                     event_to_check = getattr(self.event_types, event_data[0])  # Get event type
-                    event_to_check(event, *event_data[1])  # search if event is present
+                    search = event_to_check(event, *event_data[1])  # search if event is present
 
 
 # Single events --------------------------------|
@@ -79,18 +99,36 @@ class EventTypes:
     def __init__(self, app):
         self.app = app
 
-    def change_scene(self, event, etype, button, flag_name, flag_value):
+    def change_scene_m(self, event, etype, button, flag_name, flag_value):
         if event.type == etype and event.button == button:
             for action in range(len(flag_name)):
                 self.app.scene.surfaces.flags[flag_name[action]] = flag_value[action]
+            return "found"
+        else:
+            return "not found"
+
+    def change_scene_k(self, event, etype, key, flag_name, flag_value):
+        if event.type == etype and event.key == key:
+            for action in range(len(flag_name)):
+                self.app.scene.surfaces.flags[flag_name[action]] = flag_value[action]
+            return "found"
+        else:
+            return "not found"
+
 
     def quit_game_m(self, event, etype, button, flag_value):
         if event.type == etype and event.button == button or event.type == pg.QUIT:
             self.app.is_running = flag_value
+            return "found"
+        else:
+            return "not found"
 
     def quit_game_k(self, event, etype, key, flag_value):
         if event.type == etype and event.key == key or event.type == pg.QUIT:
             self.app.is_running = flag_value
+            return "found"
+        else:
+            return "not found"
 
     def add_secondary_scene(self, event, e_type, button, action, condition=True):
         # Handles mouse buttons events
@@ -102,34 +140,44 @@ class EventTypes:
 def events_catalog():
     catalog = {
         "other": {
-            # name = [handle type, [conditions], [event.type, event.key, flag_names, flag_values]]
-            "open_pause_menu": ["change_scene",
-                                ["main_game", 1, str()],
-                                [pg.KEYDOWN, pg.K_ESCAPE, ["main_game", "pause_menu"], [[True, "Secondary", "Frozen"],
-                                                                                        [True, "Master", "Update"]], ]],
-            "close_pause_menu": ["change_scene",
-                                 ["pause_menu", 0, True],
-                                 [pg.KEYDOWN, pg.K_ESCAPE, ["main_game", "pause_menu"], [[True, "Master", "Update"],
-                                                                                         [False, None, None]], ]],
+            # name = [handle type, ban event, [conditions], [event.type, event.key, flag_names, flag_values]]
+            "close_pause_menu": ["change_scene_k",
+                                 ["pause_menu", 1, int],
+                                 [pg.KEYDOWN, pg.K_ESCAPE, ["main_game", "pause_menu"], [[True, 1, "Update"],
+                                                                                         [False, None, None]], ],
+                                 [True, "open_pause_menu", False]],
+            "open_pause_menu": ["change_scene_k",
+                                ["main_game", 1, int],
+                                [pg.KEYDOWN, pg.K_ESCAPE, ["main_game", "pause_menu"], [[True, 2, "Frozen"],
+                                                                                        [True, 1, "Update"]], ],
+                                [True, "close_pause_menu", False]],
             "emergency_quit": ["quit_game_k",
-                               ["running", 0, 1],  # Trick to get always true condition
-                               [pg.KEYDOWN, [pg.K_LALT, pg.K_F4], False]]
+                               ["running", 0, int],  # Trick to get always true condition
+                               [pg.KEYDOWN, [pg.K_LALT, pg.K_F4], False],
+                               [True]],
         },
         "main_menu": {
             # sprite = [handle type,[event.type, event.button, flag_names, flag_values]]
-            "button_play": ["change_scene", [pg.MOUSEBUTTONDOWN, 1, ["main_game", "main_menu"],
-                                             [[True, "Master", "Update"], [False, None, None]], ], ],
-            "button_continue": ["change_scene", [pg.MOUSEBUTTONDOWN, 1, ["saves_menu", "main_menu"],
-                                                 [[True, "Master", "Update"], [False, None, None]], ], ],
-            "button_settings": ["change_scene", [pg.MOUSEBUTTONDOWN, 1, ["settings_menu", "main_menu"],
-                                                 [[True, "Master", "Update"], [False, None, None]], ], ],
+            "button_play": ["change_scene_m", [pg.MOUSEBUTTONDOWN, 1, ["main_game", "main_menu"],
+                                             [[True, 1, "Update"], [False, None, None]], ], ],
+            "button_continue": ["change_scene_m", [pg.MOUSEBUTTONDOWN, 1, ["saves_menu", "main_menu"],
+                                                 [[True, 1, "Update"], [False, None, None]], ], ],
+            "button_settings": ["change_scene_m", [pg.MOUSEBUTTONDOWN, 1, ["settings_menu", "main_menu"],
+                                                 [[True, 1, "Update"], [False, None, None]], ], ],
             # sprite = [handle type,[event.type, event.button, game_running]]
             "button_quit": ["quit_game_m", [pg.MOUSEBUTTONDOWN, 1, False]]
         },
         "pause_menu": {
             # sprite = [handle type,[event.type, event.button, flag_names, flag_values]]
-            "button_return_main": ["change_scene", [pg.MOUSEBUTTONDOWN, 1, ["pause_menu", "main_menu"],
-                                                    [[False, "Null", "Null"], [True, "Master", "Update"]], ], ]
+            "button_return_main": ["change_scene_m", [pg.MOUSEBUTTONDOWN, 1, ["pause_menu", "main_menu", "main_game"],
+                                                    [[False, None, None], [True, 1, "Update"], [False, None, None]], ], ],
+            "button_save": ["change_scene_m", [pg.MOUSEBUTTONDOWN, 1, ["saves_menu", "pause_menu"],
+                                                 [[True, 1, "Update"], [False, None, None]], ], ],
+            "button_settings": ["change_scene_m", [pg.MOUSEBUTTONDOWN, 1, ["settings_menu", "pause_menu"],
+                                                 [[True, 1, "Update"], [False, None, None]], ], ],
+            # sprite = [handle type,[event.type, event.button, game_running]]
+            "button_quit": ["quit_game_m", [pg.MOUSEBUTTONDOWN, 1, False]]
+
         },
     }
     return catalog
