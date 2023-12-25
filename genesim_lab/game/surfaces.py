@@ -3,7 +3,6 @@
 # Created on: 03/12/2023
 # Last update: 17/12/2023
 # Notes: Handles main menu, settings, play and other menu
-import operator
 
 # Import packages ------------------------------|
 from genesim_lab.meshes.quad_mesh import QuadMesh
@@ -46,7 +45,8 @@ class Surfaces:
             "main_game": self.app.shader_prog_3D.update,
             "saves_menu": self.app.shader_prog_2D.saves_menu.update,
             "settings_menu": self.app.shader_prog_2D.settings_menu.update,
-            "pause_menu": self.app.shader_prog_2D.pause_menu.update
+            "pause_menu": self.app.shader_prog_2D.pause_menu.update,
+            "player_control": self.app.player.update
         }
         self.render = {
             "main_menu": self.app.shader_prog_2D.main_menu.draw2d,
@@ -81,6 +81,9 @@ class Surfaces:
         for act_surf in self.active:  # Search for active surface to update
             if act_surf[1][2]:
                 self.update[act_surf[0]](self.app)
+        # Check if player should move, if not reset all
+        if self.flags['main_game'][1] == 1:
+            self.update['player_control']()
 
     def render_current_scene(self):
         for act_surf in self.active:  # Search for active surface to update

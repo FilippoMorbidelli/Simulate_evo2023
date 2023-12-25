@@ -8,8 +8,7 @@
 
 # Import packages ------------------------------|
 import ctypes
-from genesim_lab.game.settings import *
-
+import pygame as pg
 
 # Sprite shader program ------------------------|
 class GLTextures2D(pg.sprite.Group):

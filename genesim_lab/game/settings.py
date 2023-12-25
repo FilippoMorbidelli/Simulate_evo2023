@@ -54,21 +54,33 @@ def sim_settings():
     return settings
 
 
-def game_settings():
-    """ """
+pg.font.init()
 
-    settings = {
-        'window': {  # Game window
-            'h': 900,  # Height of window
-            'l': 1600,  # Length of window
-            'full_screen': True,  # Automatically opens game in full screen
-            'rect': None,  # Current rect of main window
-        },
-        'util': {  # Utilities
-            'fps_limit': 144,  # Limit frame rate to value
-            'text_font': pg.font.SysFont('Verdana', 16),  # Font and size for utility text
-            'text_color': (255, 255, 255),  # Color of displayed text
-        },
-    }
-
-    return settings
+game_stgs = {
+    'window': {  # Game window
+        'h': 900,  # Height of window
+        'l': 1600,  # Length of window
+        'full_screen': True,  # Automatically opens game in full screen
+        'rect': None,  # Current rect of main window
+    },
+    'camera': {  # Camera settings
+        'aspect_ratio': 1920/1080,  # Implement correct value not hard coded
+        'fov_deg': 50,  # Field of view degrees
+        'v_fov': glm.radians(50),  # Vertical FOV
+        'h_fov': 2 * math.atan(math.tan(50 * 0.5) * 1920/1080),  # Horizontal FOV
+        'near': 0.1,  # Near field
+        'far': 2000.0,  # Far field
+        'pitch_max': glm.radians(89),  # Max pitch of camera
+    },
+    'player': {  # Player settings
+        'speed': 0.005,  # Limit player speed to move around
+        'rot_speed': 0.003,  # Limit player speed to rotate
+        'pos': glm.vec3(0, 0, 1),  # Player initial position
+        'mouse_sensitivity': 0.002,  # Mouse sensitivity
+    },
+    'util': {  # Utilities
+        'fps_limit': 144,  # Limit frame rate to value
+        'text_font': pg.font.SysFont('Verdana', 16),  # Font and size for utility text
+        'text_color': (255, 255, 255),  # Color of displayed text
+    },
+}

@@ -5,13 +5,12 @@
 # Notes: Main module to run simulation game
 
 # Import third party and game packages ---------|
-from genesim_lab.game.world import *
-from genesim_lab.game.settings import *
-from genesim_lab.game.events import *
 from genesim_lab.game.scene import Scene
 from genesim_lab.game.surfaces import *
 from genesim_lab.game.shader_program import ShaderProgram
 from genesim_lab.game.events import *
+from genesim_lab.game.player import Player
+from genesim_lab.game.settings import *
 import moderngl as mgl
 import pygame as pg
 import sys
@@ -33,7 +32,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #
 
         # Initialize game settings
-        self.g_stg = game_settings()
+        self.g_stg = game_stgs
 
         # Set game window size (default: full screen)
         if self.g_stg['window']['full_screen']:
@@ -59,6 +58,9 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
 
         # Game is running?
         self.is_running = True
+
+        # Init player control (during main game as master only)
+        self.player = Player(self)
 
         # Init scene and shader programs
         self.shader_prog_2D = init_shaders_2d(self)
