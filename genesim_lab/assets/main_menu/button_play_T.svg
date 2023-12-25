@@ -24,9 +24,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#505050"
      inkscape:document-units="px"
-     inkscape:zoom="8.2747368"
-     inkscape:cx="352.94174"
-     inkscape:cy="165.98715"
+     inkscape:zoom="1.4627806"
+     inkscape:cx="392.74515"
+     inkscape:cy="145.27127"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="1912"
@@ -72,11 +72,11 @@
        id="linearGradient1"
        inkscape:collect="always">
       <stop
-         style="stop-color:#e44e2f;stop-opacity:1;"
-         offset="0.40000001"
+         style="stop-color:#e6833c;stop-opacity:1;"
+         offset="0.25"
          id="stop1" />
       <stop
-         style="stop-color:#a61c07;stop-opacity:1;"
+         style="stop-color:#f6400e;stop-opacity:1;"
          offset="1"
          id="stop4" />
     </linearGradient>
@@ -198,7 +198,7 @@
        style="opacity:1;fill:#006428;fill-opacity:1"
        transform="matrix(1.3229167,0,0,1.0230556,-10.583333,-1.5875)">
       <path
-         style="opacity:1;fill:url(#radialGradient6);fill-opacity:1;stroke-width:0.132291;stroke:none;stroke-opacity:1"
+         style="opacity:1;fill:url(#radialGradient6);fill-opacity:1;stroke:none;stroke-width:0.132291;stroke-opacity:1"
          id="rect1"
          width="60"
          height="15"
@@ -227,7 +227,7 @@
        id="g27"
        transform="translate(9.2606537,-14.155214)"
        inkscape:label="g27"
-       style="stroke-width:1.00012499;stroke-dasharray:none;fill:#000000;fill-opacity:1;stroke:#0e0c0d;stroke-opacity:1">
+       style="stroke-width:1.00012499;stroke-dasharray:none;fill:#0e0c0d;fill-opacity:1;stroke:#0e0c0d;stroke-opacity:1">
       <path
          id="path27"
          style="stroke:#0e0c0d;stroke-width:1.00012499;stroke-dasharray:none;fill:#0e0c0d;fill-opacity:1;stroke-opacity:1"

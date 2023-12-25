@@ -25,19 +25,20 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
     def find_active_sprite(self, app, scene):
         try:
             for sprite in scene:
-                try:
-                    check_over = sprite.mask.get_at(app.mouse)
-                except:
-                    break
-                if sprite.flag != check_over:
-                    sprite.flag = check_over
-                    if sprite.flag:
-                        sprite.image = sprite.sprite_T  # Select sprite active
-                        self.active_sprite = sprite.name  # Give sprite to event checker
-                        break  # Break current search since over sprite has been found
-                    elif not sprite.flag:
-                        sprite.image = sprite.sprite_F  # Deselect sprite active
-                        self.active_sprite = None  # No active over sprite
+                if sprite.flag:
+                    try:
+                        check_over = sprite.mask.get_at(app.mouse)
+                    except:
+                        break
+                    if sprite.over != check_over:
+                        sprite.over = check_over
+                        if sprite.over:
+                            sprite.image = sprite.sprite_T  # Select sprite active
+                            self.active_sprite = sprite.name  # Give sprite to event checker
+                            break  # Break current search since over sprite has been found
+                        elif not sprite.over:
+                            sprite.image = sprite.sprite_F  # Deselect sprite active
+                            self.active_sprite = None  # No active over sprite
         except:
             self.active_sprite = None
 
@@ -103,6 +104,7 @@ class EventTypes:
         if event.type == etype and event.button == button:
             for action in range(len(flag_name)):
                 self.app.scene.surfaces.flags[flag_name[action]] = flag_value[action]
+            self.app.custom_events.active_sprite = None  # Reset active sprite if scene is changed
             return "found"
         else:
             return "not found"
@@ -111,10 +113,10 @@ class EventTypes:
         if event.type == etype and event.key == key:
             for action in range(len(flag_name)):
                 self.app.scene.surfaces.flags[flag_name[action]] = flag_value[action]
+            self.app.custom_events.active_sprite = None  # Reset active sprite if scene is changed
             return "found"
         else:
             return "not found"
-
 
     def quit_game_m(self, event, etype, button, flag_value):
         if event.type == etype and event.button == button or event.type == pg.QUIT:

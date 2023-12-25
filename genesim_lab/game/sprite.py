@@ -88,16 +88,31 @@ class GLTextures2D(pg.sprite.Group):
 
 
 # 2D Sprite classes ----------------------------|
-class ButtonSprite(pg.sprite.Sprite):
-    def __init__(self, app, scene, button):
+class BackgroundSprite(pg.sprite.Sprite):
+    def __init__(self, app, scene, button, ext, flag):
         super().__init__()
         self.rect = app.g_stg['window']['rect']  # Generate sprite rect from main window
-        self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.svg').convert_alpha()
-        self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.svg').convert_alpha()
+        self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/background_{button}.{ext}').convert_alpha()
+        self.image = self.sprite
+        self.mask = pg.mask.from_surface(self.image)
+        self.name = f"background_{button}"
+        self.flag = flag  # Flag to determine if button is dynamic or not
+
+    def update(self, *args):
+        pass
+
+
+class ButtonSprite(pg.sprite.Sprite):
+    def __init__(self, app, scene, button, ext, flag):
+        super().__init__()
+        self.rect = app.g_stg['window']['rect']  # Generate sprite rect from main window
+        self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.{ext}').convert_alpha()
+        self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.{ext}').convert_alpha()
         self.image = self.sprite_F
         self.mask = pg.mask.from_surface(self.image)
-        self.flag = self.mask.get_at(app.mouse)  # Add check if mouse is over from start
+        self.over = self.mask.get_at(app.mouse)  # Add check if mouse is over from start
         self.name = f"button_{button}"
+        self.flag = flag  # Flag to determine if sprite is dynamic or not
 
     def update(self, *args):
         pass

@@ -5,9 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/background_logo.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_play_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_play_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/background_menu.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/background_menu.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_continue_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_continue_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_continue_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_continue_T.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_play_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_play_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_quit_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_quit_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_quit_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_quit_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_settings_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_settings_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_settings_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_settings_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/sprite.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.frag" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,17 +53,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;Python.GENESIM_LAB.executor&quot;: &quot;Run&quot;,
-    &quot;Python.events.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python.GENESIM_LAB.executor": "Run",
+    "Python.events.executor": "Debug",
+    "Python.sprite.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\profiling" />
