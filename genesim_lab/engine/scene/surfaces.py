@@ -5,7 +5,7 @@
 # Notes: Handles main menu, settings, play and other menu
 
 # Import packages ------------------------------|
-from genesim_lab.meshes.quad_mesh import QuadMesh
+from genesim_lab.engine.world_gen.chunk import Chunk
 from genesim_lab.engine.scene.sprite import *
 
 
@@ -51,7 +51,7 @@ class Surfaces:
         self.render = {
             "main_menu": self.app.shader_prog_2D.main_menu.draw2d,
             "utility": self.app.shader_prog_2D.utility.draw2d,
-            "main_game": self.surf.main_game.quad.render,
+            "main_game": self.surf.main_game.chunk.render,
             "saves_menu": self.app.shader_prog_2D.saves_menu.draw2d,
             "settings_menu": self.app.shader_prog_2D.settings_menu.draw2d,
             "pause_menu": self.app.shader_prog_2D.pause_menu.draw2d
@@ -162,7 +162,7 @@ class MainGame:
 
     def __init__(self, app):
         # Initialize quadrilateral
-        self.quad = QuadMesh(app)
+        self.chunk = Chunk(app)
 
 
 def init_shaders_2d(app):

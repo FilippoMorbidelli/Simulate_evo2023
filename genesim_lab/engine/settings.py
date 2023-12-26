@@ -9,6 +9,7 @@ import numpy as np
 import glm
 import math
 import pygame as pg
+from dataclasses import dataclass
 
 
 # Settings ------------------------------------------|
