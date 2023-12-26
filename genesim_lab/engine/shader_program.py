@@ -5,7 +5,7 @@
 # Notes:
 
 # Import packages ------------------------------|
-from genesim_lab.game.settings import *
+from genesim_lab.engine.settings import *
 
 
 # Main -----------------------------------------|

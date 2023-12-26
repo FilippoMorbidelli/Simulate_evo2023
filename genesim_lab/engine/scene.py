@@ -2,10 +2,10 @@
 # Author: Filippo Morbidelli
 # Created on: 03/12/2023
 # Last update: 17/12/2023
-# Notes: Contains all renders in the varius scenes (main menu, options, game, plot mode, ecc)
+# Notes: Contains all renders in the varius scenes (main menu, options, engine, plot mode, ecc)
 
 # Import packages ------------------------------|
-from genesim_lab.game.surfaces import *
+from genesim_lab.engine.surfaces import *
 
 
 # Main -----------------------------------------|
@@ -22,7 +22,7 @@ class Scene:
         # Check current scene and render proper scene
         # Main menu
 
-        # Main game
+        # Main engine
 
     def render(self):
         self.surfaces.render_current_scene()

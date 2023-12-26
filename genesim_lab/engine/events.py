@@ -102,18 +102,22 @@ class EventTypes:
 
     def change_scene_m(self, event, etype, button, flag_name, flag_value):
         if event.type == etype and event.button == button:
+            prev_status = self.app.scene.surfaces.flags['main_game'][1]  # Check state of main engine before change
             for action in range(len(flag_name)):
                 self.app.scene.surfaces.flags[flag_name[action]] = flag_value[action]
             self.app.custom_events.active_sprite = None  # Reset active sprite if scene is changed
+            reset_view(self.app, prev_status)
             return "found"
         else:
             return "not found"
 
     def change_scene_k(self, event, etype, key, flag_name, flag_value):
         if event.type == etype and event.key == key:
+            prev_status = self.app.scene.surfaces.flags['main_game'][1]  # Check state of main engine before change
             for action in range(len(flag_name)):
                 self.app.scene.surfaces.flags[flag_name[action]] = flag_value[action]
             self.app.custom_events.active_sprite = None  # Reset active sprite if scene is changed
+            reset_view(self.app, prev_status)
             return "found"
         else:
             return "not found"
@@ -183,3 +187,15 @@ def events_catalog():
         },
     }
     return catalog
+
+
+def reset_view(app, prev_status):
+    main_game_status = app.scene.surfaces.flags['main_game'][1]
+    if main_game_status == 1 and main_game_status != prev_status:
+        pg.mouse.set_visible(False)
+        pg.mouse.get_rel()
+    elif prev_status == 1 and main_game_status != prev_status:
+        pg.mouse.set_pos(app.screen.get_rect().center)
+        pg.mouse.set_visible(True)
+    elif main_game_status is None:
+        app.player.reset(app)

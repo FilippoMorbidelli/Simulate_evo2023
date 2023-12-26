@@ -3,7 +3,7 @@
 # Last update: 31/07/2023
 # Objectives:
 
-# Import third party and game packages---------------
+# Import third party and engine packages---------------
 import numpy as np
 import numpy.random as rnd
 

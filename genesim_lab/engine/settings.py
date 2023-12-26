@@ -3,7 +3,7 @@
 # Last update: 31/07/2023
 # Objectives:
 
-# Import third party and game packages --------------|
+# Import third party and engine packages --------------|
 from numba import njit
 import numpy as np
 import glm
@@ -60,7 +60,7 @@ game_stgs = {
     'window': {  # Game window
         'h': 900,  # Height of window
         'l': 1600,  # Length of window
-        'full_screen': True,  # Automatically opens game in full screen
+        'full_screen': True,  # Automatically opens engine in full screen
         'rect': None,  # Current rect of main window
     },
     'camera': {  # Camera settings

@@ -6,7 +6,7 @@
 
 # Import packages ------------------------------|
 import pygame as pg
-from genesim_lab.game.settings import *
+from genesim_lab.engine.settings import *
 
 
 # All surfaces ---------------------------------|
@@ -64,3 +64,15 @@ class Camera:
 
     def move_back(self, velocity):
         self.position -= self.forward * velocity
+
+    def reset_camera(self, position, yaw, pitch):
+        self.position = glm.vec3(position)
+        self.yaw = glm.radians(yaw)
+        self.pitch = glm.radians(pitch)
+
+        self.up = glm.vec3(0, 1, 0)
+        self.right = glm.vec3(1, 0, 0)
+        self.forward = glm.vec3(0, 0, -1)
+
+        self.m_proj = glm.perspective(game_stgs['camera']['v_fov'], game_stgs['camera']['aspect_ratio'], game_stgs['camera']['near'], game_stgs['camera']['far'])
+        self.m_view = glm.mat4()

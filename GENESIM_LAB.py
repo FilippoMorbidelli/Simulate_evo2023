@@ -2,15 +2,15 @@
 # Author: Filippo Morbidelli
 # Created on: 31/07/2023
 # Last update: 17/12/2023
-# Notes: Main module to run simulation game
+# Notes: Main module to run simulation engine
 
-# Import third party and game packages ---------|
-from genesim_lab.game.scene import Scene
-from genesim_lab.game.surfaces import *
-from genesim_lab.game.shader_program import ShaderProgram
-from genesim_lab.game.events import *
-from genesim_lab.game.player import Player
-from genesim_lab.game.settings import *
+# Import third party and engine packages ---------|
+from genesim_lab.engine.scene import Scene
+from genesim_lab.engine.surfaces import *
+from genesim_lab.engine.shader_program import ShaderProgram
+from genesim_lab.engine.events import *
+from genesim_lab.engine.player import Player
+from genesim_lab.engine.settings import *
 import moderngl as mgl
 import pygame as pg
 import sys
@@ -23,18 +23,18 @@ import io
 # Game start -----------------------------------|
 class BoxelEngine:  # Voxel engine inspired from Minecraft
 
-    def __init__(self):  # Initialize game
-        # Initialize game window
+    def __init__(self):  # Initialize engine
+        # Initialize engine window
         pg.init()
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)  # X. OpenGL version
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)  # .X OpenGL version
         pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)  #
         pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #
 
-        # Initialize game settings
+        # Initialize engine settings
         self.g_stg = game_stgs
 
-        # Set game window size (default: full screen)
+        # Set engine window size (default: full screen)
         if self.g_stg['window']['full_screen']:
             self.screen = pg.display.set_mode((0, 0), flags=pg.FULLSCREEN | pg.OPENGL | pg.DOUBLEBUF)
         else:
@@ -53,13 +53,15 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.delta_time = 0
         self.time = 0
 
-        # Keep track of mouse position
+        # Keep track of mouse positionand lock it inside screen
         self.mouse = pg.mouse.get_pos()
+        pg.event.set_grab(True)
+        self.mouse_visible = True
 
         # Game is running?
         self.is_running = True
 
-        # Init player control (during main game as master only)
+        # Init player control (during main engine as master only)
         self.player = Player(self)
 
         # Init scene and shader programs
@@ -96,7 +98,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.custom_events.handle_events(self)
 
     def run(self):
-        # Main game loop
+        # Main engine loop
         while self.is_running:
             self.handle_events()
             self.update()

@@ -6,7 +6,7 @@
 
 # Import packages ------------------------------|
 from genesim_lab.meshes.quad_mesh import QuadMesh
-from genesim_lab.game.sprite import *
+from genesim_lab.engine.sprite import *
 
 
 # All surfaces ---------------------------------|
@@ -81,7 +81,7 @@ class Surfaces:
         for act_surf in self.active:  # Search for active surface to update
             if act_surf[1][2]:
                 self.update[act_surf[0]](self.app)
-        # Check if player should move, if not reset all
+        # Check if player should move, if not reset all (TBD)
         if self.flags['main_game'][1] == 1:
             self.update['player_control']()
 

@@ -6,8 +6,8 @@
 
 # Import packages ------------------------------|
 import pygame as pg
-from genesim_lab.game.camera import *
-from genesim_lab.game.settings import *
+from genesim_lab.engine.camera import *
+from genesim_lab.engine.settings import *
 
 
 # All surfaces ---------------------------------|
@@ -44,3 +44,9 @@ class Player(Camera):
             self.move_up(vel)
         if key_state[pg.K_LCTRL]:
             self.move_down(vel)
+
+    def reset(self, app, position=game_stgs['player']['pos'], yaw=-90, pitch=0):
+        self.app = app
+        self.reset_camera(position=game_stgs['player']['pos'], yaw=-90, pitch=0)
+        #self.app.scene.surfaces.surf.main_game.quad['m_proj'].write(self.m_proj)
+        #self.app.scene.surfaces.surf.main_game.quad['m_model'].write(glm.mat4())
