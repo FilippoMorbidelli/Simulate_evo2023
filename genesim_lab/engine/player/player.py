@@ -5,8 +5,7 @@
 # Notes: Handles main menu, settings, play and other menu
 
 # Import packages ------------------------------|
-import pygame as pg
-from genesim_lab.engine.camera import *
+from genesim_lab.engine.player.camera import *
 from genesim_lab.engine.settings import *
 
 

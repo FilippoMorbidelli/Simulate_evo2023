@@ -1,4 +1,4 @@
-# Evolution simulation project - world generation module
+# Evolution simulation project - world_objects generation module
 # Author: Filippo Morbidelli
 # Created on: 20/11/2023
 # Last update: 20/11/2023

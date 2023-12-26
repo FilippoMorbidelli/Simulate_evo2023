@@ -1,8 +1,8 @@
-# Evolution simulation project - world generation module
+# Evolution simulation project - world_objects generation module
 # Author: Filippo Morbidelli
 # Created on: 20/11/2023
 # Last update: 20/11/2023
-# Notes: Contains the engine, engine start and world generation
+# Notes: Contains the engine, engine start and world_objects generation
 
 # Import packages ------------------------------|
 import numpy as np

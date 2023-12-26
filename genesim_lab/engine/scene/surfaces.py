@@ -6,7 +6,7 @@
 
 # Import packages ------------------------------|
 from genesim_lab.meshes.quad_mesh import QuadMesh
-from genesim_lab.engine.sprite import *
+from genesim_lab.engine.scene.sprite import *
 
 
 # All surfaces ---------------------------------|

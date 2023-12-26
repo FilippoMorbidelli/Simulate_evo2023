@@ -5,11 +5,11 @@
 # Notes: Main module to run simulation engine
 
 # Import third party and engine packages ---------|
-from genesim_lab.engine.scene import Scene
-from genesim_lab.engine.surfaces import *
-from genesim_lab.engine.shader_program import ShaderProgram
-from genesim_lab.engine.events import *
-from genesim_lab.engine.player import Player
+from genesim_lab.engine.scene.scene import Scene
+from genesim_lab.engine.scene.surfaces import *
+from genesim_lab.engine.world_gen.shader_program import ShaderProgram
+from genesim_lab.engine.scene.events import *
+from genesim_lab.engine.player.player import Player
 from genesim_lab.engine.settings import *
 import moderngl as mgl
 import pygame as pg

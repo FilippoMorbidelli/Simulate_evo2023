@@ -5,26 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh_builder.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk.frag" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/engine/player/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/engine/world_objects/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/camera.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/events.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/genetic_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/genetic_db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/life.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/life.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/player.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/resources.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/scene.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/shader_program.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/shader_program.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/sprite.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/surfaces.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/game/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/quad_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/quad_mesh.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/player/camera.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/genetic_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_objects/genetic_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/life.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_objects/life.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/player/player.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_objects/resources.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/scene.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/shader_program.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/shader_program.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/surfaces.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,13 +67,20 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/k1filo20/Documents/GitHub/Simulate_evo2023/genesim_lab/engine/world",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\world" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\profiling" />
-      <recent name="C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\game" />
+      <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\scene" />
+      <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\world_gen" />
+      <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\player" />
+      <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine" />
+      <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\management" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -111,15 +116,6 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/GENESIM_LAB.py</url>
-          <line>42</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="self" />

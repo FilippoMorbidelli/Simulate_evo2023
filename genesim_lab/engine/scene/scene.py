@@ -5,7 +5,7 @@
 # Notes: Contains all renders in the varius scenes (main menu, options, engine, plot mode, ecc)
 
 # Import packages ------------------------------|
-from genesim_lab.engine.surfaces import *
+from genesim_lab.engine.scene.surfaces import *
 
 
 # Main -----------------------------------------|

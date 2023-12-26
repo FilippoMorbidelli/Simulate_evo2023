@@ -5,5 +5,5 @@
 # Notes: Import all modules
 
 # Import all ----------------------------------|
-__all__ = ["life", "world", "resources", "settings", "genetic_db", "events",
-           "scene", "shader_program", "sprite", "surfaces"]
+__all__ = ["world_objects", "settings",
+           "scene", "sprite",]
