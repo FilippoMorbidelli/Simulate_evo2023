@@ -57,6 +57,12 @@ def sim_settings():
 pg.font.init()
 
 game_stgs = {
+    'world': {
+        'chunk_size': 32,
+        'h_chunk_size': 16,
+        'chunk_area': 32 * 32,
+        'chunk_vol': 32 * 32 * 32,
+    },
     'window': {  # Game window
         'h': 900,  # Height of window
         'l': 1600,  # Length of window
@@ -75,7 +81,7 @@ game_stgs = {
     'player': {  # Player settings
         'speed': 0.005,  # Limit player speed to move around
         'rot_speed': 0.003,  # Limit player speed to rotate
-        'pos': glm.vec3(0, 0, 1),  # Player initial position
+        'pos': glm.vec3(16, 32, 1.5 * 32),  # Player initial position
         'mouse_sensitivity': 0.002,  # Mouse sensitivity
     },
     'util': {  # Utilities
