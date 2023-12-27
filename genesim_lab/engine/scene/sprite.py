@@ -89,25 +89,39 @@ class GLTextures2D(pg.sprite.Group):
 
 
 # 2D Sprite classes ----------------------------|
-class BackgroundSprite(pg.sprite.Sprite):
-    def __init__(self, app, scene, button, ext, order, flag):
+class OverlaySprite(pg.sprite.Sprite):
+    def __init__(self, app, scene, name, ext, flag):
         super().__init__()
-        self.rect = app.g_stg['window']['rect']  # Generate sprite rect from main window
+        self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/overlay_{name}.{ext}').convert_alpha()
+        self.rect = self.sprite.get_rect(center=app.stg.window.rect.center)  # Generate sprite rect from main window
+        #self.sprite.get_rect(center=self.rect.center)
+        self.image = self.sprite
+        self.mask = pg.mask.from_surface(self.image)
+        self.name = f"overlay_{name}"
+        self.flag = flag  # Flag to determine if button is dynamic or not
+
+    def update(self, *args):
+        pass
+
+
+class BackgroundSprite(pg.sprite.Sprite):
+    def __init__(self, app, scene, button, ext, flag):
+        super().__init__()
+        self.rect = app.stg.window.rect  # Generate sprite rect from main window
         self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/background_{button}.{ext}').convert_alpha()
         self.image = self.sprite
         self.mask = pg.mask.from_surface(self.image)
         self.name = f"background_{button}"
         self.flag = flag  # Flag to determine if button is dynamic or not
-        self.z_order = float(f'0.{order}')
 
     def update(self, *args):
         pass
 
 
 class ButtonSprite(pg.sprite.Sprite):
-    def __init__(self, app, scene, button, ext, order, flag):
+    def __init__(self, app, scene, button, ext, flag):
         super().__init__()
-        self.rect = app.g_stg['window']['rect']  # Generate sprite rect from main window
+        self.rect = app.stg.window.rect  # Generate sprite rect from main window
         self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.{ext}').convert_alpha()
         self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.{ext}').convert_alpha()
         self.image = self.sprite_F
@@ -115,23 +129,21 @@ class ButtonSprite(pg.sprite.Sprite):
         self.over = self.mask.get_at(app.mouse)  # Add check if mouse is over from start
         self.name = f"button_{button}"
         self.flag = flag  # Flag to determine if sprite is dynamic or not
-        self.z_order = float(f'1.{order}')
 
     def update(self, *args):
         pass
 
 
 class UtilityStaticText(pg.sprite.Sprite):
-    def __init__(self, app, name, text, order, rect=None, align="left"):
+    def __init__(self, app, name, text, rect=None, align="left"):
         super().__init__()
 
         # Generate context window
-        self.rect = app.g_stg['window']['rect']  # Generate sprite rect from main window
+        self.rect = app.stg.window.rect  # Generate sprite rect from main window
         self.image = pg.Surface(self.rect.size, pg.SRCALPHA, 32)  # Surface on which sprite is blit on
         collection = [line.split('\n') for line in text.splitlines()]  # Get single lines from text
         x, y = rect.topleft  # Initial blit coordinates
         self.name = name
-        self.z_order = float(f'2.{order}')
 
         # adjust x blit position depending on align
         if align == "left":
@@ -144,7 +156,7 @@ class UtilityStaticText(pg.sprite.Sprite):
         # Extract each line and blit to surface
         for lines in collection:
             words = lines[0]
-            w_surf = app.g_stg['util']['text_font'].render(words, True, app.g_stg['util']['text_color'])
+            w_surf = app.stg.util.text_font.render(words, True, app.stg.util.text_color)
             w_width, w_height = w_surf.get_size()
 
             # adjust x blit position depending on line length
@@ -175,14 +187,13 @@ class FpsSprite(pg.sprite.Sprite):
     def __init__(self, app):
         super().__init__()
         self.image = pg.Surface((100, 100), pg.SRCALPHA, 32)
-        self.image.blit(app.g_stg['util']['text_font'].render(f'{app.clock.get_fps() :.0f}',
-                                                              True, app.g_stg['util']['text_color']), (0, 0))
+        self.image.blit(app.stg.util.text_font.render(f'{app.clock.get_fps() :.0f}',
+                                                              True, app.stg.util.text_color), (0, 0))
         self.rect = pg.Rect(0, 0, 100, 100)
         self.name = "fps_counter"
-        self.z_order = 2.0
 
     def update(self, app):
         if app.custom_events.FPS_EVENT in [e.type for e in app.event_list]:
             self.image = pg.Surface((100, 100), pg.SRCALPHA, 32)
-            self.image.blit(app.g_stg['util']['text_font'].render(f'{app.clock.get_fps() :.0f}',
-                                                                  True, app.g_stg['util']['text_color']), (0, 0))
+            self.image.blit(app.stg.util.text_font.render(f'{app.clock.get_fps() :.0f}',
+                                                                  True, app.stg.util.text_color), (0, 0))

@@ -11,6 +11,7 @@ from genesim_lab.engine.world_gen.shader_program import ShaderProgram
 from genesim_lab.engine.scene.events import *
 from genesim_lab.engine.player.player import Player
 from genesim_lab.engine.settings import *
+from genesim_lab.engine.world_gen.textures import Textures
 import moderngl as mgl
 import pygame as pg
 import sys
@@ -32,17 +33,17 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #
 
         # Initialize engine settings
-        self.g_stg = game_stgs
+        self.stg = GameSettings()
 
         # Set engine window size (default: full screen)
-        if self.g_stg['window']['full_screen']:
+        if self.stg.window.full_screen:
             self.screen = pg.display.set_mode((0, 0), flags=pg.FULLSCREEN | pg.OPENGL | pg.DOUBLEBUF)
         else:
-            self.screen = pg.display.set_mode((self.g_stg['window']['l'], self.g_stg['window']['h']),
+            self.screen = pg.display.set_mode((self.stg.window.l, self.stg.window.h),
                                               flags=pg.OPENGL | pg.DOUBLEBUF)
-        self.g_stg['window']['rect'] = self.screen.get_rect()  # Get current rect of main window
+        self.stg.window.rect = self.screen.get_rect()  # Get current rect of main window
 
-        # Call context for ModernGL
+        # Call contexts for ModernGL
         self.ctx = mgl.create_context()
         self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.CULL_FACE | mgl.BLEND)
         self.ctx.gc_mode = 'auto'  # Garbage collection
@@ -64,6 +65,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.player = Player(self)
 
         # Init scene and shader programs
+        self.textures = Textures(self)
         self.shader_prog_2D = init_shaders_2d(self)
         self.shader_prog_3D = ShaderProgram(self)
         self.scene = Scene(self)
@@ -77,7 +79,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.scene.update()
 
         # Update time, delta_time
-        self.delta_time = self.clock.tick(self.g_stg['util']['fps_limit'])
+        self.delta_time = self.clock.tick(self.stg.util.fps_limit)
         self.time = pg.time.get_ticks() * 0.001
 
         # Update mouse position
@@ -103,7 +105,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
             self.update()
             self.render()
         pg.quit()
-        sys.exit()  # Comment during profiling
+        #sys.exit()  # Comment during profiling
 
 
 def profiling():
@@ -115,12 +117,12 @@ def profiling():
     ps = pstats.Stats(pr, stream=s).sort_stats('tottime')
     ps.print_stats()
 
-    with open('profiling/stats_24122023_1.txt', 'w+') as f:
+    with open('profiling/stats_27122023_1.txt', 'w+') as f:
         f.write(s.getvalue())
 
 
 # Main ----------------------------------------------|
 if __name__ == '__main__':
     app = BoxelEngine()
-    app.run()
-    # profiling()
+    #app.run()
+    profiling()

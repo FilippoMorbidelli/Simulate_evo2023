@@ -34,7 +34,7 @@ class Surfaces:
         self.handle = {
             "main_menu": app.shader_prog_2D.main_menu,
             "utility": app.shader_prog_2D.utility,
-            "main_game": app.shader_prog_3D,
+            "main_game": self.surf.main_game.handle,
             "saves_menu": app.shader_prog_2D.saves_menu,
             "settings_menu": app.shader_prog_2D.settings_menu,
             "pause_menu": app.shader_prog_2D.pause_menu
@@ -42,7 +42,7 @@ class Surfaces:
         self.update = {
             "main_menu": self.app.shader_prog_2D.main_menu.update,
             "utility": self.app.shader_prog_2D.utility.update,
-            "main_game": self.app.shader_prog_3D.update,
+            "main_game": self.surf.main_game.update,
             "saves_menu": self.app.shader_prog_2D.saves_menu.update,
             "settings_menu": self.app.shader_prog_2D.settings_menu.update,
             "pause_menu": self.app.shader_prog_2D.pause_menu.update,
@@ -51,7 +51,7 @@ class Surfaces:
         self.render = {
             "main_menu": self.app.shader_prog_2D.main_menu.draw2d,
             "utility": self.app.shader_prog_2D.utility.draw2d,
-            "main_game": self.surf.main_game.chunk.render,
+            "main_game": self.surf.main_game.render,
             "saves_menu": self.app.shader_prog_2D.saves_menu.draw2d,
             "settings_menu": self.app.shader_prog_2D.settings_menu.draw2d,
             "pause_menu": self.app.shader_prog_2D.pause_menu.draw2d
@@ -97,23 +97,23 @@ class MainMenu:
         # Load first backgrounds and then foremost sprites, defining the z order
 
         # Background menu button
-        background_menu = BackgroundSprite(app, "main_menu", "menu",  "svg", 1, False)
+        background_menu = BackgroundSprite(app, "main_menu", "menu",  "svg", False)
         app.shader_prog_2D.main_menu.add(background_menu)
         # Background team logo button
-        background_logo = BackgroundSprite(app, "main_menu", "logo", "svg", 2, False)
+        background_logo = BackgroundSprite(app, "main_menu", "logo", "svg", False)
         app.shader_prog_2D.main_menu.add(background_logo)
 
         # Play button
-        button_play = ButtonSprite(app, "main_menu", "play", "svg", 1, True)
+        button_play = ButtonSprite(app, "main_menu", "play", "svg", True)
         app.shader_prog_2D.main_menu.add(button_play)
         # Continue button (with saves)
-        button_continue = ButtonSprite(app, "main_menu", "continue", "svg", 2, True)
+        button_continue = ButtonSprite(app, "main_menu", "continue", "svg", True)
         app.shader_prog_2D.main_menu.add(button_continue)
         # Settings button
-        button_settings = ButtonSprite(app, "main_menu", "settings", "svg", 3, True)
+        button_settings = ButtonSprite(app, "main_menu", "settings", "svg", True)
         app.shader_prog_2D.main_menu.add(button_settings)
         # Quit button
-        button_quit = ButtonSprite(app, "main_menu", "quit", "svg", 4, True)
+        button_quit = ButtonSprite(app, "main_menu", "quit", "svg", True)
         app.shader_prog_2D.main_menu.add(button_quit)
 
 
@@ -121,7 +121,7 @@ class UtilityMenu:
 
     def __init__(self, app):
         fps_counter = FpsSprite(app)
-        util_text = UtilityStaticText(app, "version_info", 'Genesim Lab - version alpha\nAuthor: F. Morbidelli\nTrial version', 1,
+        util_text = UtilityStaticText(app, "version_info", 'Genesim Lab - version alpha\nAuthor: F. Morbidelli\nTrial version',
                                       pg.Rect(1620, 0, 300, 100), "right")
         app.shader_prog_2D.utility.add(fps_counter)
         app.shader_prog_2D.utility.add(util_text)
@@ -132,20 +132,20 @@ class PauseMenu:
     def __init__(self, app):
         # Init each sprite for the pause menu scene
         # Background transparent window button
-        background_window = BackgroundSprite(app, "pause_menu", "window", "svg", 1, False)
+        background_window = BackgroundSprite(app, "pause_menu", "window", "svg", False)
         app.shader_prog_2D.pause_menu.add(background_window)
 
         # Return to main menu button
-        button_return_main = ButtonSprite(app, "pause_menu", "return_main", "svg", 1, True)
+        button_return_main = ButtonSprite(app, "pause_menu", "return_main", "svg", True)
         app.shader_prog_2D.pause_menu.add(button_return_main)
         # Save button
-        button_save = ButtonSprite(app, "pause_menu", "save", "svg", 2, True)
+        button_save = ButtonSprite(app, "pause_menu", "save", "svg", True)
         app.shader_prog_2D.pause_menu.add(button_save)
         # Settings button
-        button_settings = ButtonSprite(app, "pause_menu", "settings", "svg", 3, True)
+        button_settings = ButtonSprite(app, "pause_menu", "settings", "svg", True)
         app.shader_prog_2D.pause_menu.add(button_settings)
         # Quit button
-        button_quit = ButtonSprite(app, "pause_menu", "quit", "svg", 4, True)
+        button_quit = ButtonSprite(app, "pause_menu", "quit", "svg", True)
         app.shader_prog_2D.pause_menu.add(button_quit)
 
 
@@ -164,8 +164,27 @@ class SettingsMenu:
 class MainGame:
 
     def __init__(self, app):
-        # Initialize quadrilateral
+        self.app = app
+
+        # Init background
+
+        # Initialize 3D graphic elements
         self.chunk = Chunk(app)
+        # Init overlay elements
+        #overlay_crosshair = OverlaySprite(app, "main_game", "crosshair", "svg", True)
+        #app.shader_prog_2D.main_game.add(overlay_crosshair)
+
+    def handle(self):
+        self.app.shader_prog_3D()
+        self.app.shader_prog_2D.main_game()
+
+    def update(self, app):
+        self.app.shader_prog_3D.update()
+        self.app.shader_prog_2D.main_game.update(app)
+
+    def render(self):
+        self.chunk.render()
+        self.app.shader_prog_2D.main_game.draw2d()
 
 
 def init_shaders_2d(app):
@@ -176,5 +195,6 @@ def init_shaders_2d(app):
     programs.pause_menu = GLTextures2D(app)
     programs.settings_menu = GLTextures2D(app)
     programs.saves_menu = GLTextures2D(app)
+    programs.main_game = GLTextures2D(app)
 
     return programs

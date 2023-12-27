@@ -91,3 +91,54 @@ game_stgs = {
         'text_color': (255, 255, 255),  # Color of displayed text
     },
 }
+
+
+@dataclass(slots=True)
+class World:
+    chunk_size: float = 32
+    h_chunk_size: float = chunk_size / 2
+    chunk_area: float = chunk_size ** 2
+    chunk_vol: float = chunk_size ** 3
+
+
+@dataclass(slots=True)
+class Window:
+    h: int = 900  # Height of window
+    l: int = 1600  # Length of window
+    full_screen: bool = True  # Automatically opens engine in full screen
+    rect: pg.Rect = None  # Current rect of main window
+
+
+@dataclass(slots=True)
+class CameraData:
+    aspect_ratio: float = 1920/1080  # Implement correct value not hard coded
+    fov_deg: float = 50  # Field of view degrees
+    v_fov: float = glm.radians(fov_deg)  # Vertical FOV
+    h_fov: float = 2 * math.atan(math.tan(fov_deg * 0.5) * aspect_ratio)  # Horizontal FOV
+    near: float = 0.1  # Near field
+    far: float = 2000.0  # Far field
+    pitch_max: float = glm.radians(89)  # Max pitch of camera
+
+
+@dataclass(slots=True)
+class PlayerData:
+    speed: float = 0.005  # Limit player speed to move around
+    rot_speed: float = 0.003  # Limit player speed to rotate
+    pos: float = glm.vec3(16, 32, 1.5 * 32)  # Player initial position
+    mouse_sensitivity: float = 0.002  # Mouse sensitivity
+
+
+@dataclass(slots=True)
+class Util:
+    fps_limit: int = 144  # Limit frame rate to value
+    text_font: pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
+    text_color: tuple = (255, 255, 255)  # Color of displayed text
+
+
+@dataclass(slots=True)
+class GameSettings:
+    world = World()
+    window = Window()
+    camera = CameraData()
+    player = PlayerData()
+    util = Util()
