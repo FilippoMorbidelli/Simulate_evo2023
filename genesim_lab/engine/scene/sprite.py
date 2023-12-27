@@ -10,6 +10,7 @@
 import ctypes
 import pygame as pg
 
+
 # Sprite shader program ------------------------|
 class GLTextures2D(pg.sprite.Group):
 
@@ -40,6 +41,7 @@ class GLTextures2D(pg.sprite.Group):
     def get_buffer(self):
         if self.gl_buffer is None:
             self.gl_buffer = self.gl_context.buffer(None, reserve=6 * 4 * 4)
+            self.gl_buffer.ctx.fbo.depth_mask = False
         return self.gl_buffer
 
     def get_vao(self):
@@ -88,7 +90,7 @@ class GLTextures2D(pg.sprite.Group):
 
 # 2D Sprite classes ----------------------------|
 class BackgroundSprite(pg.sprite.Sprite):
-    def __init__(self, app, scene, button, ext, flag):
+    def __init__(self, app, scene, button, ext, order, flag):
         super().__init__()
         self.rect = app.g_stg['window']['rect']  # Generate sprite rect from main window
         self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/background_{button}.{ext}').convert_alpha()
@@ -96,13 +98,14 @@ class BackgroundSprite(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.name = f"background_{button}"
         self.flag = flag  # Flag to determine if button is dynamic or not
+        self.z_order = float(f'0.{order}')
 
     def update(self, *args):
         pass
 
 
 class ButtonSprite(pg.sprite.Sprite):
-    def __init__(self, app, scene, button, ext, flag):
+    def __init__(self, app, scene, button, ext, order, flag):
         super().__init__()
         self.rect = app.g_stg['window']['rect']  # Generate sprite rect from main window
         self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.{ext}').convert_alpha()
@@ -112,13 +115,14 @@ class ButtonSprite(pg.sprite.Sprite):
         self.over = self.mask.get_at(app.mouse)  # Add check if mouse is over from start
         self.name = f"button_{button}"
         self.flag = flag  # Flag to determine if sprite is dynamic or not
+        self.z_order = float(f'1.{order}')
 
     def update(self, *args):
         pass
 
 
 class UtilityStaticText(pg.sprite.Sprite):
-    def __init__(self, app, name, text, rect=None, align="left"):
+    def __init__(self, app, name, text, order, rect=None, align="left"):
         super().__init__()
 
         # Generate context window
@@ -127,6 +131,7 @@ class UtilityStaticText(pg.sprite.Sprite):
         collection = [line.split('\n') for line in text.splitlines()]  # Get single lines from text
         x, y = rect.topleft  # Initial blit coordinates
         self.name = name
+        self.z_order = float(f'2.{order}')
 
         # adjust x blit position depending on align
         if align == "left":
@@ -174,6 +179,7 @@ class FpsSprite(pg.sprite.Sprite):
                                                               True, app.g_stg['util']['text_color']), (0, 0))
         self.rect = pg.Rect(0, 0, 100, 100)
         self.name = "fps_counter"
+        self.z_order = 2.0
 
     def update(self, app):
         if app.custom_events.FPS_EVENT in [e.type for e in app.event_list]:

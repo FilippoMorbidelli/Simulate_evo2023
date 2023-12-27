@@ -5,6 +5,7 @@
 
 in vec2 in_position;
 in vec2 in_uv;
+
 out vec2 v_uv;
 
 void main()

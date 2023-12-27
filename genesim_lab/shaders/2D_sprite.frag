@@ -3,13 +3,15 @@
 #extension GL_ARB_separate_shader_objects : require
 #extension GL_ARB_explicit_uniform_location : require
 
-out vec4 fragColor;
-uniform sampler2D u_texture;
 in vec2 v_uv;
+
+uniform sampler2D u_texture;
+
+out vec4 fragColor;
 
 void main()
 {
     fragColor = texture(u_texture, v_uv);
-    if(fragColor.a < 0.01)
+    if(fragColor.a == 0)
         discard;
 }

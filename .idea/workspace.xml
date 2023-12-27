@@ -6,14 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/sprite.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/surfaces.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/shader_program.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/shader_program.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh_builder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.vert" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +52,7 @@
   "keyToString": {
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "Python.GENESIM_LAB.executor": "Run",
-    "Python.events.executor": "Debug",
+    "Python.events.executor": "Run",
     "Python.player.executor": "Debug",
     "Python.settings.executor": "Run",
     "Python.sprite.executor": "Run",
@@ -110,6 +108,15 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/genesim_lab/engine/scene/events.py</url>
+          <line>95</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="self" />

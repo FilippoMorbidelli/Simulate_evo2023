@@ -46,7 +46,6 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.ctx = mgl.create_context()
         self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.CULL_FACE | mgl.BLEND)
         self.ctx.gc_mode = 'auto'  # Garbage collection
-        #self.ctx.depth_func = "1"
 
         # Keep track of time and delta_time
         self.clock = pg.time.Clock()
