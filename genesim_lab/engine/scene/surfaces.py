@@ -171,8 +171,8 @@ class MainGame:
         # Initialize 3D graphic elements
         self.chunk = Chunk(app)
         # Init overlay elements
-        #overlay_crosshair = OverlaySprite(app, "main_game", "crosshair", "svg", True)
-        #app.shader_prog_2D.main_game.add(overlay_crosshair)
+        overlay_crosshair = OverlaySprite(app, "main_game", "crosshair", "svg", True)
+        app.shader_prog_2D.main_game.add(overlay_crosshair)
 
     def handle(self):
         self.app.shader_prog_3D()

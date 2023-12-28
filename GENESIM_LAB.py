@@ -105,7 +105,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
             self.update()
             self.render()
         pg.quit()
-        #sys.exit()  # Comment during profiling
+        sys.exit()  # Comment during profiling
 
 
 def profiling():
@@ -124,5 +124,5 @@ def profiling():
 # Main ----------------------------------------------|
 if __name__ == '__main__':
     app = BoxelEngine()
-    #app.run()
-    profiling()
+    app.run()
+    # profiling()

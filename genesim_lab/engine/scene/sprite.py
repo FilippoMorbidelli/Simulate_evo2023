@@ -36,6 +36,7 @@ class GLTextures2D(pg.sprite.Group):
 
             self.gl_program = self.gl_context.program(vertex_shader=vertex_shader_sprite,
                                                       fragment_shader=fragment_shader_sprite)
+            self.gl_program['u_texture'] = 1
         return self.gl_program
 
     def get_buffer(self):
@@ -76,7 +77,7 @@ class GLTextures2D(pg.sprite.Group):
             *corners[3], 0.0, 0.0)
 
         self.get_buffer().write(vertices_quad_2d)
-        self.get_texture(sprite.image).use(0)
+        self.get_texture(sprite.image).use(location=1)
         self.get_vao().render()
 
     def draw2d(self):
@@ -94,7 +95,6 @@ class OverlaySprite(pg.sprite.Sprite):
         super().__init__()
         self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/overlay_{name}.{ext}').convert_alpha()
         self.rect = self.sprite.get_rect(center=app.stg.window.rect.center)  # Generate sprite rect from main window
-        #self.sprite.get_rect(center=self.rect.center)
         self.image = self.sprite
         self.mask = pg.mask.from_surface(self.image)
         self.name = f"overlay_{name}"
