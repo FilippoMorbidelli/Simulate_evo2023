@@ -25,10 +25,10 @@ class Chunk:
         self.mesh.render()
 
     def build_voxels(self):
-        chunk_size = game_stgs['world']['chunk_size']
-        chunk_area = game_stgs['world']['chunk_area']
+        chunk_size = stg.world.chunk_size
+        chunk_area = stg.world.chunk_area
         # Empty chunk
-        voxels = np.zeros(game_stgs['world']['chunk_vol'], dtype='uint8')
+        voxels = np.zeros(stg.world.chunk_vol, dtype='uint8')
 
         # Fill chunk
         for x in range(chunk_size):

@@ -12,7 +12,7 @@ from genesim_lab.engine.settings import *
 # All surfaces ---------------------------------|
 class Player(Camera):
 
-    def __init__(self, app, position=game_stgs['player']['pos'], yaw=-90, pitch=0):
+    def __init__(self, app, position=stg.player.pos, yaw=-90, pitch=0):
         self.app = app
         super().__init__(position, yaw, pitch)
 
@@ -24,13 +24,13 @@ class Player(Camera):
     def mouse_control(self):
         mouse_dx, mouse_dy = pg.mouse.get_rel()
         if mouse_dx:
-            self.rotate_yaw(delta_x=mouse_dx * game_stgs['player']['mouse_sensitivity'])
+            self.rotate_yaw(delta_x=mouse_dx * stg.player.mouse_sensitivity)
         if mouse_dy:
-            self.rotate_pitch(delta_y=mouse_dy * game_stgs['player']['mouse_sensitivity'])
+            self.rotate_pitch(delta_y=mouse_dy * stg.player.mouse_sensitivity)
 
     def keyboard_control(self):
         key_state = pg.key.get_pressed()
-        vel = game_stgs['player']['speed'] * self.app.delta_time
+        vel = stg.player.speed * self.app.delta_time
         if key_state[pg.K_w]:
             self.move_forward(vel)
         if key_state[pg.K_s]:
@@ -44,8 +44,5 @@ class Player(Camera):
         if key_state[pg.K_LCTRL]:
             self.move_down(vel)
 
-    def reset(self, app, position=game_stgs['player']['pos'], yaw=-90, pitch=0):
-        self.app = app
-        self.reset_camera(position=game_stgs['player']['pos'], yaw=-90, pitch=0)
-        #self.app.scene.surfaces.surf.main_game.quad['m_proj'].write(self.m_proj)
-        #self.app.scene.surfaces.surf.main_game.quad['m_model'].write(glm.mat4())
+    def reset(self, position=stg.player.pos, yaw=-90, pitch=0):
+        self.reset_camera(position=stg.player.pos, yaw=-90, pitch=0)

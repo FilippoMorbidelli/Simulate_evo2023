@@ -210,7 +210,6 @@ def events_catalog():
             ]
         },
         "pause_menu": {
-            # sprite = [handle type,[event.type, event.button, flag_names, flag_values]]
             "button_return_main": [
                 "change_scene",  # Event handle to use for this custom event
                 [pg.MOUSEBUTTONDOWN, "button", 1, ["pause_menu", "main_menu", "main_game"],  # Event data
@@ -229,7 +228,6 @@ def events_catalog():
                                                                                     [False, None, None]]],
                 [True],  # Event validity status
             ],
-            # sprite = [handle type,[event.type, event.button, game_running]]
             "button_quit": [
                 "quit_game",  # Event handle to use for this custom event
                 [pg.MOUSEBUTTONDOWN, "button", 1, False],  # Event data
@@ -250,7 +248,7 @@ def reset_view(app, prev_status):
         pg.mouse.set_pos(app.screen.get_rect().center)
         pg.mouse.set_visible(True)
     elif main_game_status is None:
-        app.player.reset(app)
+        app.player.reset()
 
 
 # Custom exceptions --

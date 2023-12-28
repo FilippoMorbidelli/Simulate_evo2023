@@ -55,47 +55,12 @@ def sim_settings():
     return settings
 
 
-pg.font.init()
-
-game_stgs = {
-    'world': {
-        'chunk_size': 32,
-        'h_chunk_size': 16,
-        'chunk_area': 32 * 32,
-        'chunk_vol': 32 * 32 * 32,
-    },
-    'window': {  # Game window
-        'h': 900,  # Height of window
-        'l': 1600,  # Length of window
-        'full_screen': True,  # Automatically opens engine in full screen
-        'rect': None,  # Current rect of main window
-    },
-    'camera': {  # Camera settings
-        'aspect_ratio': 1920/1080,  # Implement correct value not hard coded
-        'fov_deg': 50,  # Field of view degrees
-        'v_fov': glm.radians(50),  # Vertical FOV
-        'h_fov': 2 * math.atan(math.tan(50 * 0.5) * 1920/1080),  # Horizontal FOV
-        'near': 0.1,  # Near field
-        'far': 2000.0,  # Far field
-        'pitch_max': glm.radians(89),  # Max pitch of camera
-    },
-    'player': {  # Player settings
-        'speed': 0.005,  # Limit player speed to move around
-        'rot_speed': 0.003,  # Limit player speed to rotate
-        'pos': glm.vec3(16, 32, 1.5 * 32),  # Player initial position
-        'mouse_sensitivity': 0.002,  # Mouse sensitivity
-    },
-    'util': {  # Utilities
-        'fps_limit': 144,  # Limit frame rate to value
-        'text_font': pg.font.SysFont('Verdana', 16),  # Font and size for utility text
-        'text_color': (255, 255, 255),  # Color of displayed text
-    },
-}
+pg.font.init()  # Init pygame fonts to create font inside settings
 
 
 @dataclass(slots=True)
 class World:
-    chunk_size: float = 32
+    chunk_size: float = 32  # Chunk size == number of cubes along a dimension [N x N x N]
     h_chunk_size: float = chunk_size / 2
     chunk_area: float = chunk_size ** 2
     chunk_vol: float = chunk_size ** 3
@@ -142,3 +107,6 @@ class GameSettings:
     camera = CameraData()
     player = PlayerData()
     util = Util()
+
+
+stg = GameSettings()

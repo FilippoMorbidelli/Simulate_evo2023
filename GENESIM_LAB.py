@@ -33,7 +33,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #
 
         # Initialize engine settings
-        self.stg = GameSettings()
+        self.stg = stg
 
         # Set engine window size (default: full screen)
         if self.stg.window.full_screen:

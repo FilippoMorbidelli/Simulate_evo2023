@@ -21,7 +21,7 @@ class Camera:
         self.right = glm.vec3(1, 0, 0)
         self.forward = glm.vec3(0, 0, -1)
 
-        self.m_proj = glm.perspective(game_stgs['camera']['v_fov'], game_stgs['camera']['aspect_ratio'], game_stgs['camera']['near'], game_stgs['camera']['far'])
+        self.m_proj = glm.perspective(stg.camera.v_fov, stg.camera.aspect_ratio, stg.camera.near, stg.camera.far)
         self.m_view = glm.mat4()
 
     def update(self):
@@ -42,7 +42,7 @@ class Camera:
 
     def rotate_pitch(self, delta_y):
         self.pitch -= delta_y
-        self.pitch = glm.clamp(self.pitch, - game_stgs['camera']['pitch_max'], game_stgs['camera']['pitch_max'])
+        self.pitch = glm.clamp(self.pitch, - stg.camera.pitch_max, stg.camera.pitch_max)
 
     def rotate_yaw(self, delta_x):
         self.yaw += delta_x
@@ -74,5 +74,5 @@ class Camera:
         self.right = glm.vec3(1, 0, 0)
         self.forward = glm.vec3(0, 0, -1)
 
-        self.m_proj = glm.perspective(game_stgs['camera']['v_fov'], game_stgs['camera']['aspect_ratio'], game_stgs['camera']['near'], game_stgs['camera']['far'])
+        self.m_proj = glm.perspective(stg.camera.v_fov, stg.camera.aspect_ratio, stg.camera.near, stg.camera.far)
         self.m_view = glm.mat4()

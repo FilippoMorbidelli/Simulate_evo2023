@@ -25,6 +25,7 @@ class GLTextures2D(pg.sprite.Group):
         self.gl_buffer = None
         self.gl_vao = None
         self.gl_textures = {}
+        self.gl_vertices = {}
 
     def get_program(self):
         if self.gl_program is None:
@@ -36,7 +37,7 @@ class GLTextures2D(pg.sprite.Group):
 
             self.gl_program = self.gl_context.program(vertex_shader=vertex_shader_sprite,
                                                       fragment_shader=fragment_shader_sprite)
-            self.gl_program['u_texture'] = 1
+            self.gl_program['u_texture'] = 0
         return self.gl_program
 
     def get_buffer(self):
@@ -59,26 +60,31 @@ class GLTextures2D(pg.sprite.Group):
             self.gl_textures[image] = texture
         return self.gl_textures[image]
 
-    def convert_vertex(self, pt, surface):
-        return pt[0] / surface.get_width() * 2 - 1, 1 - pt[1] / surface.get_height() * 2
-
     def render(self, sprite, surface):
-        corners = [
-            self.convert_vertex(sprite.rect.bottomleft, surface),
-            self.convert_vertex(sprite.rect.bottomright, surface),
-            self.convert_vertex(sprite.rect.topright, surface),
-            self.convert_vertex(sprite.rect.topleft, surface)]
-        vertices_quad_2d = (ctypes.c_float * (6 * 4))(
-            *corners[0], 0.0, 1.0,
-            *corners[1], 1.0, 1.0,
-            *corners[2], 1.0, 0.0,
-            *corners[0], 0.0, 1.0,
-            *corners[2], 1.0, 0.0,
-            *corners[3], 0.0, 0.0)
+        # Check if VBO for sprite exists, in case builds it or update it (forced_reconstruct == True)
+        if sprite.name not in self.gl_vertices or sprite.forced_reconstruct:
+            w, h = surface.get_size()
+            left, top, width, height = sprite.rect
+            right = left + width
+            bottom = top + height
+            corners = [  # Convert vertex
+                (left / w * 2 - 1, 1 - bottom / h * 2),  # Bottomleft corner
+                (right / w * 2 - 1, 1 - bottom / h * 2),  # Bottomright corner
+                (right / w * 2 - 1, 1 - top / h * 2),  # Topright corner
+                (left / w * 2 - 1, 1 - top / h * 2),  # Topleft corner
+            ]
+            vertices_quad_2d = (ctypes.c_float * (6 * 4))(
+                *corners[0], 0.0, 1.0,
+                *corners[1], 1.0, 1.0,
+                *corners[2], 1.0, 0.0,
+                *corners[0], 0.0, 1.0,
+                *corners[2], 1.0, 0.0,
+                *corners[3], 0.0, 0.0)
+            self.gl_vertices[sprite.name] = vertices_quad_2d
 
-        self.get_buffer().write(vertices_quad_2d)
-        self.get_texture(sprite.image).use(location=1)
-        self.get_vao().render()
+        self.get_buffer().write(self.gl_vertices[sprite.name])  # Build VBO for the sprite
+        self.get_texture(sprite.image).use(location=0)  # Retrive the texture and overwrite it in loc=0
+        self.get_vao().render()  # Render sprite
 
     def draw2d(self):
         for sprite in self:
@@ -99,6 +105,7 @@ class OverlaySprite(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.name = f"overlay_{name}"
         self.flag = flag  # Flag to determine if button is dynamic or not
+        self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame
 
     def update(self, *args):
         pass
@@ -113,6 +120,7 @@ class BackgroundSprite(pg.sprite.Sprite):
         self.mask = pg.mask.from_surface(self.image)
         self.name = f"background_{button}"
         self.flag = flag  # Flag to determine if button is dynamic or not
+        self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame
 
     def update(self, *args):
         pass
@@ -129,6 +137,7 @@ class ButtonSprite(pg.sprite.Sprite):
         self.over = self.mask.get_at(app.mouse)  # Add check if mouse is over from start
         self.name = f"button_{button}"
         self.flag = flag  # Flag to determine if sprite is dynamic or not
+        self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame
 
     def update(self, *args):
         pass
@@ -144,6 +153,7 @@ class UtilityStaticText(pg.sprite.Sprite):
         collection = [line.split('\n') for line in text.splitlines()]  # Get single lines from text
         x, y = rect.topleft  # Initial blit coordinates
         self.name = name
+        self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame
 
         # adjust x blit position depending on align
         if align == "left":
@@ -191,6 +201,7 @@ class FpsSprite(pg.sprite.Sprite):
                                                               True, app.stg.util.text_color), (0, 0))
         self.rect = pg.Rect(0, 0, 100, 100)
         self.name = "fps_counter"
+        self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame
 
     def update(self, app):
         if app.custom_events.FPS_EVENT in [e.type for e in app.event_list]:

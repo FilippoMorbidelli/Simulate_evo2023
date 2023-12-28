@@ -10,8 +10,8 @@ from genesim_lab.engine.settings import *
 
 # World generator ------------------------------|
 def is_void(voxel_pos, chunk_voxels):
-    chunk_size = game_stgs['world']['chunk_size']
-    chunk_area = game_stgs['world']['chunk_area']
+    chunk_size = stg.world.chunk_size
+    chunk_area = stg.world.chunk_area
     x, y, z = voxel_pos
     if 0 <= x < chunk_size and 0 <= y < chunk_size and 0 <= z < chunk_size:
         if chunk_voxels[x + chunk_size * z + chunk_area * y]:
@@ -28,9 +28,9 @@ def add_data(vertex_data, index, *vertices):
 
 
 def build_chunk_mesh(chunk_voxels, format_size):
-    chunk_size = game_stgs['world']['chunk_size']
-    chunk_area = game_stgs['world']['chunk_area']
-    vertex_data = np.empty(game_stgs['world']['chunk_vol'] * 18 * format_size, dtype='uint8')
+    chunk_size = stg.world.chunk_size
+    chunk_area = stg.world.chunk_area
+    vertex_data = np.empty(stg.world.chunk_vol * 18 * format_size, dtype='uint8')
     index = 0
 
     for x in range(chunk_size):

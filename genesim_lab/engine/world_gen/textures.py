@@ -19,7 +19,7 @@ class Textures:
         self.texture_0 = self.load('terrain/terrain_basic.png')
 
         # Assign texture unit
-        self.texture_0.use(location=0)
+        self.texture_0.use(location=1)
 
     def load(self, file_name):
         texture = pg.image.load(f'genesim_lab/assets/main_game/{file_name}')
