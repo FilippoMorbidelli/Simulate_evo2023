@@ -96,6 +96,20 @@ class GLTextures2D(pg.sprite.Group):
 
 
 # 2D Sprite classes ----------------------------|
+class DynamicSprite(pg.sprite.Sprite):
+    def __init__(self, app, scene, name, ext, flag):
+        super().__init__()
+        self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/overlay_{name}.{ext}').convert_alpha()
+        self.rect = self.sprite.get_rect(center=app.stg.window.rect.center)  # Generate sprite rect from main window
+        self.image = self.sprite
+        self.mask = pg.mask.from_surface(self.image)
+        self.name = f"overlay_{name}"
+        self.flag = flag  # Flag to determine if button is dynamic or not
+        self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame
+
+    def update(self, *args):
+        pass
+
 class OverlaySprite(pg.sprite.Sprite):
     def __init__(self, app, scene, name, ext, flag):
         super().__init__()
