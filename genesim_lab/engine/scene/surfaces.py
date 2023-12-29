@@ -29,6 +29,7 @@ class Surfaces:
             "saves_menu": [False, None, None],
             "settings_menu": [False, None, None],
             "pause_menu": [False, None, None],
+            "other": [False, None, None],
             "running": [1]
         }
         self.handle = {
@@ -37,7 +38,8 @@ class Surfaces:
             "main_game": self.surf.main_game.handle,
             "saves_menu": app.shader_prog_2D.saves_menu,
             "settings_menu": app.shader_prog_2D.settings_menu,
-            "pause_menu": app.shader_prog_2D.pause_menu
+            "pause_menu": app.shader_prog_2D.pause_menu,
+            "other": app.shader_prog_2D.other
         }
         self.update = {
             "main_menu": self.app.shader_prog_2D.main_menu.update,
@@ -46,7 +48,8 @@ class Surfaces:
             "saves_menu": self.app.shader_prog_2D.saves_menu.update,
             "settings_menu": self.app.shader_prog_2D.settings_menu.update,
             "pause_menu": self.app.shader_prog_2D.pause_menu.update,
-            "player_control": self.app.player.update
+            "player_control": self.app.player.update,
+            "other": self.app.shader_prog_2D.other.update,
         }
         self.render = {
             "main_menu": self.app.shader_prog_2D.main_menu.draw2d,
@@ -54,7 +57,8 @@ class Surfaces:
             "main_game": self.surf.main_game.render,
             "saves_menu": self.app.shader_prog_2D.saves_menu.draw2d,
             "settings_menu": self.app.shader_prog_2D.settings_menu.draw2d,
-            "pause_menu": self.app.shader_prog_2D.pause_menu.draw2d
+            "pause_menu": self.app.shader_prog_2D.pause_menu.draw2d,
+            "other": self.app.shader_prog_2D.other.draw2d
         }
 
         # Init utility vision --> fps counter, version info
@@ -70,6 +74,7 @@ class Surfaces:
         surf_group.saves_menu = SavesMenu(self.app)
         surf_group.settings_menu = SettingsMenu(self.app)
         surf_group.pause_menu = PauseMenu(self.app)
+        surf_group.other = Other(self.app)
 
         return surf_group
 
@@ -88,6 +93,15 @@ class Surfaces:
     def render_current_scene(self):
         for act_surf in self.active:  # Search for active surface to update
             self.render[act_surf[0]]()
+
+
+class Other:
+
+    def __init__(self, app):
+        pass
+        # Custom cursor
+        #other_cursor = DynamicSprite(app, "other", "cursor", "svg", False)
+        #app.shader_prog_2D.other.add(other_cursor)
 
 
 class MainMenu:
@@ -196,5 +210,6 @@ def init_shaders_2d(app):
     programs.settings_menu = GLTextures2D(app)
     programs.saves_menu = GLTextures2D(app)
     programs.main_game = GLTextures2D(app)
+    programs.other = GLTextures2D(app)
 
     return programs
