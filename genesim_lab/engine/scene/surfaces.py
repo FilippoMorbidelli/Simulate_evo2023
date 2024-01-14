@@ -5,7 +5,7 @@
 # Notes: Handles main menu, settings, play and other menu
 
 # Import packages ------------------------------|
-from genesim_lab.engine.world_gen.chunk import Chunk
+from genesim_lab.engine.world_gen.world import World
 from genesim_lab.engine.scene.sprite import *
 
 
@@ -183,7 +183,7 @@ class MainGame:
         # Init background
 
         # Initialize 3D graphic elements
-        self.chunk = Chunk(app)
+        self.world = World(self.app)
         # Init overlay elements
         overlay_crosshair = OverlaySprite(app, "main_game", "crosshair", "svg", True)
         app.shader_prog_2D.main_game.add(overlay_crosshair)
@@ -193,11 +193,12 @@ class MainGame:
         self.app.shader_prog_2D.main_game()
 
     def update(self, app):
+        self.world.update()
         self.app.shader_prog_3D.update()
         self.app.shader_prog_2D.main_game.update(app)
 
     def render(self):
-        self.chunk.render()
+        self.world.render()
         self.app.shader_prog_2D.main_game.draw2d()
 
 

@@ -30,7 +30,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)  # X. OpenGL version
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)  # .X OpenGL version
         pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)  #
-        pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #
+        pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  # 
 
         # Initialize engine settings
         self.stg = stg
@@ -53,7 +53,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.delta_time = 0
         self.time = 0
 
-        # Keep track of mouse positionand lock it inside screen, change curson to custom one
+        # Keep track of mouse position and lock it inside screen, change cursor to custom one
         cursor = pg.image.load(f'genesim_lab/assets/other/cursor.svg').convert_alpha()
         cursor = pg.transform.scale(cursor, (48, 48))
         cursor = pg.cursors.Cursor((0, 0), cursor)
@@ -121,7 +121,7 @@ def profiling():
     ps = pstats.Stats(pr, stream=s).sort_stats('tottime')
     ps.print_stats()
 
-    with open('profiling/stats_27122023_1.txt', 'w+') as f:
+    with open('profiling/stats_14012024.txt', 'w+') as f:
         f.write(s.getvalue())
 
 
@@ -129,4 +129,4 @@ def profiling():
 if __name__ == '__main__':
     app = BoxelEngine()
     app.run()
-    # profiling()
+    #profiling()

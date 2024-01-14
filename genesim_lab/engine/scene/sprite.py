@@ -68,8 +68,8 @@ class GLTextures2D(pg.sprite.Group):
             right = left + width
             bottom = top + height
             corners = [  # Convert vertex
-                (left / w * 2 - 1, 1 - bottom / h * 2),  # Bottomleft corner
-                (right / w * 2 - 1, 1 - bottom / h * 2),  # Bottomright corner
+                (left / w * 2 - 1, 1 - bottom / h * 2),  # Bottom-left corner
+                (right / w * 2 - 1, 1 - bottom / h * 2),  # Bottom-right corner
                 (right / w * 2 - 1, 1 - top / h * 2),  # Topright corner
                 (left / w * 2 - 1, 1 - top / h * 2),  # Topleft corner
             ]
@@ -83,12 +83,17 @@ class GLTextures2D(pg.sprite.Group):
             self.gl_vertices[sprite.name] = vertices_quad_2d
 
         self.get_buffer().write(self.gl_vertices[sprite.name])  # Build VBO for the sprite
-        self.get_texture(sprite.image).use(location=0)  # Retrive the texture and overwrite it in loc=0
+        self.get_texture(sprite.image).use(location=0)  # Retrieve the texture and overwrite it in loc=0
         self.get_vao().render()  # Render sprite
 
     def draw2d(self):
+        try:
+            self.gl_buffer.ctx.fbo.depth_mask = False  # TO DO - find better way
+        except Exception:
+            pass
         for sprite in self:
             self.render(sprite, self.app.screen)
+        self.gl_buffer.ctx.fbo.depth_mask = True
 
     def update(self, app):
         for sprite in self:

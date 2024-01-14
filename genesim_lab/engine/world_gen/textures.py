@@ -16,7 +16,7 @@ class Textures:
         self.ctx = app.ctx
 
         # Load texture
-        self.texture_0 = self.load('terrain/terrain_basic.png')
+        self.texture_0 = self.load('terrain/voxel_blank.svg')
 
         # Assign texture unit
         self.texture_0.use(location=1)

@@ -60,10 +60,28 @@ pg.font.init()  # Init pygame fonts to create font inside settings
 
 @dataclass(slots=True)
 class World:
-    chunk_size: float = 32  # Chunk size == number of cubes along a dimension [N x N x N]
-    h_chunk_size: float = chunk_size / 2
-    chunk_area: float = chunk_size ** 2
-    chunk_vol: float = chunk_size ** 3
+    # Chunk data
+    c_size: float = 32  # Chunk size == number of cubes along a dimension [N x N x N]
+    c_half: float = c_size // 2
+    c_area: float = c_size ** 2
+    c_vol: float = c_size ** 3
+
+    # Voxel data (stretching factor along each dimension)
+    v_x: float = 1.0
+    v_y: float = 0.5
+    v_z: float = 1.0
+    v_dim: tuple = (v_x, v_y, v_z)
+
+    # World data
+    w_width: int = 10
+    w_height: int = 3
+    w_depth: int = w_width
+    w_area: int = w_width * w_depth
+    w_vol: int = w_area * w_height
+
+    # World center data
+    center_xz: float = w_width * c_half
+    center_y: float = w_height * c_half
 
 
 @dataclass(slots=True)
@@ -87,9 +105,9 @@ class CameraData:
 
 @dataclass(slots=True)
 class PlayerData:
-    speed: float = 0.005  # Limit player speed to move around
+    speed: float = 0.01  # Limit player speed to move around
     rot_speed: float = 0.003  # Limit player speed to rotate
-    pos: float = glm.vec3(16, 32, 1.5 * 32)  # Player initial position
+    pos: float = glm.vec3(0, 0, 0)  # Player initial position
     mouse_sensitivity: float = 0.002  # Mouse sensitivity
 
 
@@ -107,6 +125,9 @@ class GameSettings:
     camera = CameraData()
     player = PlayerData()
     util = Util()
+
+    # Addition settings to compute after init
+    player.pos = glm.vec3(world.center_xz, world.w_height * world.c_size * world.v_y, world.center_xz)
 
 
 stg = GameSettings()

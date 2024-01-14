@@ -7,9 +7,47 @@
 # Import packages ------------------------------|
 import numpy as np
 import numpy.random as rnd
+from genesim_lab.engine.world_gen.chunk import Chunk
 
 
 # World generator ------------------------------|
+class World:
+
+    def __init__(self, app):
+        self.app = app
+        self.info = app.stg.world
+        self.chunks = [None for _ in range(self.info.w_vol)]
+        self.voxels = np.empty([self.info.w_vol, self.info.c_vol], dtype='uint8')
+        self.build_chunks()
+        self.build_chunk_mesh()
+
+    def build_chunks(self):
+        for x in range(self.info.w_width):
+            for y in range(self.info.w_height):
+                for z in range(self.info.w_depth):
+                    chunk = Chunk(self, position=(x * self.info.v_x, y * self.info.v_y, z * self.info.v_z))
+
+                    chunk_index = x + self.info.w_width * z + self.info.w_area * y
+                    self.chunks[chunk_index] = chunk
+
+                    # Put the chunk voxels in a separate array
+                    self.voxels[chunk_index] = chunk.build_voxels()
+
+                    # Get pointer to voxels
+                    chunk.voxels = self.voxels[chunk_index]
+
+    def build_chunk_mesh(self):
+        for chunk in self.chunks:
+            chunk.build_mesh()
+
+    def update(self):
+        pass
+
+    def render(self):
+        for chunk in self.chunks:
+            chunk.render()
+
+
 class SimGrid:
     def __init__(self, settings):
         # Preallocate attributes

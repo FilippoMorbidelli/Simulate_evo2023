@@ -5,11 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/voxel_blank.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/profiling/stats_14012024.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/other/cursor.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/assets/other/cursor.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/sprite.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/surfaces.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/textures.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/textures.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/base_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/base_mesh.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh_builder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +38,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/../../venv_evolution/Lib/site-packages/moderngl/__init__.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/venv_evolution/Lib/site-packages/moderngl/__init__.py" root0="SKIP_INSPECTION" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -46,21 +54,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Python.GENESIM_LAB.executor": "Run",
-    "Python.events.executor": "Run",
-    "Python.player.executor": "Debug",
-    "Python.settings.executor": "Run",
-    "Python.sprite.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/k1filo20/Documents/GitHub/Simulate_evo2023/genesim_lab/engine/world",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Python.GENESIM_LAB.executor&quot;: &quot;Run&quot;,
+    &quot;Python.events.executor&quot;: &quot;Run&quot;,
+    &quot;Python.player.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.settings.executor&quot;: &quot;Run&quot;,
+    &quot;Python.sprite.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/k1filo20/Documents/GitHub/Simulate_evo2023/genesim_lab/engine/world&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\world" />
@@ -106,6 +114,15 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh_builder.py</url>
+          <line>46</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="self" />

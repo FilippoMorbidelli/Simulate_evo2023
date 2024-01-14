@@ -3,6 +3,7 @@
 # Created on: 20/11/2023
 # Last update: 20/11/2023
 # Notes: Contains the engine, engine start and world_objects generation
+import glm
 
 # Import packages ------------------------------|
 from genesim_lab.engine.settings import *
@@ -12,27 +13,52 @@ from genesim_lab.meshes.chunk_mesh import ChunkMesh
 # World generator ------------------------------|
 class Chunk:
 
-    def __init__(self, app):
-        self.app = app
-        self.voxels: np.array = self.build_voxels()
+    def __init__(self, world, position):
+        self.app = world.app
+        self.world = world
+        self.position = position
+        self.info = world.info
+        self.m_model = self.get_model_matrix()
+
+        # Build chunk
+        self.voxels: np.array = None
         self.mesh: ChunkMesh = None
-        self.build_mesh()
+        self.is_empty = True
+
+    def get_model_matrix(self):
+        m_model = glm.translate(glm.mat4(), glm.vec3(self.position) * self.info.c_size)
+        return m_model
+
+    def set_uniform(self):
+        self.mesh.program['m_model'].write(self.m_model)
 
     def build_mesh(self):
         self.mesh = ChunkMesh(self)
 
     def render(self):
-        self.mesh.render()
+        if not self.is_empty:
+            self.set_uniform()
+            self.mesh.render()
 
     def build_voxels(self):
-        chunk_size = stg.world.chunk_size
-        chunk_area = stg.world.chunk_area
         # Empty chunk
-        voxels = np.zeros(stg.world.chunk_vol, dtype='uint8')
+        voxels = np.zeros(self.info.c_vol, dtype='uint8')
 
         # Fill chunk
-        for x in range(chunk_size):
-            for z in range(chunk_size):
-                for y in range(chunk_size):
-                    voxels[x + chunk_size * z + chunk_area * y] = x + y + z
+        cx, cy, cz = glm.ivec3(glm.vec3(self.position) / self.info.v_dim) * self.info.c_size
+
+        for x in range(self.info.c_size):
+            for z in range(self.info.c_size):
+                wx = x + cx
+                wz = z + cz
+                world_height = int(glm.simplex(glm.vec2(wx, wz) * 0.01) * 32 + 32)
+                local_height = min(world_height - cy, self.info.c_size)
+
+                for y in range(local_height):
+                    wy = y + cy
+                    voxels[x + self.info.c_size * z + self.info.c_area * y] = wy + 1
+
+        if np.any(voxels):
+            self.is_empty = False
+
         return voxels
