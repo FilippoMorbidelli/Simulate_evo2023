@@ -1,88 +1,89 @@
-         14392 function calls in 1.032 seconds
+         27570 function calls in 1.745 seconds
 
    Ordered by: internal time
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-      131    0.787    0.006    0.787    0.006 {method 'tick' of 'pygame.time.Clock' objects}
-        1    0.114    0.114    0.114    0.114 {built-in method pygame.base.quit}
-      131    0.081    0.001    0.081    0.001 {built-in method pygame.display.flip}
-      131    0.014    0.000    0.014    0.000 {built-in method pygame.event.get}
-        7    0.012    0.002    0.012    0.002 {method 'convert_alpha' of 'pygame.surface.Surface' objects}
-        7    0.007    0.001    0.007    0.001 {method 'texture' of 'mgl.Context' objects}
-      786    0.004    0.000    0.028    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:63(render)
+      251    1.470    0.006    1.470    0.006 {method 'tick' of 'pygame.time.Clock' objects}
+        1    0.091    0.091    0.091    0.091 {built-in method pygame.base.quit}
+      251    0.082    0.000    0.082    0.000 {built-in method pygame.display.flip}
+      251    0.029    0.000    0.029    0.000 {built-in method pygame.event.get}
+       10    0.017    0.002    0.017    0.002 {method 'convert_alpha' of 'pygame.surface.Surface' objects}
+     1506    0.010    0.000    0.044    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:63(render)
+       10    0.008    0.001    0.008    0.001 {method 'texture' of 'mgl.Context' objects}
+      251    0.008    0.000    0.012    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\events.py:46(handle_events)
+      251    0.003    0.000    0.044    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\GENESIM_LAB.py:98(handle_events)
+      251    0.002    0.000    1.476    0.006 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\GENESIM_LAB.py:81(update)
+      251    0.002    0.000    0.047    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:89(draw2d)
+      251    0.002    0.000    0.002    0.000 {method 'clear' of 'mgl.Framebuffer' objects}
         1    0.002    0.002    0.002    0.002 {method 'program' of 'mgl.Context' objects}
-      131    0.001    0.000    0.001    0.000 {method 'clear' of 'mgl.Framebuffer' objects}
-      131    0.001    0.000    0.003    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\events.py:46(handle_events)
-      131    0.001    0.000    0.789    0.006 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\GENESIM_LAB.py:81(update)
-      131    0.001    0.000    0.029    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:89(draw2d)
-      786    0.001    0.000    0.001    0.000 {method 'render' of 'mgl.VertexArray' objects}
-      786    0.001    0.000    0.001    0.000 {method 'write' of 'mgl.Buffer' objects}
-      131    0.000    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\events.py:26(find_active_sprite)
-      131    0.000    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:98(update)
-      786    0.000    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1141(render)
-      786    0.000    0.000    0.000    0.000 {method 'use' of 'mgl.Texture' objects}
-      131    0.000    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\surfaces.py:81(handle_current_scene)
-      131    0.000    0.000    0.111    0.001 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\GENESIM_LAB.py:92(render)
-      131    0.000    0.000    0.017    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\GENESIM_LAB.py:98(handle_events)
-      131    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\surfaces.py:82(<listcomp>)
-      393    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\pygame\sprite.py:381(sprites)
-      393    0.000    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\pygame\sprite.py:439(__iter__)
-      786    0.000    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:704(use)
-      131    0.000    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\surfaces.py:85(update_current_scene)
-      786    0.000    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:50(write)
-      786    0.000    0.000    0.019    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:55(get_texture)
+      251    0.002    0.000    0.003    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:98(update)
+      251    0.001    0.000    0.002    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\events.py:26(find_active_sprite)
+     1506    0.001    0.000    0.001    0.000 {method 'render' of 'mgl.VertexArray' objects}
+        1    0.001    0.001    1.745    1.745 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\GENESIM_LAB.py:105(run)
+      753    0.001    0.000    0.002    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\pygame\sprite.py:439(__iter__)
+     1506    0.001    0.000    0.001    0.000 {method 'write' of 'mgl.Buffer' objects}
+      251    0.001    0.000    0.002    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\surfaces.py:81(handle_current_scene)
+     1506    0.001    0.000    0.002    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1141(render)
+      251    0.001    0.000    0.132    0.001 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\GENESIM_LAB.py:92(render)
+      251    0.001    0.000    0.004    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\surfaces.py:85(update_current_scene)
+      251    0.001    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\surfaces.py:82(<listcomp>)
+     1506    0.001    0.000    0.001    0.000 {method 'use' of 'mgl.Texture' objects}
+     1506    0.001    0.000    0.026    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:55(get_texture)
+     1506    0.001    0.000    0.002    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:50(write)
+     1506    0.001    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:704(use)
+      753    0.001    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\pygame\sprite.py:381(sprites)
+      251    0.001    0.000    0.004    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\scene.py:20(update)
+      251    0.000    0.000    0.001    0.000 {built-in method builtins.sorted}
+      996    0.000    0.000    0.000    0.000 {method 'get_at' of 'pygame.mask.Mask' objects}
+      251    0.000    0.000    0.047    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\surfaces.py:93(render_current_scene)
+     1507    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:43(get_buffer)
+     1506    0.000    0.000    0.003    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:49(get_vao)
+      251    0.000    0.000    0.002    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1493(clear)
+      502    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:239(depth_mask)
+      251    0.000    0.000    0.048    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\scene.py:27(render)
+      251    0.000    0.000    0.000    0.000 {built-in method pygame.mouse.get_pos}
+      166    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\events.py:132(quit_game)
         2    0.000    0.000    0.000    0.000 {built-in method io.open}
-        1    0.000    0.000    1.032    1.032 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\GENESIM_LAB.py:105(run)
-      524    0.000    0.000    0.000    0.000 {method 'get_at' of 'pygame.mask.Mask' objects}
-      131    0.000    0.000    0.000    0.000 {built-in method builtins.sorted}
-      131    0.000    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1493(clear)
-      262    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:239(depth_mask)
-      786    0.000    0.000    0.003    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:49(get_vao)
-      787    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:43(get_buffer)
-      131    0.000    0.000    0.001    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\scene.py:20(update)
-      131    0.000    0.000    0.029    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\surfaces.py:93(render_current_scene)
-      131    0.000    0.000    0.000    0.000 {built-in method pygame.mouse.get_pos}
-       80    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\events.py:130(quit_game)
-      393    0.000    0.000    0.000    0.000 {built-in method builtins.iter}
-      131    0.000    0.000    0.029    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\scene.py:27(render)
-      131    0.000    0.000    0.000    0.000 {built-in method pygame.time.get_ticks}
+      753    0.000    0.000    0.000    0.000 {built-in method builtins.iter}
+     1004    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:163(update)
+      251    0.000    0.000    0.000    0.000 {built-in method pygame.time.get_ticks}
+      555    0.000    0.000    0.000    0.000 {built-in method builtins.isinstance}
         2    0.000    0.000    0.000    0.000 {method 'read' of '_io.TextIOWrapper' objects}
-      524    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:163(update)
-      287    0.000    0.000    0.000    0.000 {built-in method builtins.isinstance}
-      202    0.000    0.000    0.000    0.000 {method 'items' of 'dict' objects}
-      131    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\surfaces.py:83(<lambda>)
-        7    0.000    0.000    0.007    0.001 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1556(texture)
-      262    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:146(update)
-      151    0.000    0.000    0.000    0.000 {built-in method builtins.getattr}
-        1    0.000    0.000    0.002    0.002 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:30(get_program)
-        2    0.000    0.000    0.000    0.000 {method '__exit__' of '_io._IOBase' objects}
-       71    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\events.py:142(over_scene)
+      502    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:146(update)
+      251    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\surfaces.py:83(<lambda>)
+      326    0.000    0.000    0.000    0.000 {built-in method builtins.getattr}
+      389    0.000    0.000    0.000    0.000 {method 'items' of 'dict' objects}
         1    0.000    0.000    0.000    0.000 {method 'vertex_array' of 'mgl.Context' objects}
-        7    0.000    0.000    0.000    0.000 {method 'get_buffer' of 'pygame.surface.Surface' objects}
-        1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1638(_vertex_array)
-        7    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:642(swizzle)
-        2    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\_moderngl.py:300(make_attribute)
+      138    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\events.py:144(over_scene)
+       10    0.000    0.000    0.008    0.001 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1556(texture)
         1    0.000    0.000    0.000    0.000 {method 'buffer' of 'mgl.Context' objects}
-        2    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\AppData\Local\Programs\Python\Python311\Lib\re\__init__.py:178(sub)
-        1    0.000    0.000    0.002    0.002 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1678(program)
-        2    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\_moderngl.py:617(resolve_includes)
-        1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1533(buffer)
-       10    0.000    0.000    0.000    0.000 {built-in method __new__ of type object at 0x00007FFE94078F90}
-       13    0.000    0.000    0.000    0.000 {method 'get_size' of 'pygame.surface.Surface' objects}
+       10    0.000    0.000    0.000    0.000 {method 'get_buffer' of 'pygame.surface.Surface' objects}
+        1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1638(_vertex_array)
+        2    0.000    0.000    0.000    0.000 {method '__exit__' of '_io._IOBase' objects}
+       10    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:642(swizzle)
+        1    0.000    0.000    0.002    0.002 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\sprite.py:30(get_program)
+        1    0.000    0.000    0.000    0.000 {method '_write_uniform' of 'mgl.Context' objects}
+       22    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\engine\scene\events.py:116(change_scene)
         1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1633(vertex_array)
+        2    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\_moderngl.py:300(make_attribute)
+        2    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\AppData\Local\Programs\Python\Python311\Lib\re\__init__.py:178(sub)
+        2    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\_moderngl.py:617(resolve_includes)
+        1    0.000    0.000    0.002    0.002 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1678(program)
+        1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1533(buffer)
+       16    0.000    0.000    0.000    0.000 {method 'get_size' of 'pygame.surface.Surface' objects}
+       13    0.000    0.000    0.000    0.000 {built-in method __new__ of type object at 0x00007FFEA32F8F90}
         2    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\AppData\Local\Programs\Python\Python311\Lib\encodings\cp1252.py:22(decode)
-        2    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\AppData\Local\Programs\Python\Python311\Lib\re\__init__.py:272(_compile)
-        2    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\_moderngl.py:6(__init__)
         1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\_moderngl.py:68(value)
-        2    0.000    0.000    0.000    0.000 {built-in method _codecs.charmap_decode}
+        2    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\AppData\Local\Programs\Python\Python311\Lib\re\__init__.py:272(_compile)
         1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\_moderngl.py:319(make_uniform)
+        2    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\_moderngl.py:6(__init__)
+        2    0.000    0.000    0.000    0.000 {built-in method _codecs.charmap_decode}
         1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:339(__setitem__)
         2    0.000    0.000    0.000    0.000 {method 'sub' of 're.Pattern' objects}
-        1    0.000    0.000    0.000    0.000 {method '_write_uniform' of 'mgl.Context' objects}
-        1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\_moderngl.py:94(write)
         1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\_moderngl.py:29(__init__)
-        1    0.000    0.000    0.000    0.000 {built-in method _struct.pack}
+        1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\_moderngl.py:94(write)
         1    0.000    0.000    0.000    0.000 C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\venv\Lib\site-packages\moderngl\__init__.py:1647(<listcomp>)
+        1    0.000    0.000    0.000    0.000 {built-in method _struct.pack}
         2    0.000    0.000    0.000    0.000 <frozen codecs>:260(__init__)
         3    0.000    0.000    0.000    0.000 {method 'get' of 'dict' objects}
         1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}

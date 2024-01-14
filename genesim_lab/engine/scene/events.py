@@ -101,6 +101,9 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                     event_to_check = getattr(self.event_types, event_data[0])  # Get event type
                     search = event_to_check(event, *event_data[1])  # search if event is present
                     if self.major_change:
+                        if self.active_sprite == "button_play":
+                            self.event_types.sub_init_world()
+                        self.active_sprite = None  # Reset active sprite if scene is changed
                         self.major_change = False
                         break
 
@@ -110,25 +113,24 @@ class EventTypes:
     def __init__(self, app):
         self.app = app
 
-    def change_scene(self, event, etype, in_type, user_in, flag_name, flag_value):
-        if event.type == etype:
+    def change_scene(self, event, e_type, in_type, user_in, flag_name, flag_value):
+        if event.type == e_type:
             if in_type == 'button':
                 event_in = event.button
             else:
                 event_in = event.key
             if event_in == user_in:
                 prev_status = self.app.scene.surfaces.flags['main_game'][1]  # Check state of main engine before change
-                for action in range(len(flag_name)):
-                    self.app.scene.surfaces.flags[flag_name[action]] = flag_value[action]
-                self.app.custom_events.active_sprite = None  # Reset active sprite if scene is changed
+                for name, value in zip(flag_name, flag_value):
+                    self.app.scene.surfaces.flags[name] = value
                 reset_view(self.app, prev_status)
                 self.app.custom_events.major_change = True
             return "found"
         else:
             return "not found"
 
-    def quit_game(self, event, etype, in_type, user_in, flag_value):
-        if event.type == etype or event.type == pg.QUIT:
+    def quit_game(self, event, e_type, in_type, user_in, flag_value):
+        if event.type == e_type or event.type == pg.QUIT:
             if in_type == 'button':
                 event_in = event.button
             else:
@@ -149,6 +151,9 @@ class EventTypes:
                 self.app.scene.surfaces.flags[flag] = [False, None, None]
             elif event_in == user_in and not self.app.scene.surfaces.flags[flag][0]:
                 self.app.scene.surfaces.flags[flag] = [True, 0.1, "Update"]
+
+    def sub_init_world(self):
+        self.app.scene.surfaces.surf.main_game.init_world()
 
 
 def events_catalog():
@@ -234,6 +239,11 @@ def events_catalog():
                 [True],  # Event validity status
             ]
 
+        },
+        "main_game": {
+            "init_game": [
+                "init_world", # Event handle to use for this custom event
+            ]
         },
     }
     return catalog

@@ -182,11 +182,16 @@ class MainGame:
 
         # Init background
 
-        # Initialize 3D graphic elements
-        self.world = World(self.app)
+        # Istantiate world
+        self.world = None
+
         # Init overlay elements
         overlay_crosshair = OverlaySprite(app, "main_game", "crosshair", "svg", True)
         app.shader_prog_2D.main_game.add(overlay_crosshair)
+
+    def init_world(self):
+        # Initialize 3D graphic elements
+        self.world = World(self.app)
 
     def handle(self):
         self.app.shader_prog_3D()

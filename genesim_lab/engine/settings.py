@@ -9,6 +9,7 @@ import numpy as np
 import glm
 import math
 import pygame as pg
+import dataclasses
 from dataclasses import dataclass
 
 
@@ -58,7 +59,7 @@ def sim_settings():
 pg.font.init()  # Init pygame fonts to create font inside settings
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, order=True)
 class World:
     # Chunk data
     c_size: float = 32  # Chunk size == number of cubes along a dimension [N x N x N]
@@ -83,16 +84,24 @@ class World:
     center_xz: float = w_width * c_half
     center_y: float = w_height * c_half
 
+    def __iter__(self):
+        for field in dataclasses.fields(self):
+            yield getattr(self, field.name)
 
-@dataclass(slots=True)
+
+@dataclass(slots=True, order=True)
 class Window:
     h: int = 900  # Height of window
     l: int = 1600  # Length of window
     full_screen: bool = True  # Automatically opens engine in full screen
     rect: pg.Rect = None  # Current rect of main window
 
+    def __iter__(self):
+        for field in dataclasses.fields(self):
+            yield getattr(self, field.name)
 
-@dataclass(slots=True)
+
+@dataclass(slots=True, order=True)
 class CameraData:
     aspect_ratio: float = 1920/1080  # Implement correct value not hard coded
     fov_deg: float = 50  # Field of view degrees
@@ -102,23 +111,35 @@ class CameraData:
     far: float = 2000.0  # Far field
     pitch_max: float = glm.radians(89)  # Max pitch of camera
 
+    def __iter__(self):
+        for field in dataclasses.fields(self):
+            yield getattr(self, field.name)
 
-@dataclass(slots=True)
+
+@dataclass(slots=True, order=True)
 class PlayerData:
     speed: float = 0.01  # Limit player speed to move around
     rot_speed: float = 0.003  # Limit player speed to rotate
     pos: float = glm.vec3(0, 0, 0)  # Player initial position
     mouse_sensitivity: float = 0.002  # Mouse sensitivity
 
+    def __iter__(self):
+        for field in dataclasses.fields(self):
+            yield getattr(self, field.name)
 
-@dataclass(slots=True)
+
+@dataclass(slots=True, order=True)
 class Util:
     fps_limit: int = 144  # Limit frame rate to value
     text_font: pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
     text_color: tuple = (255, 255, 255)  # Color of displayed text
 
+    def __iter__(self):
+        for field in dataclasses.fields(self):
+            yield getattr(self, field.name)
 
-@dataclass(slots=True)
+
+@dataclass(slots=True, order=True)
 class GameSettings:
     world = World()
     window = Window()
@@ -128,6 +149,10 @@ class GameSettings:
 
     # Addition settings to compute after init
     player.pos = glm.vec3(world.center_xz, world.w_height * world.c_size * world.v_y, world.center_xz)
+
+    def __iter__(self):
+        for field in dataclasses.fields(self):
+            yield getattr(self, field.name)
 
 
 stg = GameSettings()
