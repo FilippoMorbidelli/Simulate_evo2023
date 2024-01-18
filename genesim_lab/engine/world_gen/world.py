@@ -25,7 +25,7 @@ class World:
         for x in range(self.info.w_width):
             for y in range(self.info.w_height):
                 for z in range(self.info.w_depth):
-                    chunk = Chunk(self, position=(x * self.info.v_x, y * self.info.v_y, z * self.info.v_z))
+                    chunk = Chunk(self, position=(x, y, z))
 
                     chunk_index = x + self.info.w_width * z + self.info.w_area * y
                     self.chunks[chunk_index] = chunk

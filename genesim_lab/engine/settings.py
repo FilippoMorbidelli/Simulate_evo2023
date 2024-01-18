@@ -69,9 +69,12 @@ class World:
 
     # Voxel data (stretching factor along each dimension)
     v_x: float = 1.0
-    v_y: float = 0.5
+    v_y: float = 1.0
     v_z: float = 1.0
-    v_dim: tuple = (v_x, v_y, v_z)
+    v_x_inv: float = 1 / v_x
+    v_y_inv: float = 1 / v_y
+    v_z_inv: float = 1 / v_z
+    v_dim_inv: tuple = (v_x_inv, v_y_inv, v_z_inv)
 
     # World data
     w_width: int = 10
@@ -156,3 +159,22 @@ class GameSettings:
 
 
 stg = GameSettings()
+
+c_size: int = 32  # Chunk size == number of cubes along a dimension [N x N x N]
+c_area: int = c_size ** 2
+c_vol: int = c_size ** 3
+
+# Voxel data (stretching factor along each dimension)
+v_x: float = 1.0
+v_y: float = 1.0
+v_z: float = 1.0
+v_x_inv: float = 1/v_x
+v_y_inv: float = 1/v_y
+v_z_inv: float = 1/v_z
+
+# World data
+w_width: int = 10
+w_height: int = 3
+w_depth: int = w_width
+w_area: int = w_width * w_depth
+w_vol: int = w_area * w_height

@@ -26,7 +26,7 @@ class Chunk:
         self.is_empty = True
 
     def get_model_matrix(self):
-        m_model = glm.translate(glm.mat4(), glm.vec3(self.position) * self.info.c_size)
+        m_model = glm.translate(glm.mat4(), glm.vec3(self.position) * self.info.c_size * [1, 0.5, 1])
         return m_model
 
     def set_uniform(self):
@@ -41,22 +41,23 @@ class Chunk:
             self.mesh.render()
 
     def build_voxels(self):
+        c_size = self.info.c_size
         # Empty chunk
         voxels = np.zeros(self.info.c_vol, dtype='uint8')
 
         # Fill chunk
-        cx, cy, cz = glm.ivec3(glm.vec3(self.position) / self.info.v_dim) * self.info.c_size
+        cx, cy, cz = glm.ivec3(self.position) * c_size
 
-        for x in range(self.info.c_size):
-            for z in range(self.info.c_size):
+        for x in range(c_size):
+            for z in range(c_size):
                 wx = x + cx
                 wz = z + cz
                 world_height = int(glm.simplex(glm.vec2(wx, wz) * 0.01) * 32 + 32)
-                local_height = min(world_height - cy, self.info.c_size)
+                local_height = min(world_height - cy, c_size)
 
                 for y in range(local_height):
                     wy = y + cy
-                    voxels[x + self.info.c_size * z + self.info.c_area * y] = wy + 1
+                    voxels[x + c_size * z + self.info.c_area * y] = wy + 1
 
         if np.any(voxels):
             self.is_empty = False
