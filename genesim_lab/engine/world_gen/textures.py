@@ -17,19 +17,29 @@ class Textures:
 
         # Load texture
         self.texture_0 = self.load('terrain/voxel_blank.svg')
+        self.texture_array_0 = self.load('terrain/terrain_array_example.svg', is_tex_array=True)
 
         # Assign texture unit
         self.texture_0.use(location=1)
+        self.texture_array_0.use(location=2)
 
-    def load(self, file_name):
+    def load(self, file_name, is_tex_array=False):
         texture = pg.image.load(f'genesim_lab/assets/main_game/{file_name}')
         texture = pg.transform.flip(texture, flip_x=True, flip_y=False)
 
-        texture = self.ctx.texture(
-            size=texture.get_size(),
-            components=4,
-            data=pg.image.tostring(texture, 'RGBA', False)
-        )
+        if is_tex_array:
+            num_layers = 3 * texture.get_height() // texture.get_width()  # 3 textures per layer
+            texture = self.ctx.texture_array(
+                size=(texture.get_width(), texture.get_height() // num_layers, num_layers),
+                components=4,
+                data=pg.image.tostring(texture, 'RGBA')
+            )
+        else:
+            texture = self.ctx.texture(
+                size=texture.get_size(),
+                components=4,
+                data=pg.image.tostring(texture, 'RGBA', False)
+            )
         texture.anisotropy = 32.0
         texture.build_mipmaps()
         texture.filter = (mgl.NEAREST, mgl.NEAREST)

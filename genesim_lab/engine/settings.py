@@ -115,7 +115,7 @@ class CameraData:
     aspect_ratio: float = 1920/1080  # Implement correct value not hard coded
     fov_deg: float = 50  # Field of view degrees
     v_fov: float = glm.radians(fov_deg)  # Vertical FOV
-    h_fov: float = 2 * math.atan(math.tan(fov_deg * 0.5) * aspect_ratio)  # Horizontal FOV
+    h_fov: float = 2 * math.atan(math.tan(v_fov * 0.5) * aspect_ratio)  # Horizontal FOV
     near: float = 0.1  # Near field
     far: float = 2000.0  # Far field
     pitch_max: float = glm.radians(89)  # Max pitch of camera
@@ -171,6 +171,7 @@ c_size: int = 32  # Chunk size == number of cubes along a dimension [N x N x N]
 c_half: int = c_size // 2
 c_area: int = c_size ** 2
 c_vol: int = c_size ** 3
+c_sphere_radius = c_half * math.sqrt(3)
 
 # Voxel data (stretching factor along each dimension)
 v_x: float = 1.0

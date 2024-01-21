@@ -7,6 +7,7 @@
 # Import packages ------------------------------|
 import pygame as pg
 from genesim_lab.engine.settings import *
+from genesim_lab.engine.player.frustum import Frustum
 
 
 # All surfaces ---------------------------------|
@@ -23,6 +24,8 @@ class Camera:
 
         self.m_proj = glm.perspective(stg.camera.v_fov, stg.camera.aspect_ratio, stg.camera.near, stg.camera.far)
         self.m_view = glm.mat4()
+
+        self.frustum = Frustum(self)
 
     def update(self):
         self.update_vectors()

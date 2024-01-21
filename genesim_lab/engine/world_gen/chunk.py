@@ -25,6 +25,9 @@ class Chunk:
         self.mesh: ChunkMesh = None
         self.is_empty = True
 
+        self.center = (glm.vec3(self.position) + 0.5) * [c_size, c_size/2, c_size]
+        self.is_on_frustum = self.app.player.frustum.is_on_frustum
+
     def get_model_matrix(self):
         m_model = glm.translate(glm.mat4(), glm.vec3(self.position) * self.info.c_size * [1, 0.5, 1])
         return m_model
@@ -36,7 +39,7 @@ class Chunk:
         self.mesh = ChunkMesh(self)
 
     def render(self):
-        if not self.is_empty:
+        if not self.is_empty and self.is_on_frustum(self):
             self.set_uniform()
             self.mesh.render()
 
@@ -58,7 +61,7 @@ class Chunk:
 
                 for y in range(local_height):
                     wy = y + cy
-                    voxels[x + c_size * z + self.info.c_area * y] = rng
+                    voxels[x + c_size * z + self.info.c_area * y] = 1
 
         if np.any(voxels):
             self.is_empty = False
