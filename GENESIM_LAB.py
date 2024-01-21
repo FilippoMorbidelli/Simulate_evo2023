@@ -58,9 +58,9 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         cursor = pg.transform.scale(cursor, (48, 48))
         cursor = pg.cursors.Cursor((0, 0), cursor)
         pg.mouse.set_cursor(cursor)
-        self.mouse = pg.mouse.get_pos()
         pg.event.set_grab(True)
         self.mouse_visible = True
+        self.mouse = pg.mouse.get_pos()
 
         # Game is running?
         self.is_running = True

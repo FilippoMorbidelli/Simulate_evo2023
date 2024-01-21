@@ -6,6 +6,7 @@
 
 # Import packages ------------------------------|
 from genesim_lab.engine.world_gen.world import World
+from genesim_lab.engine.world_objects.voxel_marker import VoxelMarker
 from genesim_lab.engine.scene.sprite import *
 
 
@@ -184,6 +185,7 @@ class MainGame:
 
         # Istantiate world
         self.world = None
+        self.voxel_marker = None
 
         # Init overlay elements
         overlay_crosshair = OverlaySprite(app, "main_game", "crosshair", "svg", True)
@@ -192,6 +194,7 @@ class MainGame:
     def init_world(self):
         # Initialize 3D graphic elements
         self.world = World(self.app)
+        self.voxel_marker = VoxelMarker(self.world.voxel_handler)
 
     def handle(self):
         self.app.shader_prog_3D()
@@ -199,11 +202,13 @@ class MainGame:
 
     def update(self, app):
         self.world.update()
+        self.voxel_marker.update()
         self.app.shader_prog_3D.update()
         self.app.shader_prog_2D.main_game.update(app)
 
     def render(self):
         self.world.render()
+        self.voxel_marker.render()
         self.app.shader_prog_2D.main_game.draw2d()
 
 

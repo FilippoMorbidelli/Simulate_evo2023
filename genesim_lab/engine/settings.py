@@ -60,6 +60,12 @@ pg.font.init()  # Init pygame fonts to create font inside settings
 
 
 @dataclass(slots=True, order=True)
+class Interaction:
+    # Ray casting
+    max_ray_dist: int = 6
+
+
+@dataclass(slots=True, order=True)
 class World:
     # Chunk data
     c_size: float = 32  # Chunk size == number of cubes along a dimension [N x N x N]
@@ -145,6 +151,7 @@ class Util:
 @dataclass(slots=True, order=True)
 class GameSettings:
     world = World()
+    interaction = Interaction()
     window = Window()
     camera = CameraData()
     player = PlayerData()
@@ -161,12 +168,13 @@ class GameSettings:
 stg = GameSettings()
 
 c_size: int = 32  # Chunk size == number of cubes along a dimension [N x N x N]
+c_half: int = c_size // 2
 c_area: int = c_size ** 2
 c_vol: int = c_size ** 3
 
 # Voxel data (stretching factor along each dimension)
 v_x: float = 1.0
-v_y: float = 1.0
+v_y: float = 0.5
 v_z: float = 1.0
 v_x_inv: float = 1/v_x
 v_y_inv: float = 1/v_y

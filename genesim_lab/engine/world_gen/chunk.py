@@ -3,7 +3,7 @@
 # Created on: 20/11/2023
 # Last update: 20/11/2023
 # Notes: Contains the engine, engine start and world_objects generation
-import glm
+import random
 
 # Import packages ------------------------------|
 from genesim_lab.engine.settings import *
@@ -44,6 +44,7 @@ class Chunk:
         c_size = self.info.c_size
         # Empty chunk
         voxels = np.zeros(self.info.c_vol, dtype='uint8')
+        rng = random.randrange(1, 100)
 
         # Fill chunk
         cx, cy, cz = glm.ivec3(self.position) * c_size
@@ -57,7 +58,7 @@ class Chunk:
 
                 for y in range(local_height):
                     wy = y + cy
-                    voxels[x + c_size * z + self.info.c_area * y] = wy + 1
+                    voxels[x + c_size * z + self.info.c_area * y] = rng
 
         if np.any(voxels):
             self.is_empty = False

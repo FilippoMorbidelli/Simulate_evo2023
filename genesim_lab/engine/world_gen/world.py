@@ -8,6 +8,7 @@
 import numpy as np
 import numpy.random as rnd
 from genesim_lab.engine.world_gen.chunk import Chunk
+from genesim_lab.engine.player.voxel_handler import VoxelHandler
 
 
 # World generator ------------------------------|
@@ -20,6 +21,7 @@ class World:
         self.voxels = np.empty([self.info.w_vol, self.info.c_vol], dtype='uint8')
         self.build_chunks()
         self.build_chunk_mesh()
+        self.voxel_handler = VoxelHandler(self)
 
     def build_chunks(self):
         for x in range(self.info.w_width):
@@ -41,7 +43,7 @@ class World:
             chunk.build_mesh()
 
     def update(self):
-        pass
+        self.voxel_handler.update()  # Update ray casting algorithm for player
 
     def render(self):
         for chunk in self.chunks:

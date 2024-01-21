@@ -3,7 +3,6 @@
 # Created on: 20/11/2023
 # Last update: 20/11/2023
 # Notes: Contains the engine, engine start and world_objects generation
-import numpy as np
 
 # Import packages ------------------------------|
 from genesim_lab.meshes.base_mesh import BaseMesh
@@ -24,6 +23,9 @@ class ChunkMesh(BaseMesh):
         self.vbo_format = '1u4'  # All data passed as uint8
         self.format_size = sum(int(fmt[:1]) for fmt in self.vbo_format.split())
         self.attrs = ('packed_data',)
+        self.vao = self.get_vao()
+
+    def rebuild(self):
         self.vao = self.get_vao()
 
     def get_vertex_data(self):

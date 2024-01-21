@@ -5,16 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/genesim_lab/engine/player/voxel_handler.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/engine/world_objects/voxel_marker.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/meshes/cube_mesh.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/voxel_marker.frag" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/voxel_marker.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/player/player.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/surfaces.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/shader_program.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/shader_program.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/base_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/base_mesh.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh_builder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/profiling/stats_14012024.txt" beforeDir="false" afterPath="$PROJECT_DIR$/profiling/stats_14012024.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,10 +30,10 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="shader-template" />
-        <option value="fs-template" />
-        <option value="vs-template" />
         <option value="Python Script" />
+        <option value="shader-template" />
+        <option value="vs-template" />
+        <option value="fs-template" />
       </list>
     </option>
   </component>
@@ -114,9 +120,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py</url>
-          <line>28</line>
-          <option name="timeStamp" value="54" />
+          <url>file://$PROJECT_DIR$/genesim_lab/engine/player/player.py</url>
+          <line>26</line>
+          <option name="timeStamp" value="71" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/genesim_lab/engine/player/voxel_handler.py</url>
+          <line>150</line>
+          <option name="timeStamp" value="80" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -124,6 +135,7 @@
       <configuration name="PythonConfigurationType">
         <watch expression="self" />
         <watch expression="vertex_data" />
+        <watch expression="self.chunk" />
       </configuration>
     </watches-manager>
   </component>

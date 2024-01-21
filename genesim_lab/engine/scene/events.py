@@ -43,6 +43,23 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
         except:
             self.active_sprite = None
 
+    def search_generic_event(self, event):
+        for name, data in self.catalog["other"].items():  # Extract event data
+            handle, cond, effect, val = data
+            if val[0]:
+                pass
+            else:
+                val[0] = True
+                continue
+            if isinstance(self.app.scene.surfaces.flags[cond[0]][cond[1]], cond[2]):  # Condition validity
+                event_to_check = getattr(self.event_types, handle)  # Get event type
+                search = event_to_check(event, *effect)  # search if event is present
+                if search == "found":
+                    try:
+                        self.catalog["other"][val[1]][3][0] = val[2]
+                    except:
+                        pass
+
     def handle_events(self, app):
         # Search for master scene and sprite on which mouse is currently over
         app.scene.surfaces.handle_current_scene()  # Extract active surfaces from flags
@@ -53,49 +70,32 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                 self.find_active_sprite(app, scene)  # Find active sprite on scene
 
         # Switch between case with active sprite or not active sprite (check only always active events)
-        match self.active_sprite:
-            case None:
-                # Check always active and on condition events
+        match (self.master_scene, self.active_sprite):
+            case ("main_game", _):  # Main Game, any condition
                 for event in self.app.event_list:
-                    for name, data in self.catalog["other"].items():  # Extract event data
-                        if data[3][0]:
-                            pass
-                        else:
-                            self.catalog["other"][name][3][0] = True
-                            continue
-                        if isinstance(self.app.scene.surfaces.flags[data[1][0]][data[1][1]], data[1][2]):  # Condition validity
-                            event_to_check = getattr(self.event_types, data[0])  # Get event type
-                            search = event_to_check(event, *data[2])  # search if event is present
-                            if search == "found":
-                                try:
-                                    self.catalog["other"][data[3][1]][3][0] = data[3][2]
-                                except:
-                                    pass
+                    # Generic events
+                    self.search_generic_event(event=event)
                     if self.major_change:
                         self.major_change = False
                         break
 
-            case str():
+                    # Player events
+                    self.app.player.handle_event(event=event)
+
+                    # Sprite events
+
+                    # World events
+
+            case (_, str()):  # Any scene, any active sprite
                 # Check always active and on condition events
                 for event in self.app.event_list:
-                    for name, data in self.catalog["other"].items():
-                        if data[3][0]:
-                            pass
-                        else:
-                            self.catalog["other"][name][3][0] = True
-                            continue
-                        if isinstance(self.app.scene.surfaces.flags[data[1][0]][data[1][1]], data[1][2]):
-                            event_to_check = getattr(self.event_types, data[0])  # Get event type
-                            search = event_to_check(event, *data[2])  # search if event is present
-                            if search == "found":
-                                try:
-                                    self.catalog["other"][data[3][1]][3][0] = data[3][2]
-                                except:
-                                    pass
+                    # Generic events
+                    self.search_generic_event(event=event)
                     if self.major_change:
                         self.major_change = False
                         break
 
+                    # Sprite events
                     # check for action/event possible with active sprite
                     event_data = self.catalog[self.master_scene][self.active_sprite]  # Extract event data
                     event_to_check = getattr(self.event_types, event_data[0])  # Get event type
@@ -104,6 +104,14 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                         if self.active_sprite == "button_play":
                             self.event_types.sub_init_world()
                         self.active_sprite = None  # Reset active sprite if scene is changed
+                        self.major_change = False
+                        break
+
+            case (_, None):  # Any scene, inactive sprite
+                # Check always active and on condition events
+                for event in self.app.event_list:
+                    self.search_generic_event(event=event)
+                    if self.major_change:
                         self.major_change = False
                         break
 
@@ -141,7 +149,7 @@ class EventTypes:
         else:
             return "not found"
 
-    def over_scene(self, event, e_type, in_type, user_in, flag):
+    def overlap_scene(self, event, e_type, in_type, user_in, flag):
         if event.type == e_type:
             if in_type == 'button':
                 event_in = event.button
@@ -181,7 +189,7 @@ def events_catalog():
                 [True],  # Event validity status
             ],
             "debug_window": [
-                "over_scene",  # Event handle to use for this custom event
+                "overlap_scene",  # Event handle to use for this custom event
                 ["running", 0, int],  # Additional condition (trick to get always true)
                 [pg.KEYDOWN, "key", pg.K_F1, "utility"],  # Event data
                 [True],  # Event validity status
@@ -242,7 +250,7 @@ def events_catalog():
         },
         "main_game": {
             "init_game": [
-                "init_world", # Event handle to use for this custom event
+                "init_world",  # Event handle to use for this custom event
             ]
         },
     }
