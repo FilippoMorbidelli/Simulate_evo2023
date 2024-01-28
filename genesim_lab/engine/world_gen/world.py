@@ -9,6 +9,8 @@ import numpy as np
 import numpy.random as rnd
 from genesim_lab.engine.world_gen.chunk import Chunk
 from genesim_lab.engine.player.voxel_handler import VoxelHandler
+from genesim_lab.engine.world_objects.voxel_marker import VoxelMarker
+from genesim_lab.engine.world_objects.celestial_body import CelestialBody
 
 
 # World generator ------------------------------|
@@ -17,17 +19,23 @@ class World:
     def __init__(self, app):
         self.app = app
         self.info = app.stg.world
-        self.chunks = [None for _ in range(self.info.w_vol)]
+        self.chunks: list = [None for _ in range(self.info.w_vol)]
         self.voxels = np.empty([self.info.w_vol, self.info.c_vol], dtype='uint8')
         self.build_chunks()
         self.build_chunk_mesh()
+
+        # Player interactivity
         self.voxel_handler = VoxelHandler(self)
+        self.voxel_marker = VoxelMarker(self.voxel_handler)
+
+        # World objects
+        self.celestial = CelestialBody(self)
 
     def build_chunks(self):
         for x in range(self.info.w_width):
             for y in range(self.info.w_height):
                 for z in range(self.info.w_depth):
-                    chunk = Chunk(self, position=(x, y, z))
+                    chunk = Chunk(self, index=(x, y, z))
 
                     chunk_index = x + self.info.w_width * z + self.info.w_area * y
                     self.chunks[chunk_index] = chunk
@@ -43,11 +51,23 @@ class World:
             chunk.build_mesh()
 
     def update(self):
+        # Update Sky objects
+        self.celestial.update()
+
+        # Update Player functions
         self.voxel_handler.update()  # Update ray casting algorithm for player
+        self.voxel_marker.update()  # Update voxel marker obtained from ray casting algorithm
 
     def render(self):
+        # Render Chunks
         for chunk in self.chunks:
             chunk.render()
+
+        # Render Sky objects
+        self.celestial.render()
+
+        # Render Player functions
+        self.voxel_marker.render()
 
 
 class SimGrid:

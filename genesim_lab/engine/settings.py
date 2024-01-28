@@ -60,6 +60,23 @@ pg.font.init()  # Init pygame fonts to create font inside settings
 
 
 @dataclass(slots=True, order=True)
+class WorldObj:
+    # Celestial bodies
+    bodies: tuple = (
+        # [Name, id, distance, orbit time, scale, init_pos]
+        ("Skybox", 0, 0 * 5 * 32, 0                     , 1000, glm.vec3(0, 0, 0)),
+        ("Sun"   , 1, 5 * 5 * 32, 12 * 30 * 24 * 60 * 60, 75  , glm.vec3(1, 0, 0)),
+        ("Moon"  , 2, 2 * 5 * 32, 28 * 24 * 60 * 60     , 25  , glm.vec3(-1, 0, 0))
+    )
+
+    # Earth revolution
+    revolution: int = 24 * 60 * 60
+
+    # World Clock
+    speedup: int = 120  # Number of seconds in game for each real second
+
+
+@dataclass(slots=True, order=True)
 class Interaction:
     # Ray casting
     max_ray_dist: int = 6
@@ -72,15 +89,18 @@ class World:
     c_half: float = c_size // 2
     c_area: float = c_size ** 2
     c_vol: float = c_size ** 3
+    c_sphere_radius: float = c_half * math.sqrt(3)
 
     # Voxel data (stretching factor along each dimension)
     v_x: float = 1.0
-    v_y: float = 1.0
+    v_y: float = 0.5
     v_z: float = 1.0
-    v_x_inv: float = 1 / v_x
-    v_y_inv: float = 1 / v_y
-    v_z_inv: float = 1 / v_z
-    v_dim_inv: tuple = (v_x_inv, v_y_inv, v_z_inv)
+    scale: glm.vec3 = glm.vec3(v_x, v_y, v_z)
+    c_scale: glm.vec3 = c_size * scale
+    v_x_i: float = 1 / v_x
+    v_y_i: float = 1 / v_y
+    v_z_i: float = 1 / v_z
+    scale_i: glm.vec3 = glm.vec3(v_x_i, v_y_i, v_z_i)
 
     # World data
     w_width: int = 10
@@ -92,6 +112,7 @@ class World:
     # World center data
     center_xz: float = w_width * c_half
     center_y: float = w_height * c_half
+    offset: glm.vec3 = glm.vec3(w_width/2, 0, w_depth/2)
 
     def __iter__(self):
         for field in dataclasses.fields(self):
@@ -151,6 +172,7 @@ class Util:
 @dataclass(slots=True, order=True)
 class GameSettings:
     world = World()
+    world_obj = WorldObj()
     interaction = Interaction()
     window = Window()
     camera = CameraData()
@@ -158,7 +180,8 @@ class GameSettings:
     util = Util()
 
     # Addition settings to compute after init
-    player.pos = glm.vec3(world.center_xz, world.w_height * world.c_size * world.v_y, world.center_xz)
+    player.pos = glm.vec3(0, world.w_height * world.c_size * world.v_y, 0)
+    world_obj.bodies
 
     def __iter__(self):
         for field in dataclasses.fields(self):
@@ -167,23 +190,5 @@ class GameSettings:
 
 stg = GameSettings()
 
-c_size: int = 32  # Chunk size == number of cubes along a dimension [N x N x N]
-c_half: int = c_size // 2
-c_area: int = c_size ** 2
-c_vol: int = c_size ** 3
-c_sphere_radius = c_half * math.sqrt(3)
-
-# Voxel data (stretching factor along each dimension)
-v_x: float = 1.0
-v_y: float = 0.5
-v_z: float = 1.0
-v_x_inv: float = 1/v_x
-v_y_inv: float = 1/v_y
-v_z_inv: float = 1/v_z
-
-# World data
-w_width: int = 10
-w_height: int = 3
-w_depth: int = w_width
-w_area: int = w_width * w_depth
-w_vol: int = w_area * w_height
+(c_size, c_half, c_area, c_vol, c_sphere_radius, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
+ w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset) = stg.world

@@ -7,6 +7,7 @@ uniform mat4 m_proj;
 uniform mat4 m_view;
 uniform mat4 m_model;
 uniform uint mode_id;
+uniform vec3 scale;
 
 const vec3 marker_colors[2] = vec3[2](vec3(1, 0, 0), vec3(0, 0, 1));
 
@@ -17,5 +18,5 @@ out vec2 uv;
 void main() {
     uv = in_tex_coord_0;
     marker_color = marker_colors[mode_id];
-    gl_Position = m_proj * m_view * m_model * vec4(((in_position - 0.5) * 1.01 + 0.5) * vec3(1.0, 0.5, 1.0), 1.0);
+    gl_Position = m_proj * m_view * m_model * vec4(((in_position - 0.5) * 1.01 + 0.5) * scale, 1.0);
 }

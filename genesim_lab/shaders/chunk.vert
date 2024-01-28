@@ -12,6 +12,7 @@ int flip_id;
 uniform mat4 m_proj;
 uniform mat4 m_view;
 uniform mat4 m_model;
+uniform vec3 scale;
 
 flat out int voxel_id;
 flat out int face_id;
@@ -77,5 +78,5 @@ void main() {
     voxel_color = hash31(voxel_id);
     shading = face_shading[face_id] * ao_values[ao_id];
 
-    gl_Position = m_proj * m_view * m_model * vec4(in_position * vec3(1.0, 0.5, 1.0), 1.0);
+    gl_Position = m_proj * m_view * m_model * vec4(in_position * scale, 1.0);
 }

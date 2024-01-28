@@ -7,7 +7,7 @@
 
 # Import packages ------------------------------|
 from genesim_lab.engine.settings import *
-from genesim_lab.meshes.chunk_mesh_builder import  get_chunk_index
+from genesim_lab.meshes.chunk_mesh_builder import get_chunk_index
 from math import floor
 
 
@@ -92,7 +92,7 @@ class VoxelHandler:
         # end point
         x2, y2, z2 = self.app.player.position + self.app.player.forward * self.app.stg.interaction.max_ray_dist
 
-        current_voxel_pos = glm.vec3(int(x1), 0.5 * floor(2.0 * y1), int(z1))
+        current_voxel_pos = glm.vec3(int(x1), v_y * floor(v_y_i * y1), int(z1))
         self.voxel_id = 0
         self.voxel_normal = glm.vec3(0)
         step_dir = -1
@@ -101,7 +101,7 @@ class VoxelHandler:
         delta_x = min(dx / (x2 - x1), 10000000.0) if dx != 0 else 10000000.0
         max_x = delta_x * (1.0 - glm.fract(x1)) if dx > 0 else delta_x * glm.fract(x1)
 
-        dy = glm.sign(y2 - y1) * 0.5
+        dy = glm.sign(y2 - y1) * scale.y
         delta_y = min(dy / (y2 - y1), 10000000.0) if dy != 0 else 10000000.0
         max_y = delta_y * (1.0 - glm.fract(y1)) if dy > 0 else delta_y * glm.fract(y1)
 
@@ -145,15 +145,15 @@ class VoxelHandler:
         return False
 
     def get_voxel_id(self, voxel_world_pos):
-        cx, cy, cz = chunk_pos = glm.ivec3(voxel_world_pos / [c_size, c_size/2, c_size])
+        cx, cy, cz = chunk_pos = glm.ivec3(voxel_world_pos / c_scale + offset)
 
         if 0 <= cx < w_width and 0 <= cy < w_height and 0 <= cz < w_depth:
             chunk_index = cx + w_width * cz + w_area * cy
             chunk = self.chunks[chunk_index]
 
-            lx, ly, lz = voxel_local_pos = voxel_world_pos - glm.vec3(chunk_pos * [c_size, c_size/2, c_size])
+            lx, ly, lz = voxel_local_pos = voxel_world_pos - (glm.vec3(chunk_pos) - offset) * c_scale
 
-            voxel_index = lx + c_size * lz + c_area * ly * 2
+            voxel_index = lx + c_size * lz + c_area * ly * scale_i.y
             voxel_index = int(voxel_index)
             voxel_id = chunk.voxels[voxel_index]
 

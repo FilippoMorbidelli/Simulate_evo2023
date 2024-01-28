@@ -3,9 +3,9 @@
 # Created on: 20/11/2023
 # Last update: 20/11/2023
 # Notes: Contains the engine, engine start and world_objects generation
-import random
 
 # Import packages ------------------------------|
+import random
 from genesim_lab.engine.settings import *
 from genesim_lab.meshes.chunk_mesh import ChunkMesh
 
@@ -13,10 +13,11 @@ from genesim_lab.meshes.chunk_mesh import ChunkMesh
 # World generator ------------------------------|
 class Chunk:
 
-    def __init__(self, world, position):
+    def __init__(self, world, index):
         self.app = world.app
         self.world = world
-        self.position = position
+        self.index = index
+        self.pos = (self.index - offset) * c_scale
         self.info = world.info
         self.m_model = self.get_model_matrix()
 
@@ -25,11 +26,11 @@ class Chunk:
         self.mesh: ChunkMesh = None
         self.is_empty = True
 
-        self.center = (glm.vec3(self.position) + 0.5) * [c_size, c_size/2, c_size]
+        self.center = glm.vec3(self.pos) + 0.5 * c_scale #(glm.vec3(self.index) + 0.5) * c_scale #
         self.is_on_frustum = self.app.player.frustum.is_on_frustum
 
     def get_model_matrix(self):
-        m_model = glm.translate(glm.mat4(), glm.vec3(self.position) * self.info.c_size * [1, 0.5, 1])
+        m_model = glm.translate(glm.mat4(), self.pos)  #glm.vec3(self.index) * c_scale
         return m_model
 
     def set_uniform(self):
@@ -44,13 +45,12 @@ class Chunk:
             self.mesh.render()
 
     def build_voxels(self):
-        c_size = self.info.c_size
         # Empty chunk
         voxels = np.zeros(self.info.c_vol, dtype='uint8')
         rng = random.randrange(1, 100)
 
         # Fill chunk
-        cx, cy, cz = glm.ivec3(self.position) * c_size
+        cx, cy, cz = glm.ivec3(self.index) * c_size
 
         for x in range(c_size):
             for z in range(c_size):

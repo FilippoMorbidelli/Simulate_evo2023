@@ -27,22 +27,22 @@ def get_ao(local_pos, world_pos, world_voxels, plane):
         h = is_void((x + 1, y, z - 1), (wx + 1, wy, wz - 1), world_voxels)
     elif plane == 'X':  # Valid for Top and Bottom faces (Y axis)
         a = is_void((x, y, z - 1), (wx, wy, wz - 1), world_voxels)
-        b = is_void((x, y - 1, z - 1), (wx, wy - 0.5, wz - 1), world_voxels)
-        c = is_void((x, y - 1, z), (wx, wy - 0.5, wz), world_voxels)
-        d = is_void((x, y - 1, z + 1), (wx, wy - 0.5, wz + 1), world_voxels)
+        b = is_void((x, y - 1, z - 1), (wx, wy - v_y, wz - 1), world_voxels)
+        c = is_void((x, y - 1, z), (wx, wy - v_y, wz), world_voxels)
+        d = is_void((x, y - 1, z + 1), (wx, wy - v_y, wz + 1), world_voxels)
         e = is_void((x, y, z + 1), (wx, wy, wz + 1), world_voxels)
-        f = is_void((x, y + 1, z + 1), (wx, wy + 0.5, wz + 1), world_voxels)
-        g = is_void((x, y + 1, z), (wx, wy + 0.5, wz), world_voxels)
-        h = is_void((x, y + 1, z - 1), (wx, wy + 0.5, wz - 1), world_voxels)
+        f = is_void((x, y + 1, z + 1), (wx, wy + v_y, wz + 1), world_voxels)
+        g = is_void((x, y + 1, z), (wx, wy + v_y, wz), world_voxels)
+        h = is_void((x, y + 1, z - 1), (wx, wy + v_y, wz - 1), world_voxels)
     else:
         a = is_void((x - 1, y, z), (wx - 1, wy, wz), world_voxels)
-        b = is_void((x - 1, y - 1, z), (wx - 1, wy - 0.5, wz), world_voxels)
-        c = is_void((x, y - 1, z), (wx, wy -0.5, wz), world_voxels)
-        d = is_void((x + 1, y - 1, z), (wx + 1, wy - 0.5, wz), world_voxels)
+        b = is_void((x - 1, y - 1, z), (wx - 1, wy - v_y, wz), world_voxels)
+        c = is_void((x, y - 1, z), (wx, wy - v_y, wz), world_voxels)
+        d = is_void((x + 1, y - 1, z), (wx + 1, wy - v_y, wz), world_voxels)
         e = is_void((x + 1, y, z), (wx + 1, wy, wz), world_voxels)
-        f = is_void((x + 1, y + 1, z), (wx + 1, wy + 0.5, wz), world_voxels)
-        g = is_void((x, y + 1, z), (wx, wy + 0.5, wz), world_voxels)
-        h = is_void((x - 1, y + 1, z), (wx - 1, wy + 0.5, wz), world_voxels)
+        f = is_void((x + 1, y + 1, z), (wx + 1, wy + v_y, wz), world_voxels)
+        g = is_void((x, y + 1, z), (wx, wy + v_y, wz), world_voxels)
+        h = is_void((x - 1, y + 1, z), (wx - 1, wy + v_y, wz), world_voxels)
 
     ao = (a + b + c), (g + h + a), (e + f + g), (c + d + e)
     return to_uint8_ao(ao)
@@ -80,9 +80,9 @@ def to_uint8_ao(ao):
 @njit
 def get_chunk_index(world_voxel_pos):
     wx, wy, wz = world_voxel_pos
-    cx = wx // c_size
-    cy = wy // c_half
-    cz = wz // c_size
+    cx = wx // c_size + w_width/2
+    cy = wy // (c_size * v_y) + 0
+    cz = wz // c_size + w_depth/2
     if not (0 <= cx < w_width and 0 <= cy < w_height and 0 <= cz < w_depth):
         return - 1
 
@@ -136,14 +136,14 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
 
                 # Voxels world position
                 cx, cy, cz = chunk_pos
-                wx = x_ind + cx * 1.0 * c_size
-                wy = y_ind * 0.5 + cy * 0.5 * c_size
-                wz = z_ind + cz * 1.0 * c_size
+                wx = x_ind + (cx - w_width/2) * c_size
+                wy = y_ind * v_y + (cy - 0) * v_y * c_size
+                wz = z_ind + (cz - w_depth/2) * c_size
 
                 # top face
-                if is_void((x_ind, y_ind + 1, z_ind), (wx, wy + 0.5, wz), world_voxels):
+                if is_void((x_ind, y_ind + 1, z_ind), (wx, wy + v_y, wz), world_voxels):
                     # Get ao values
-                    ao = get_ao((x_ind, y_ind + 1, z_ind), (wx, wy + 0.5, wz), world_voxels, plane='Y')
+                    ao = get_ao((x_ind, y_ind + 1, z_ind), (wx, wy + v_y, wz), world_voxels, plane='Y')
                     flip_id = ao[1] + ao[3] > ao[0] + ao[2]
 
                     # format: [x, y, z, ao_id] - [voxel_id, face_id]
@@ -158,9 +158,9 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
                         index = add_data(vertex_data, index, v0, v3, v2, v0, v2, v1)
 
                 # bottom face
-                if is_void((x_ind, y_ind - 1, z_ind), (wx, wy - 0.5, wz), world_voxels):
+                if is_void((x_ind, y_ind - 1, z_ind), (wx, wy - v_y, wz), world_voxels):
                     # Get ao values
-                    ao = get_ao((x_ind, y_ind - 1, z_ind), (wx, wy - 0.5, wz), world_voxels, plane='Y')
+                    ao = get_ao((x_ind, y_ind - 1, z_ind), (wx, wy - v_y, wz), world_voxels, plane='Y')
                     flip_id = ao[1] + ao[3] > ao[0] + ao[2]
 
                     # format: [x, y, z] - [voxel_id, face_id]

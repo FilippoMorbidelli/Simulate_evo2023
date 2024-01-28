@@ -5,16 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/terrain_array_example.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/sky_array.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/terrain_array.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/engine/world_objects/celestial_body.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/engine/world_objects/world_clock.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/meshes/celestial_mesh.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/celestial.frag" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/celestial.vert" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/player/camera.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/frustum.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/player/frustum.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/terrain_array_example.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/terrain_basic.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/terrain_basic.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/voxel_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/player/voxel_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/scene/surfaces.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/shader_program.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/shader_program.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/textures.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/textures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk.frag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh_builder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/voxel_marker.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/voxel_marker.vert" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,9 +37,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="shader-template" />
+        <option value="Python Script" />
         <option value="vs-template" />
         <option value="fs-template" />
-        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -51,21 +63,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;Python.GENESIM_LAB.executor&quot;: &quot;Run&quot;,
-    &quot;Python.events.executor&quot;: &quot;Run&quot;,
-    &quot;Python.player.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.settings.executor&quot;: &quot;Run&quot;,
-    &quot;Python.sprite.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/k1filo20/Documents/GitHub/Simulate_evo2023/genesim_lab/engine/world&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python.GENESIM_LAB.executor": "Run",
+    "Python.events.executor": "Run",
+    "Python.player.executor": "Debug",
+    "Python.settings.executor": "Run",
+    "Python.sprite.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/Filippo Morbidelli/PycharmProjects/Simulate_evo2023/GENESIM_LAB.py",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\world" />
@@ -77,6 +89,30 @@
       <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine" />
       <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\management" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="GENESIM_LAB_njit_debug" type="PythonConfigurationType" factoryName="Python">
+      <module name="Simulate_evo2023" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.11 (Simulate_evo2023)" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/GENESIM_LAB.py" />
+      <option name="PARAMETERS" value="'--pdb'" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -121,17 +157,7 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/genesim_lab/engine/player/voxel_handler.py</url>
           <line>150</line>
-          <option name="timeStamp" value="80" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/engine/player/frustum.py</url>
-          <line>24</line>
-          <option name="timeStamp" value="81" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/engine/world_gen/textures.py</url>
-          <line>31</line>
-          <option name="timeStamp" value="82" />
+          <option name="timeStamp" value="86" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
