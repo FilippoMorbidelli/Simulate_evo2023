@@ -10,7 +10,7 @@ from genesim_lab.meshes.base_mesh import BaseMesh
 
 
 # Import packages ------------------------------|
-class CelestialMesh(BaseMesh):
+class SkyObjMesh(BaseMesh):
 
     def __init__(self, app, b_id):
         super().__init__()
@@ -47,8 +47,6 @@ class CelestialMesh(BaseMesh):
             (0, 6, 1), (0, 5, 6),  # Bottom face
         ]
         vertex_data = self.get_data(vertices, indices)
-        if self.body_id == 0:
-            vertex_data = np.flip(vertex_data, 1).copy(order='C')
 
         tex_coord_vertices = [(0, 0), (1, 0), (1, 1), (0, 1)]
         tex_coord_indices = [
@@ -89,3 +87,39 @@ class CelestialMesh(BaseMesh):
             skip_errors=True
         )
         return vao
+
+
+class SkyBoxMesh(BaseMesh):
+
+    def __init__(self, app):
+        super().__init__()
+        self.app = app
+        self.ctx = self.app.ctx
+        self.program = self.app.shader_prog_3D.skybox
+
+        self.vbo_format = '2f2'
+        self.attrs = ('in_position',)
+        self.vao = self.get_vao()
+
+    @staticmethod
+    def get_data(vertices, indices):
+        data = [vertices[ind] for triangle in indices for ind in triangle]
+        return np.array(data, dtype='float16')
+
+    def get_vertex_data(self):
+        vertices = [
+            (-1, -1, 1), (1, -1, 1), (1, 1, 1), (-1, 1, 1),
+            (-1, 1, -1), (-1, -1, -1), (1, -1, -1), (1, 1, -1)
+        ]
+        indices = [
+            (0, 2, 3), (0, 1, 2),  # Front face
+            (1, 7, 2), (1, 6, 7),  # Right face
+            (6, 5, 4), (4, 7, 6),  # Back face
+            (3, 4, 5), (3, 5, 0),  # Left face
+            (3, 7, 4), (3, 2, 7),  # Top face
+            (0, 6, 1), (0, 5, 6),  # Bottom face
+        ]
+        vertex_data = self.get_data(vertices, indices)
+        vertex_data = np.flip(vertex_data, 1).copy(order='C')
+
+        return vertex_data

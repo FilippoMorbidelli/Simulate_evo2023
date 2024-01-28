@@ -61,12 +61,14 @@ pg.font.init()  # Init pygame fonts to create font inside settings
 
 @dataclass(slots=True, order=True)
 class WorldObj:
+    # Skybox
+    Skybox: tuple = ("Skybox", 0, 0 * 5 * 32, 0, 1000, glm.vec3(0, 0, 0))
+
     # Celestial bodies
     bodies: tuple = (
         # [Name, id, distance, orbit time, scale, init_pos]
-        ("Skybox", 0, 0 * 5 * 32, 0                     , 1000, glm.vec3(0, 0, 0)),
-        ("Sun"   , 1, 5 * 5 * 32, 12 * 30 * 24 * 60 * 60, 75  , glm.vec3(1, 0, 0)),
-        ("Moon"  , 2, 2 * 5 * 32, 28 * 24 * 60 * 60     , 25  , glm.vec3(-1, 0, 0))
+        ("Sun"   , 0, 5 * 5 * 32, 12 * 30 * 24 * 60 * 60, 75  , glm.vec3(1, 0, 0)),
+        ("Moon"  , 1, 2 * 5 * 32, 28 * 24 * 60 * 60     , 25  , glm.vec3(-1, 0, 0))
     )
 
     # Earth revolution
@@ -148,7 +150,7 @@ class CameraData:
 
 @dataclass(slots=True, order=True)
 class PlayerData:
-    speed: float = 0.01  # Limit player speed to move around
+    speed: float = 0.1  # Limit player speed to move around
     rot_speed: float = 0.003  # Limit player speed to rotate
     pos: float = glm.vec3(0, 0, 0)  # Player initial position
     mouse_sensitivity: float = 0.002  # Mouse sensitivity

@@ -17,8 +17,7 @@ out vec2 uv;
 flat out int face_id;
 flat out int body_id;
 
-const int scale[3] = int[3](
-    100,  // Skybox
+const int scale[2] = int[2](
     75,   // Sun
     22    // Moon
 );
@@ -29,5 +28,5 @@ void main() {
     body_id = in_body_id;
 
     vec4 pos = m_proj * m_view * m_model * vec4(in_position * scale[body_id], 1.0);
-    if(body_id == 0) {gl_Position = pos.xyww; gl_Position.z -= 0.0001;} else {gl_Position = pos;}
+    gl_Position = pos;
 }

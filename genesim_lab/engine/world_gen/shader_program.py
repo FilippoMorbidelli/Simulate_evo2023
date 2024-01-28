@@ -19,6 +19,7 @@ class ShaderProgram:
         self.chunk = self.get_program(shader_name='chunk')
         self.voxel_marker = self.get_program(shader_name='voxel_marker')
         self.celestials = self.get_program(shader_name='celestial')
+        self.skybox = self.get_program(shader_name='skybox')
         # --------------------- #
         self.set_uniforms_on_init()
 
@@ -39,10 +40,15 @@ class ShaderProgram:
         self.celestials['m_model'].write(glm.mat4())
         self.celestials['u_texture_array_sky'] = 3
 
+        # Skybox
+        self.skybox['m_proj'].write(self.player.m_proj)
+        self.skybox['u_texture_cubemap_skybox'] = 4
+
     def update(self, *args):
         self.chunk['m_view'].write(self.player.m_view)
         self.voxel_marker['m_view'].write(self.player.m_view)
         self.celestials['m_view'].write(self.player.m_view)
+        self.skybox['m_view'].write(self.player.m_proj)
 
     def get_program(self, shader_name):
         with open(f'genesim_lab/shaders/{shader_name}.vert') as file:

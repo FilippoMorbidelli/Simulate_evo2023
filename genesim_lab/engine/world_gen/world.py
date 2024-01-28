@@ -10,7 +10,7 @@ import numpy.random as rnd
 from genesim_lab.engine.world_gen.chunk import Chunk
 from genesim_lab.engine.player.voxel_handler import VoxelHandler
 from genesim_lab.engine.world_objects.voxel_marker import VoxelMarker
-from genesim_lab.engine.world_objects.celestial_body import CelestialBody
+from genesim_lab.engine.world_objects.celestial_body import Celestial
 
 
 # World generator ------------------------------|
@@ -29,7 +29,7 @@ class World:
         self.voxel_marker = VoxelMarker(self.voxel_handler)
 
         # World objects
-        self.celestial = CelestialBody(self)
+        self.celestial = Celestial(self)
 
     def build_chunks(self):
         for x in range(self.info.w_width):
