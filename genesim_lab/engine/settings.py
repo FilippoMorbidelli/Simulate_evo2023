@@ -183,7 +183,6 @@ class GameSettings:
 
     # Addition settings to compute after init
     player.pos = glm.vec3(0, world.w_height * world.c_size * world.v_y, 0)
-    world_obj.bodies
 
     def __iter__(self):
         for field in dataclasses.fields(self):

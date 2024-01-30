@@ -92,7 +92,7 @@ class VoxelHandler:
         # end point
         x2, y2, z2 = self.app.player.position + self.app.player.forward * self.app.stg.interaction.max_ray_dist
 
-        current_voxel_pos = glm.vec3(int(x1), v_y * floor(v_y_i * y1), int(z1))
+        current_voxel_pos = glm.vec3(floor(x1), v_y * floor(v_y_i * y1), floor(z1))
         self.voxel_id = 0
         self.voxel_normal = glm.vec3(0)
         step_dir = -1
@@ -145,7 +145,7 @@ class VoxelHandler:
         return False
 
     def get_voxel_id(self, voxel_world_pos):
-        cx, cy, cz = chunk_pos = glm.ivec3(voxel_world_pos / c_scale + offset)
+        cx, cy, cz = chunk_pos = glm.ivec3(np.floor(voxel_world_pos / c_scale + offset))
 
         if 0 <= cx < w_width and 0 <= cy < w_height and 0 <= cz < w_depth:
             chunk_index = cx + w_width * cz + w_area * cy

@@ -23,8 +23,15 @@ class Celestial(WorldClock):
         self.is_on_frustum = self.app.player.frustum.is_on_frustum
 
     def update(self):
+        # Update bodies
         for body in self.bodies:
             body.update_body()
+
+        # Update Skybox uniform
+        SunPos = (self.bodies[0].position - self.app.player.position) / np.linalg.norm(self.bodies[0].position - self.app.player.position)
+        self.skybox.mesh.program['SunPos'].write(SunPos)
+        MoonPos = (self.bodies[1].position - self.app.player.position) / np.linalg.norm(self.bodies[1].position - self.app.player.position)
+        self.skybox.mesh.program['MoonPos'].write(MoonPos)
 
     def build_bodies(self):
         # Build Skybox
