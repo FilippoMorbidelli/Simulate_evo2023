@@ -75,7 +75,7 @@ class WorldObj:
     revolution: int = 24 * 60 * 60
 
     # World Clock
-    speedup: int = 120  # Number of seconds in game for each real second
+    speedup: int = 1200  # Number of seconds in game for each real second
 
 
 @dataclass(slots=True, order=True)

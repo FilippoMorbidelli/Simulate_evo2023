@@ -3,6 +3,7 @@
 # Created on: 20/11/2023
 # Last update: 20/11/2023
 # Notes: Contains the engine, engine start and world_objects generation
+import glm
 
 # Import packages ------------------------------|
 from genesim_lab.engine.settings import *
@@ -25,7 +26,7 @@ class Celestial(WorldClock):
     def update(self):
         # Update bodies
         for body in self.bodies:
-            body.update_body()
+            body.update_body(self.delta, self.revolution)
 
         # Update Skybox uniform
         SunPos = (self.bodies[0].position - self.app.player.position) / np.linalg.norm(self.bodies[0].position - self.app.player.position)
@@ -80,8 +81,14 @@ class Body:
         self.scale = b_scale
         self.position: glm.vec3 = init * self.dist  # Initial position of the body
 
-    def update_body(self):
-        pass
+        # Set cycle properties
+        self.angle = glm.atan2(init.y, init.x)
+
+    def update_body(self, delta, earth_rot):
+        self.angle += delta / self.orbit * 2 * glm.pi() + delta / earth_rot * 2 * glm.pi()
+        if self.angle > 2 * glm.pi():
+            self.angle -= 2 * glm.pi()
+        self.position = glm.vec3(glm.cos(self.angle), glm.sin(self.angle), 0) * self.dist
 
     def get_model_matrix(self):
         m_model = glm.translate(glm.mat4(), glm.vec3(self.position))

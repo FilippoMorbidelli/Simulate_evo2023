@@ -13,6 +13,9 @@ class WorldClock:
 
     def __init__(self, world):
         self.app = world.app
+        self.speedup = self.app.stg.world_obj.speedup
+        self.revolution = self.app.stg.world_obj.revolution
+
         self.delta = self.app.delta_time
         self.second = 0
         self.minute = 0
@@ -22,7 +25,7 @@ class WorldClock:
         self.year = 1
 
     def update_time(self):
-        self.delta = self.app.delta_time
+        self.delta = self.app.delta_time * self.speedup
         self.second += self.delta
 
         if self.second >= 60:
