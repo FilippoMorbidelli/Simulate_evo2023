@@ -12,7 +12,7 @@ from genesim_lab.engine.settings import *
 # All surfaces ---------------------------------|
 class Player(Camera):
 
-    def __init__(self, app, position=stg.player.pos, yaw=-90, pitch=0):
+    def __init__(self, app, position=stg.player.pos, yaw=-135, pitch=0):
         self.app = app
         super().__init__(position, yaw, pitch)
 

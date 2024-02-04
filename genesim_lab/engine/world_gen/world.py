@@ -11,6 +11,7 @@ from genesim_lab.engine.world_gen.chunk import Chunk
 from genesim_lab.engine.player.voxel_handler import VoxelHandler
 from genesim_lab.engine.world_objects.voxel_marker import VoxelMarker
 from genesim_lab.engine.world_objects.celestial_body import Celestial
+from genesim_lab.engine.world_gen.sparsevoxeloctree import *
 
 
 # World generator ------------------------------|
@@ -21,8 +22,13 @@ class World:
         self.info = app.stg.world
         self.chunks: list = [None for _ in range(self.info.w_vol)]
         self.voxels = np.empty([self.info.w_vol, self.info.c_vol], dtype='uint8')
+        self.svo_pointer = np.empty([self.info.w_width, self.info.w_height, self.info.w_depth])
+        self.frustum_check = self.app.player.frustum.is_on_frustum
         self.build_chunks()
         self.build_chunk_mesh()
+
+        # Build world sparse voxel octree
+        self.svo = build_svo(app, self.chunks, self.svo_pointer)
 
         # Player interactivity
         self.voxel_handler = VoxelHandler(self)
@@ -38,6 +44,7 @@ class World:
                     chunk = Chunk(self, index=(x, y, z))
 
                     chunk_index = x + self.info.w_width * z + self.info.w_area * y
+                    #chunk.id = chunk_index
                     self.chunks[chunk_index] = chunk
 
                     # Put the chunk voxels in a separate array
@@ -45,6 +52,9 @@ class World:
 
                     # Get pointer to voxels
                     chunk.voxels = self.voxels[chunk_index]
+
+                    # Get pointer to chunk index for octree
+                    self.svo_pointer[x, y, z] = chunk_index
 
     def build_chunk_mesh(self):
         for chunk in self.chunks:
@@ -60,14 +70,37 @@ class World:
 
     def render(self):
         # Render Chunks
-        for chunk in self.chunks:
-            chunk.render()
+        self.svo_frustum_render(self.svo, level=0, max_level=self.app.stg.world.vso_depth)
+        #for chunk in self.chunks:
+        #    chunk.render()
+
+        #i, k = 0, 0
+        #chunk_on_frustum = np.zeros([2, len(self.chunks)], dtype=int)
+        #for chunk in self.chunks:
+        #    if chunk.is_on_frustum(chunk):
+        #        chunk_on_frustum[0, k] = np.linalg.norm(chunk.center - self.app.player.position)
+        #        chunk_on_frustum[1, k] = i
+        #        k += 1
+        #    i += 1
+        #chunk_on_frustum = chunk_on_frustum[:, chunk_on_frustum[0, :k].argsort()]
+
+        #for index in chunk_on_frustum[1, :]:
+        #    self.chunks[index].render()
 
         # Render Sky objects
         self.celestial.render()
 
         # Render Player functions
         self.voxel_marker.render()
+
+    def svo_frustum_render(self, node, level, max_level):
+        for child_coord, child_node in node.children.items():
+            if max_level == child_node.depth and child_node.data is not None:
+                for ck_id, ck_center in child_node.data.items():
+                    if self.frustum_check(ck_center):
+                        self.chunks[ck_id].render()
+            elif self.frustum_check(child_node.center, sphere_radius=child_node.sides.x * 0.5 * math.sqrt(3)) and child_node.data != 0:
+                self.svo_frustum_render(child_node, level + 1, max_level)
 
 
 class SimGrid:

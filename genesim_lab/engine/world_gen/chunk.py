@@ -40,7 +40,7 @@ class Chunk:
         self.mesh = ChunkMesh(self)
 
     def render(self):
-        if not self.is_empty and self.is_on_frustum(self):
+        if not self.is_empty: # and self.is_on_frustum(self.center):
             self.set_uniform()
             self.mesh.render()
 

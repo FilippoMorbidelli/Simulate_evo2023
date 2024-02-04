@@ -5,7 +5,6 @@
 # Notes: Handles main menu, settings, play and other menu
 
 # Import packages ------------------------------|
-import pygame as pg
 from genesim_lab.engine.settings import *
 from genesim_lab.engine.player.frustum import Frustum
 

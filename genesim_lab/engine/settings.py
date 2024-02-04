@@ -105,8 +105,8 @@ class World:
     scale_i: glm.vec3 = glm.vec3(v_x_i, v_y_i, v_z_i)
 
     # World data
-    w_width: int = 10
-    w_height: int = 3
+    w_width: int = 8
+    w_height: int = 4
     w_depth: int = w_width
     w_area: int = w_width * w_depth
     w_vol: int = w_area * w_height
@@ -115,6 +115,12 @@ class World:
     center_xz: float = w_width * c_half
     center_y: float = w_height * c_half
     offset: glm.vec3 = glm.vec3(w_width/2, 0, w_depth/2)
+
+    # Octree creation data
+    vso_depth: int = int(np.log2(max(w_width, w_height)) - 1)
+    vso_parent_sides: glm.vec3 = [w_width, w_width, w_width] * c_scale
+    vso_parent_center: glm.vec3 = [w_width * c_half, w_width * c_half,  w_width * c_half] * scale - offset * c_scale
+    vso_parent_position: glm.vec3 = -offset * c_scale
 
     def __iter__(self):
         for field in dataclasses.fields(self):
@@ -192,4 +198,4 @@ class GameSettings:
 stg = GameSettings()
 
 (c_size, c_half, c_area, c_vol, c_sphere_radius, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
- w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset) = stg.world
+ w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, vso_depth, vso_p_sides, vso_p_center, vso_p_position) = stg.world
