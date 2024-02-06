@@ -105,7 +105,7 @@ class World:
     scale_i: glm.vec3 = glm.vec3(v_x_i, v_y_i, v_z_i)
 
     # World data
-    w_width: int = 8
+    w_width: int = 128
     w_height: int = 4
     w_depth: int = w_width
     w_area: int = w_width * w_depth
@@ -168,7 +168,7 @@ class PlayerData:
 
 @dataclass(slots=True, order=True)
 class Util:
-    fps_limit: int = 144  # Limit frame rate to value
+    fps_limit: int = 1000  # Limit frame rate to value
     text_font: pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
     text_color: tuple = (255, 255, 255)  # Color of displayed text
 
@@ -199,3 +199,5 @@ stg = GameSettings()
 
 (c_size, c_half, c_area, c_vol, c_sphere_radius, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
  w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, vso_depth, vso_p_sides, vso_p_center, vso_p_position) = stg.world
+
+(aspect_ratio, fov_deg, v_fov, h_fov, near, far, pitch_max) = stg.camera

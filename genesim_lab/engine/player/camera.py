@@ -24,11 +24,12 @@ class Camera:
         self.m_proj = glm.perspective(stg.camera.v_fov, stg.camera.aspect_ratio, stg.camera.near, stg.camera.far)
         self.m_view = glm.mat4()
 
-        self.frustum = Frustum(self)
+        self.frustum = Frustum(np.array([self.position, self.up, self.right, self.forward], dtype='float32'))
 
     def update(self):
         self.update_vectors()
         self.update_view_matrix()
+        self.frustum.update(np.array([self.position, self.up, self.right, self.forward], dtype='float32'))
 
     def update_view_matrix(self):
         self.m_view = glm.lookAt(self.position, self.position + self.forward, self.up)
@@ -78,3 +79,4 @@ class Camera:
 
         self.m_proj = glm.perspective(stg.camera.v_fov, stg.camera.aspect_ratio, stg.camera.near, stg.camera.far)
         self.m_view = glm.mat4()
+

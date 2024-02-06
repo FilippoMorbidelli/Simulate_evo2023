@@ -4,6 +4,7 @@
 #extension GL_ARB_explicit_uniform_location : require
 
 layout (location = 0) in uint packed_data;
+layout (location = 1) in vec3 model;
 
 int x, y, z;
 int ao_id;
@@ -11,7 +12,6 @@ int flip_id;
 
 uniform mat4 m_proj;
 uniform mat4 m_view;
-uniform mat4 m_model;
 uniform vec3 scale;
 
 flat out int voxel_id;
@@ -70,5 +70,12 @@ void main() {
     uv = uv_coords[uv_indices[uv_index]];
     shading = face_shading[face_id] * ao_values[ao_id];
 
+    vec4 v_model = vec4((model - vec3(4, 0, 4)) * (32, 16, 32), 0.0);
+    mat4 m_model = mat4(
+        vec4(v_model[0], 0.0, 0.0, 0.0),
+        vec4(0.0, v_model[1], 0.0, 0.0),
+        vec4(0.0, 0.0, v_model[2], 0.0),
+        vec4(0.0, 0.0, 0.0, v_model[3])
+    );
     gl_Position = m_proj * m_view * m_model * vec4(in_position * scale, 1.0);
 }
