@@ -82,18 +82,6 @@ class World:
         for ck_pass in frustum_pass[:ii+1].tolist():
             self.chunks[ck_pass].render()
 
-        #i, k = 0, 0
-        #chunk_on_frustum = np.zeros([2, len(self.chunks)], dtype=int)
-        #for chunk in self.chunks:
-        #    if chunk.is_on_frustum(chunk):
-        #        chunk_on_frustum[0, k] = np.linalg.norm(chunk.center - self.app.player.position)
-        #        chunk_on_frustum[1, k] = i
-        #        k += 1
-        #    i += 1
-        #chunk_on_frustum = chunk_on_frustum[:, chunk_on_frustum[0, :k].argsort()]
-
-        #for index in chunk_on_frustum[1, :]:
-        #    self.chunks[index].render()
 
         # Render Sky objects
         self.celestial.render()

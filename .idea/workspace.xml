@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Simulate_evo2023.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Simulate_evo2023.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/sparsevoxeloctree.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/sparsevoxeloctree.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -132,15 +128,6 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py</url>
-          <line>98</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="self" />
