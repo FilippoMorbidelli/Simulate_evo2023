@@ -25,7 +25,7 @@ class World:
         self.voxels = np.empty([self.info.w_vol, self.info.c_vol], dtype='uint8')
         self.svo_pointer = np.empty([self.info.w_width, self.info.w_height, self.info.w_depth])
 
-        self.frustum_check = self.app.player.frustum.is_on_frustum
+        #self.frustum_check = self.app.player.frustum.is_on_frustum
 
         # Build World
         self.build_chunks()
@@ -36,6 +36,7 @@ class World:
 
         # Build Sparse Voxel Octree
         self.svo = build_svo(app, self.chunks, self.svo_pointer)
+        self.max_level = self.app.stg.world.vso_depth
 
         # Player interactivity
         self.voxel_handler = VoxelHandler(self)
@@ -76,10 +77,10 @@ class World:
 
     def render(self):
         # Render Chunks
-        self.svo_frustum_render(self.svo, level=0, max_level=self.app.stg.world.vso_depth)
-        #self.instanced_render(pass_id)
-        #for chunk in self.chunks:
-        #    chunk.render()
+        frustum_pass, ii = svo_frustum_render(self.app.player.frustum, level=0, max_level=self.max_level, node=self.svo,
+                                              master=self.svo, pass_list=np.zeros(10000, dtype='int32'), ii=0)
+        for ck_pass in frustum_pass[:ii+1].tolist():
+            self.chunks[ck_pass].render()
 
         #i, k = 0, 0
         #chunk_on_frustum = np.zeros([2, len(self.chunks)], dtype=int)
@@ -100,17 +101,22 @@ class World:
         # Render Player functions
         self.voxel_marker.render()
 
-    def svo_frustum_render(self, node, level, max_level):
-        for child_coord, child_node in node.children.items():
-            if max_level == child_node.depth and child_node.data is not None:
-                for ck_id, ck_center in child_node.data.items():
-                    if self.frustum_check(ck_center):
-                        self.chunks[ck_id].render()
-            elif self.frustum_check(child_node.center, child_node.radius) and child_node.data != 0:
-                self.svo_frustum_render(child_node, level + 1, max_level)
 
-    def instanced_render(self, ids):
-        self.instanced_voxels = 2
+@njit
+def svo_frustum_render(frustum, level, max_level, node, master, pass_list, ii):
+    for child_id in node.children_id:
+        child = master.children[child_id]
+        if max_level == child.depth and child.chunk_id.size != 1:
+            for row in np.arange(8):
+                if frustum.is_on_frustum(child.chunk_center[row, :]):
+                    pass_list[ii] = child.chunk_id[row]
+                    ii += 1
+        elif frustum.is_on_frustum(child.center, child.radius):
+            pass_list, ii = svo_frustum_render(frustum, level + 1, max_level, node=child, master=master, pass_list=pass_list, ii=ii)
+    return pass_list, ii
+
+    #def instanced_render(self, ids):
+    #    self.instanced_voxels = 2
 
 
 class SimGrid:

@@ -6,6 +6,8 @@
 
 # Import packages ------------------------------|
 from genesim_lab.engine.settings import *
+from numba.experimental import jitclass
+import numba as nb
 
 
 # Import packages ------------------------------|
@@ -19,27 +21,30 @@ def build_svo(app, data, pointer):
     if tot_depth == 0:
         return
 
-    parent = build_node(data, depth, position, sides, center, radius, tot_depth, pointer)
-
-    find_void_nodes(parent, level=depth)
+    parent, _ = build_node(data, depth, position, sides, center, radius, tot_depth, pointer, ii=0)
+    #find_void_nodes(parent, level=depth)
 
     return parent
 
 
-def build_node(data, depth, position, sides, center, radius, tot_depth, pointer):
+def build_node(data, depth, position, sides, center, radius, tot_depth, pointer, ii, master=None):
     # Update space data
 
     if depth == tot_depth:
-        min_id = glm.ivec3(position / c_scale + offset)
-        max_id = min_id + glm.ivec3(2, 2, 2)
-        chunk_ids = pointer[min_id.x:max_id.x, min_id.y:max_id.y, min_id.z:max_id.z].flatten()
+        min_id = np.array(position / c_scale + offset, dtype='int32')
+        max_id = min_id + np.array([2, 2, 2])
+        chunk_ids = nb.int32(pointer[min_id[0]:max_id[0], min_id[1]:max_id[1], min_id[2]:max_id[2]].flatten())
         if not np.size(chunk_ids):
-            return Node(depth, position, sides, center, radius, data=None)
+            return ChildNode(depth, nb.float32(position), sides, nb.float32(center), nb.float32(radius)), ii
         else:
-            child_data = dict([(int(c_id), data[int(c_id)].center) for c_id in chunk_ids])#np.concatenate((np.array([data[int(c_id)].center for c_id in chunk_ids]), chunk_ids.reshape(-1, 1)), axis=1)
-            return Node(depth, position, sides, center, radius, child_data)
+            chunk_center = np.array([data[c_id].center for c_id in chunk_ids]) #dict([(int(c_id), data[int(c_id)].center) for c_id in chunk_ids])
+            return ChildNode(depth, nb.float32(position), sides, nb.float32(center), nb.float32(radius), chunk_center, chunk_ids), ii
 
-    node = Node(depth, position, sides, center, radius)
+    if depth == 0:
+        node = MasterNode(depth, position, sides, center, radius)
+        master = node
+    else:
+        node = ChildNode(depth, nb.float32(position), sides, nb.float32(center), nb.float32(radius))
     sides = sides * 0.5
     child_radius = radius * 0.5
 
@@ -49,10 +54,12 @@ def build_node(data, depth, position, sides, center, radius, tot_depth, pointer)
                 child_pos = position + [i, j, k] * sides
                 child_center = child_pos + sides * 0.5
 
-                child_node = build_node(data, depth + 1, child_pos, sides, child_center, child_radius, tot_depth, pointer)
-                node.children[i + 2 * k + 4 * j] = child_node
+                child_node, ii = build_node(data, depth + 1, child_pos, sides, child_center, child_radius, tot_depth, pointer, ii, master)
+                master.children[ii] = child_node
+                node.children_id.append(ii)
+                ii += 1
 
-    return node
+    return node, ii
 
 
 def find_void_nodes(node, level):
@@ -71,14 +78,58 @@ def find_void_nodes(node, level):
         return 0
 
 
-class Node:
+specChild = [
+    ("children_id", nb.types.ListType(nb.types.int64)),
+    ("chunk_center", nb.types.Array(nb.float32, 2, 'C')),
+    ("chunk_id", nb.types.Array(nb.int32, 1, 'C')),
+    ("depth", nb.int32),
+    ("position", nb.types.Array(nb.float32, 1, 'C')),
+    ("sides", nb.types.Array(nb.float32, 1, 'C')),
+    ("center", nb.types.Array(nb.float32, 1, 'C')),
+    ("radius", nb.float32)
+]
 
-    def __init__(self, depth, position, sides, center, radius, data=None):
-        self.children = {}
+
+@jitclass(specChild)
+class ChildNode:
+
+    def __init__(self, depth, position, sides, center, radius, chunk_center=np.zeros([1, 1], dtype='float32'), chunk_id=np.zeros([1], dtype='int32')):
+        self.children_id = nb.typed.List.empty_list(nb.types.int64)
+        self.chunk_center = chunk_center
+        self.chunk_id = chunk_id
+
+        self.depth = depth
+        self.position = position
+        self.sides = sides
+        self.center = center
+        self.radius = radius
+
+
+#node_type = nb.deferred_type()
+children_type = ChildNode.class_type.instance_type
+specMaster = [
+    ("children_id", nb.types.ListType(nb.types.int64)),
+    ("children", nb.types.DictType(keyty=nb.types.int64, valty=children_type)),
+    ("data", nb.types.Array(nb.float32, 2, 'C')),
+    ("depth", nb.int32),
+    ("position", nb.types.Array(nb.float32, 1, 'C')),
+    ("sides", nb.types.Array(nb.float32, 1, 'C')),
+    ("center", nb.types.Array(nb.float32, 1, 'C')),
+    ("radius", nb.float32)
+]
+
+
+@jitclass(specMaster)
+class MasterNode:
+
+    def __init__(self, depth, position, sides, center, radius, data=np.zeros([1, 1], dtype='float32')):
+        self.children_id = nb.typed.List.empty_list(nb.types.int64)
+        self.children = nb.typed.Dict.empty(key_type=nb.types.int64, value_type=children_type)
         self.data = data
 
         self.depth = depth
-        self.position = np.float32(position)
-        self.sides = np.float32(sides)
-        self.center = np.float32(center)
-        self.radius = np.float32(radius)
+        self.position = position
+        self.sides = sides
+        self.center = center
+        self.radius = radius
+
