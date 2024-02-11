@@ -23,6 +23,7 @@ class Chunk:
 
         # Build chunk
         self.voxels: np.array = None
+        self.current_vbo: np.array = None
         self.mesh: ChunkMesh = None
         self.is_empty = True
 

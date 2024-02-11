@@ -50,10 +50,10 @@ def get_ao(local_pos, world_pos, world_voxels, plane):
 
 @njit
 def pack_data(x, y, z, voxel_id, face_id, flip_id, ao_id):
-    # x: 6bit, y: 6bit, z: 6bit, voxel_id: 8bit, face_id: 3bit, ao_id: 2bit, flip_id: 1bit
-    a, b, c, d, e, f, g = x, y, z, voxel_id, face_id, ao_id, flip_id
+    # x: 6bit, y: 6bit, z: 6bit, voxel_id: 8bit, flip_id: 1bit, ao_id: 2bit, face_id: 3bit
+    a, b, c, d, e, f, g = x, y, z, voxel_id, flip_id, ao_id, face_id
 
-    b_bit, c_bit, d_bit, e_bit, f_bit, g_bit = 6, 6, 8, 3, 2, 1
+    b_bit, c_bit, d_bit, e_bit, f_bit, g_bit = 6, 6, 8, 1, 2, 3
     fg_bit = f_bit + g_bit
     efg_bit = e_bit + fg_bit
     defg_bit = d_bit + efg_bit

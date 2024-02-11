@@ -41,9 +41,9 @@ const int uv_indices[24] = int[24](
 );
 
 void unpack(uint packed_data) {
-    // a, b, c, d, e, f, g = x, y, z, voxel_id, face_id, ao_id, flip_id
-    uint b_bit = 6u, c_bit = 6u, d_bit = 8u, e_bit = 3u, f_bit = 2u, g_bit = 1u;
-    uint b_mask = 63u, c_mask = 63u, d_mask = 255u, e_mask = 7u, f_mask = 3u, g_mask = 1u;
+    // a, b, c, d, e, f, g = x, y, z, voxel_id, ao_id, flip_id, face_id
+    uint b_bit = 6u, c_bit = 6u, d_bit = 8u, e_bit = 1u, f_bit = 2u, g_bit = 3u;
+    uint b_mask = 63u, c_mask = 63u, d_mask = 255u, e_mask = 1u, f_mask = 3u, g_mask = 7u;
     //
     uint fg_bit = f_bit + g_bit;
     uint efg_bit = e_bit + fg_bit;
@@ -56,9 +56,9 @@ void unpack(uint packed_data) {
     z = int((packed_data >> defg_bit) & c_mask);
     //
     voxel_id = int((packed_data >> efg_bit) & d_mask);
-    face_id = int((packed_data >> fg_bit) & e_mask);
+    flip_id = int((packed_data >> fg_bit) & e_mask);
     ao_id = int((packed_data >> g_bit) & f_mask);
-    flip_id = int(packed_data & g_mask);
+    face_id = int(packed_data & g_mask);
 }
 
 void main() {
