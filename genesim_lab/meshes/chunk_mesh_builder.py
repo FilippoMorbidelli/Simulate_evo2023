@@ -243,5 +243,8 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
                         index = add_data(vertex_data, index, v3, v1, v0, v3, v2, v1)
                     else:
                         index = add_data(vertex_data, index, v0, v2, v1, v0, v3, v2)
-
-    return vertex_data[:index + 1]
+    if index != 0 :
+        vertex_data = vertex_data[:index]
+    elif index == 0:
+        vertex_data = vertex_data[:index+1]
+    return vertex_data

@@ -99,7 +99,8 @@ def svo_frustum_render(frustum, level, max_level, node, master, pass_list, ii):
                     pass_list[ii] = child.chunk_id[row]
                     ii += 1
         elif frustum.is_on_frustum(child.center, child.radius):
-            pass_list, ii = svo_frustum_render(frustum, level + 1, max_level, node=child, master=master, pass_list=pass_list, ii=ii)
+            pass_list, ii = svo_frustum_render(frustum, level + 1, max_level, node=child,
+                                               master=master, pass_list=pass_list, ii=ii)
     return pass_list, ii
 
     #def instanced_render(self, ids):
