@@ -82,7 +82,6 @@ class World:
         for ck_pass in frustum_pass[:ii+1].tolist():
             self.chunks[ck_pass].render()
 
-
         # Render Sky objects
         self.celestial.render()
 
