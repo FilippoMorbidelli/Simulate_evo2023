@@ -26,7 +26,7 @@ class Chunk:
         self.mesh: ChunkMesh = None
         self.is_empty = True
 
-        self.center = glm.vec3(self.pos) + 0.5 * c_scale #(glm.vec3(self.index) + 0.5) * c_scale #
+        self.center = glm.vec3(self.pos) + 0.5 * c_scale
         self.is_on_frustum = self.app.player.frustum.is_on_frustum
 
     def get_model_matrix(self):
@@ -35,14 +35,20 @@ class Chunk:
 
     def set_uniform(self):
         self.mesh.program['m_model'].write(self.m_model)
+        #self.mesh.program['p_pos'].write(self.app.player.position)
 
     def build_mesh(self):
         self.mesh = ChunkMesh(self)
 
     def render(self):
-        if not self.is_empty: # and self.is_on_frustum(self.center):
+        if not self.is_empty:
             self.set_uniform()
             self.mesh.render()
+
+    def render_oc(self):
+        if not self.is_empty:
+            self.mesh.program_oc['m_model'].write(self.m_model)
+            self.mesh.render_oc()
 
     def build_voxels(self):
         # Empty chunk

@@ -24,11 +24,13 @@ class World:
         self.voxels = np.empty([self.info.w_vol, self.info.c_vol], dtype='uint8')
         self.svo_pointer = np.empty([self.info.w_width, self.info.w_height, self.info.w_depth])
         self.frustum_check = self.app.player.frustum.is_on_frustum
+
         self.build_chunks()
         self.build_chunk_mesh()
 
         # Build world sparse voxel octree
         self.svo = build_svo(app, self.chunks, self.svo_pointer)
+        self.queries = [self.app.ctx.query(samples=True) for n in range(len(self.chunks))]
 
         # Player interactivity
         self.voxel_handler = VoxelHandler(self)
@@ -71,21 +73,23 @@ class World:
     def render(self):
         # Render Chunks
         self.svo_frustum_render(self.svo, level=0, max_level=self.app.stg.world.vso_depth)
-        #for chunk in self.chunks:
-        #    chunk.render()
+        #for chunk_id in fc_pass:
+        #    if self.queries[chunk_id].samples:
+        #        flag = True
+        #    else:
+        #        flag = False
 
-        #i, k = 0, 0
-        #chunk_on_frustum = np.zeros([2, len(self.chunks)], dtype=int)
-        #for chunk in self.chunks:
-        #    if chunk.is_on_frustum(chunk):
-        #        chunk_on_frustum[0, k] = np.linalg.norm(chunk.center - self.app.player.position)
-        #        chunk_on_frustum[1, k] = i
-        #        k += 1
-        #    i += 1
-        #chunk_on_frustum = chunk_on_frustum[:, chunk_on_frustum[0, :k].argsort()]
-
-        #for index in chunk_on_frustum[1, :]:
-        #    self.chunks[index].render()
+        #    with self.queries[chunk_id]:
+        #        if flag:
+        #            self.app.ctx.fbo.depth_mask = True
+        #            self.app.ctx.fbo.color_mask = True, True, True, True
+        #            self.chunks[chunk_id].render()
+        #        else:
+        #            self.app.ctx.fbo.depth_mask = False
+        #            self.app.ctx.fbo.color_mask = False, False, False, False
+        #            self.chunks[chunk_id].render_oc()
+        #self.app.ctx.fbo.depth_mask = True
+        #self.app.ctx.fbo.color_mask = True, True, True, True
 
         # Render Sky objects
         self.celestial.render()
@@ -97,7 +101,7 @@ class World:
         for child_coord, child_node in node.children.items():
             if max_level == child_node.depth and child_node.data is not None:
                 for ck_id, ck_center in child_node.data.items():
-                    if self.frustum_check(ck_center):
+                    if self.chunks[ck_id].mesh.vao.mglo.vertices > 1:
                         self.chunks[ck_id].render()
             elif self.frustum_check(child_node.center, sphere_radius=child_node.sides.x * 0.5 * math.sqrt(3)) and child_node.data != 0:
                 self.svo_frustum_render(child_node, level + 1, max_level)

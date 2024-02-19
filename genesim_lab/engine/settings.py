@@ -87,7 +87,7 @@ class Interaction:
 @dataclass(slots=True, order=True)
 class World:
     # Chunk data
-    c_size: float = 32  # Chunk size == number of cubes along a dimension [N x N x N]
+    c_size: float = 48  # Chunk size == number of cubes along a dimension [N x N x N]
     c_half: float = c_size // 2
     c_area: float = c_size ** 2
     c_vol: float = c_size ** 3
@@ -105,7 +105,7 @@ class World:
     scale_i: glm.vec3 = glm.vec3(v_x_i, v_y_i, v_z_i)
 
     # World data
-    w_width: int = 8
+    w_width: int = 128
     w_height: int = 4
     w_depth: int = w_width
     w_area: int = w_width * w_depth
@@ -168,7 +168,7 @@ class PlayerData:
 
 @dataclass(slots=True, order=True)
 class Util:
-    fps_limit: int = 144  # Limit frame rate to value
+    fps_limit: int = 1000  # Limit frame rate to value
     text_font: pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
     text_color: tuple = (255, 255, 255)  # Color of displayed text
 

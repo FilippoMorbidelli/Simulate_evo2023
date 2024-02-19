@@ -5,14 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/sparsevoxeloctree.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk_oc.frag" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk_oc.vert" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/profiling/stats_18022024.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/player/camera.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/frustum.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/player/frustum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/player/player.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/shader_program.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/shader_program.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,9 +26,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="shader-template" />
+        <option value="Python Script" />
         <option value="vs-template" />
         <option value="fs-template" />
-        <option value="Python Script" />
       </list>
     </option>
   </component>
