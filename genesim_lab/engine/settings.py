@@ -106,7 +106,7 @@ class World:
 
     # World data
     w_width: int = 128
-    w_height: int = 4
+    w_height: int = 16
     w_depth: int = w_width
     w_area: int = w_width * w_depth
     w_vol: int = w_area * w_height

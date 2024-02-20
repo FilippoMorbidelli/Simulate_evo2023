@@ -33,10 +33,11 @@ def build_node(data, depth, position, sides, center, tot_depth, pointer):
         max_id = min_id + glm.ivec3(2, 2, 2)
         chunk_ids = pointer[min_id.x:max_id.x, min_id.y:max_id.y, min_id.z:max_id.z].flatten()
         if not np.size(chunk_ids):
-            return Node(depth, position, sides, center, data=None)
+            return Node(depth, position, sides, center, data=None, visibility=False)
         else:
-            child_data = dict([(int(c_id), data[int(c_id)].center) for c_id in chunk_ids])#np.concatenate((np.array([data[int(c_id)].center for c_id in chunk_ids]), chunk_ids.reshape(-1, 1)), axis=1)
-            return Node(depth, position, sides, center, child_data)
+            child_data = dict([(int(c_id), data[int(c_id)].center) for c_id in chunk_ids])
+            visibility = any(data[c_id].mesh.vao.mglo.vertices > 1 for c_id in child_data.keys())
+            return Node(depth, position, sides, center, data=child_data, visibility=visibility)
 
     node = Node(depth, position, sides, center)
     sides = sides * 0.5
@@ -55,23 +56,16 @@ def build_node(data, depth, position, sides, center, tot_depth, pointer):
 
 def find_void_nodes(node, level):
     if not node.children:
-        if node.data is None:
-            return 1
-        return 0
+        return
     else:
-        is_void = 0
-        for child_coord, child_node in node.children.items():
-            flag = find_void_nodes(child_node, level + 1)
-            is_void += flag
-        if is_void == 8:
-            node.data = 0
-            return 1
-        return 0
+        for child_node in node.children.values():
+            find_void_nodes(child_node, level + 1)
+        node.visibility = any(child.visibility for child in node.children.values())
 
 
 class Node:
 
-    def __init__(self, depth, position, sides, center, data=None):
+    def __init__(self, depth, position, sides, center, data=None, visibility=True):
         self.children = {}
         self.data = data
 
@@ -79,3 +73,12 @@ class Node:
         self.position = position
         self.sides = sides
         self.center = center
+
+        self.visibility = visibility
+
+    def update_node(self):
+        pass  # TBD
+
+    def update_parent(self):
+        pass  # TBD
+

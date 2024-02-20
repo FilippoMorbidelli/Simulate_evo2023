@@ -99,11 +99,11 @@ class World:
 
     def svo_frustum_render(self, node, level, max_level):
         for child_coord, child_node in node.children.items():
-            if max_level == child_node.depth and child_node.data is not None:
+            if max_level == child_node.depth and child_node.visibility:
                 for ck_id, ck_center in child_node.data.items():
                     if self.chunks[ck_id].mesh.vao.mglo.vertices > 1:
                         self.chunks[ck_id].render()
-            elif self.frustum_check(child_node.center, sphere_radius=child_node.sides.x * 0.5 * math.sqrt(3)) and child_node.data != 0:
+            elif child_node.visibility and self.frustum_check(child_node.center, sphere_radius=child_node.sides.x * 0.5 * math.sqrt(3)):
                 self.svo_frustum_render(child_node, level + 1, max_level)
 
 
