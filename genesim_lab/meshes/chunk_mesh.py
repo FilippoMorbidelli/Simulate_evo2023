@@ -30,12 +30,13 @@ class ChunkMesh(BaseMesh):
         self.vao, self.vao_oc = self.get_vao()
 
     def get_vertex_data(self):
-        mesh = build_chunk_mesh(
+        mesh, greedy_mesh = build_chunk_mesh(
             chunk_voxels=self.chunk.voxels,
             format_size=self.format_size,
             chunk_pos=self.chunk.index,
             world_voxels=self.chunk.world.voxels,
         )
+
         return mesh
 
     def get_vao(self):

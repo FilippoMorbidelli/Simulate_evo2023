@@ -8,7 +8,10 @@
 from genesim_lab.engine.settings import *
 from numba import uint8
 from numba import float32
+from numba import njit
 
+import numpy as np
+import numpy.ma as ma
 
 # World generator ------------------------------|
 @njit
@@ -71,6 +74,25 @@ def pack_data(x, y, z, voxel_id, face_id, flip_id, ao_id):
 
     return packed_data
 
+@njit
+def greedy_pack_data(x, y, z, voxel_id, face_id):
+    # x: 6bit, y: 6bit, z: 6bit, voxel_id: 8bit, face_id: 3bit, void --> 3bit
+    a, b, c, d, e = x, y, z, voxel_id, face_id
+
+    b_bit, c_bit, d_bit, e_bit = 6, 6, 8, 3
+    de_bit = d_bit + e_bit
+    cde_bit = c_bit + de_bit
+    bcde_bit = b_bit + cde_bit
+
+    packed_data = (
+        a << bcde_bit |
+        b << cde_bit |
+        c << de_bit |
+        d << e_bit | e
+    )
+
+    return packed_data
+
 
 @njit
 def to_uint8_ao(ao):
@@ -115,11 +137,109 @@ def add_data(vertex_data, index, *vertices):
 
 
 @njit
+def bit_length(v):
+    r =     (v > 0xFFFFFFFF) << 5; v >>= r
+    shift = (v > 0xFFFF) << 4; v >>= shift; r |= shift
+    shift = (v > 0xFF  ) << 3; v >>= shift; r |= shift
+    shift = (v > 0xF   ) << 2; v >>= shift; r |= shift
+    shift = (v > 0x3   ) << 1; v >>= shift; r |= shift
+
+    return  r | (v >> 1)
+
+
+@njit
+def greedy_mesh_builder(v_mask, face, voxel, level, gvd, indexGreedy):
+    row_length = c_size
+
+    for row in range(row_length):
+        h = 0
+        while h < row_length:
+            # Find the first solid bit (non-zero bit)
+            tmp_trl_zeros = bit_length(v_mask[row] >> h & - v_mask[row] >> h) - 1
+            h += tmp_trl_zeros + 1 if tmp_trl_zeros >= 0 else row_length
+            if h >= row_length:
+                continue  # Reached the top
+
+            # Find the height of contiguous ones starting at `h`
+            tmp_trl_ones = bit_length(~(v_mask[row] >> h) & - ~(v_mask[row] >> h)) - 1
+            trailing_ones = tmp_trl_ones + 1 if tmp_trl_ones >= 0 else 0
+
+            # Create a mask for the height
+            h_as_mask = (1 << trailing_ones) - 1 if trailing_ones > 0 else 0
+            mask = h_as_mask << h
+
+            # Grow horizontally
+            w = 1
+            while row + w < row_length:
+                # Fetch bits spanning height in the next row
+                next_row_h = (v_mask[row + w] >> h) & h_as_mask
+                if next_row_h != h_as_mask:
+                    break  # Can no longer expand horizontally
+
+                # Remove the bits we expanded into
+                v_mask[row + w] &= ~mask
+
+                w += 1
+
+            # Compute the two triangles and append them
+            match face:
+                case 0:  # Top
+                    v0 = greedy_pack_data(row, level + 1, h, voxel, face)
+                    v1 = greedy_pack_data(row + w, level + 1, h, voxel, face)
+                    v2 = greedy_pack_data(row + w, level + 1, h + trailing_ones, voxel, face)
+                    v3 = greedy_pack_data(row, level + 1, h + trailing_ones, voxel, face)
+                    indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
+
+                case 1:  # Bottom
+                    v0 = greedy_pack_data(row, level, h, voxel, face)
+                    v1 = greedy_pack_data(row + w, level, h, voxel, face)
+                    v2 = greedy_pack_data(row + w, level, h + trailing_ones, voxel, face)
+                    v3 = greedy_pack_data(row, level, h + trailing_ones, voxel, face)
+                    indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
+
+                case 2:  # Right
+                    v0 = greedy_pack_data(level + 1, h, row, voxel, face)
+                    v1 = greedy_pack_data(level + 1, h + trailing_ones, row, voxel, face)
+                    v2 = greedy_pack_data(level + 1, h + trailing_ones, row + w, voxel, face)
+                    v3 = greedy_pack_data(level + 1, h, row + w, voxel, face)
+                    indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
+
+                case 3:  # Left
+                    v0 = greedy_pack_data(level, h, row, voxel, face)
+                    v1 = greedy_pack_data(level, h + trailing_ones, row, voxel, face)
+                    v2 = greedy_pack_data(level, h + trailing_ones, row + w, voxel, face)
+                    v3 = greedy_pack_data(level, h, row + w, voxel, face)
+                    indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
+
+                case 4:  # Forward
+                    v0 = greedy_pack_data(row, h, level + 1, voxel, face)
+                    v1 = greedy_pack_data(row, h + trailing_ones, level + 1, voxel, face)
+                    v2 = greedy_pack_data(row + w, h + trailing_ones, level + 1, voxel, face)
+                    v3 = greedy_pack_data(row + w, h, level + 1, voxel, face)
+                    indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
+
+                case 5:  # Backward
+                    v0 = greedy_pack_data(row, h, level, voxel, face)
+                    v1 = greedy_pack_data(row, h + trailing_ones, level, voxel, face)
+                    v2 = greedy_pack_data(row + w, h + trailing_ones, level, voxel, face)
+                    v3 = greedy_pack_data(row + w, h, level, voxel, face)
+                    indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
+
+            h += trailing_ones
+
+    return indexGreedy
+
+
+@njit
 def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
     # Array containing additional properties [Voxel_ID, Face_ID] - type: uint8 to reduce memory size
     vertex_data = np.empty(c_vol * 18 * format_size, dtype='uint32')
+    # Array containing voxel type per face, after culling (used by greedy meshing algo)
+    greedy_raw_data = np.zeros((c_vol, 6), dtype = 'uint8')
+    greedy_vertex_data = np.empty(c_vol * 18 * format_size, dtype='uint32')
     # Init index to extract actual size of matrix
     index = 0
+    indexGreedy = 0
 
     # Iterate over each dimension, compute the vertex of the only visible faces
     for x_ind in range(c_size):
@@ -157,6 +277,17 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
                     else:
                         index = add_data(vertex_data, index, v0, v3, v2, v0, v2, v1)
 
+                    # save data for greedy meshing
+                    if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
+                        greedy_raw_data[x_ind + c_size * z_ind + c_area * y_ind, 0] = voxel_id
+                    else:
+                        # voxel is meshed as is, no need for flip id check
+                        v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 0)
+                        v1 = greedy_pack_data(x_plus, y_plus, z_ind, voxel_id, 0)
+                        v2 = greedy_pack_data(x_plus, y_plus, z_plus, voxel_id, 0)
+                        v3 = greedy_pack_data(x_ind, y_plus, z_plus, voxel_id, 0)
+                        indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
+
                 # bottom face
                 if is_void((x_ind, y_ind - 1, z_ind), (wx, wy - v_y, wz), world_voxels):
                     # Get ao values
@@ -174,6 +305,17 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
                     else:
                         index = add_data(vertex_data, index, v0, v2, v3, v0, v1, v2)
 
+                    # save data for greedy meshing
+                    if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
+                        greedy_raw_data[x_ind + c_size * z_ind + c_area * y_ind, 1] = voxel_id
+                    else:
+                        # voxel is meshed as is, no need for flip id check
+                        v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 1)
+                        v1 = greedy_pack_data(x_plus, y_plus, z_ind, voxel_id, 1)
+                        v2 = greedy_pack_data(x_plus, y_plus, z_plus, voxel_id, 1)
+                        v3 = greedy_pack_data(x_ind, y_plus, z_plus, voxel_id, 1)
+                        indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
+
                 # right face
                 if is_void((x_ind + 1, y_ind, z_ind), (wx + 1, wy, wz), world_voxels):
                     # Get ao values
@@ -189,8 +331,18 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
                     if flip_id:
                         index = add_data(vertex_data, index, v3, v0, v1, v3, v1, v2)
                     else:
-
                         index = add_data(vertex_data, index, v0, v1, v2, v0, v2, v3)
+
+                    # save data for greedy meshing
+                    if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
+                        greedy_raw_data[z_ind + c_size * y_ind + c_area * x_ind, 2] = voxel_id
+                    else:
+                        # voxel is meshed as is, no need for flip id check
+                        v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 2)
+                        v1 = greedy_pack_data(x_plus, y_plus, z_ind, voxel_id, 2)
+                        v2 = greedy_pack_data(x_plus, y_plus, z_plus, voxel_id, 2)
+                        v3 = greedy_pack_data(x_ind, y_plus, z_plus, voxel_id, 2)
+                        indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 # left face
                 if is_void((x_ind - 1, y_ind, z_ind), (wx - 1, wy, wz), world_voxels):
@@ -209,6 +361,17 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
                     else:
                         index = add_data(vertex_data, index, v0, v2, v1, v0, v3, v2)
 
+                    # save data for greedy meshing
+                    if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
+                        greedy_raw_data[z_ind + c_size * y_ind + c_area * x_ind, 3] = voxel_id
+                    else:
+                        # voxel is meshed as is, no need for flip id check
+                        v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 3)
+                        v1 = greedy_pack_data(x_plus, y_plus, z_ind, voxel_id, 3)
+                        v2 = greedy_pack_data(x_plus, y_plus, z_plus, voxel_id, 3)
+                        v3 = greedy_pack_data(x_ind, y_plus, z_plus, voxel_id, 3)
+                        indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
+
                 # back face
                 if is_void((x_ind, y_ind, z_ind - 1), (wx, wy, wz - 1), world_voxels):
                     # Get ao values
@@ -224,8 +387,18 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
                     if flip_id:
                         index = add_data(vertex_data, index, v3, v0, v1, v3, v1, v2)
                     else:
-
                         index = add_data(vertex_data, index, v0, v1, v2, v0, v2, v3)
+
+                    # save data for greedy meshing
+                    if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
+                        greedy_raw_data[x_ind + c_size * y_ind + c_area * z_ind, 4] = voxel_id
+                    else:
+                        # voxel is meshed as is, no need for flip id check
+                        v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 4)
+                        v1 = greedy_pack_data(x_plus, y_plus, z_ind, voxel_id, 4)
+                        v2 = greedy_pack_data(x_plus, y_plus, z_plus, voxel_id, 4)
+                        v3 = greedy_pack_data(x_ind, y_plus, z_plus, voxel_id, 4)
+                        indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 # front face
                 if is_void((x_ind, y_ind, z_ind + 1), (wx, wy, wz + 1), world_voxels):
@@ -244,4 +417,37 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
                     else:
                         index = add_data(vertex_data, index, v0, v2, v1, v0, v3, v2)
 
-    return vertex_data[:index + 1]
+                    # save data for greedy meshing
+                    if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
+                        greedy_raw_data[x_ind + c_size * y_ind + c_area * z_ind, 5] = voxel_id
+                    else:
+                        # voxel is meshed as is, no need for flip id check
+                        v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 5)
+                        v1 = greedy_pack_data(x_plus, y_plus, z_ind, voxel_id, 5)
+                        v2 = greedy_pack_data(x_plus, y_plus, z_plus, voxel_id, 5)
+                        v3 = greedy_pack_data(x_ind, y_plus, z_plus, voxel_id, 5)
+                        indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
+
+    # Build fast greedy mesh
+    new_mask = np.zeros(c_size, dtype = "int64")
+    for v_type in range(1, 2): # Iterate over each meshable voxel type
+        for face in range(6):
+            for cut in range(c_size):
+                raw_mask = greedy_raw_data[cut * c_area : (cut + 1) * c_area, face] == v_type
+                if raw_mask.any():
+                    for it_m in range(c_size):
+                        new_mask[it_m] = np.sum(powers * raw_mask[it_m * c_size : (it_m + 1) * c_size])
+                    indexGreedy = greedy_mesh_builder(new_mask, face, v_type, cut, greedy_vertex_data, indexGreedy)
+
+    # Truncate Vertex Data array
+    if not index:
+        vertex_data = vertex_data[:index + 1]
+    else:
+        vertex_data = vertex_data[:index]
+
+    if not indexGreedy:
+        greedy_vertex_data = greedy_vertex_data[:indexGreedy + 1]
+    else:
+        greedy_vertex_data = greedy_vertex_data[:indexGreedy]
+
+    return vertex_data, greedy_vertex_data

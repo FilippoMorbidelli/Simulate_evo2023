@@ -72,24 +72,7 @@ class World:
 
     def render(self):
         # Render Chunks
-        self.svo_frustum_render(self.svo, level=0, max_level=self.app.stg.world.vso_depth)
-        #for chunk_id in fc_pass:
-        #    if self.queries[chunk_id].samples:
-        #        flag = True
-        #    else:
-        #        flag = False
-
-        #    with self.queries[chunk_id]:
-        #        if flag:
-        #            self.app.ctx.fbo.depth_mask = True
-        #            self.app.ctx.fbo.color_mask = True, True, True, True
-        #            self.chunks[chunk_id].render()
-        #        else:
-        #            self.app.ctx.fbo.depth_mask = False
-        #            self.app.ctx.fbo.color_mask = False, False, False, False
-        #            self.chunks[chunk_id].render_oc()
-        #self.app.ctx.fbo.depth_mask = True
-        #self.app.ctx.fbo.color_mask = True, True, True, True
+        self.svo_frustum_render(self.svo)
 
         # Render Sky objects
         self.celestial.render()
@@ -97,14 +80,21 @@ class World:
         # Render Player functions
         self.voxel_marker.render()
 
-    def svo_frustum_render(self, node, level, max_level):
-        for child_coord, child_node in node.children.items():
-            if max_level == child_node.depth and child_node.visibility:
-                for ck_id, ck_center in child_node.data.items():
-                    if self.chunks[ck_id].mesh.vao.mglo.vertices > 1:
-                        self.chunks[ck_id].render()
-            elif child_node.visibility and self.frustum_check(child_node.center, sphere_radius=child_node.sides.x * 0.5 * math.sqrt(3)):
-                self.svo_frustum_render(child_node, level + 1, max_level)
+    def svo_frustum_render(self, node):
+        # Check if node is visible and inside player frustum
+        if node.visibility and self.frustum_check(node.center, sphere_radius=node.sides.x * 0.5 * math.sqrt(3)):
+
+            # Check if parent at level X contains data to be rendered
+            if node.data:
+
+                for ck_id, _ in node.data.items():
+                    self.chunks[ck_id].render()
+
+            # If node doesn't contain item check if it has children and is visible from player frustum
+            elif node.children:
+
+                for child_coord, child_node in node.children.items():
+                    self.svo_frustum_render(child_node)
 
 
 class SimGrid:

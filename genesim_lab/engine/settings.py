@@ -4,14 +4,14 @@
 # Objectives:
 
 # Import third party and engine packages --------------|
-from numba import njit
 import numpy as np
 import glm
 import math
 import pygame as pg
 import dataclasses
 from dataclasses import dataclass
-
+from numba.experimental import jitclass
+from numba import float32, int32
 
 # Settings ------------------------------------------|
 def sim_settings():
@@ -19,23 +19,23 @@ def sim_settings():
 
     # Values are reported in SI units if they have a dimension [m, s, kg, ...]
     settings = {
-        'tick': 1,  # [s] tick conversion to seconds
-        'x_min': -128,  # [m]
-        'y_min': -128,  # [m]
-        'x_max': 128,  # [m]
-        'y_max': 128,  # [m]
-        'terrain': {
-            'shape': (256, 256),
-            'resolution': (1, 1),
-            'octaves': 6,
-            'persistence': 0.5,
-            'grass_ID': 1,
-            'grass_RGB': [],
-            'water_threshold': 0.2,
-            'water_ID': 0,
-            'water_RGB': [],
-            'vegetation_ID': 2,
-            'vegetation_RGB': [],
+        'tick'    : 1,  # [s] tick conversion to seconds
+        'x_min'   : -128,  # [m]
+        'y_min'   : -128,  # [m]
+        'x_max'   : 128,  # [m]
+        'y_max'   : 128,  # [m]
+        'terrain' : {
+            'shape'           : (256, 256),
+            'resolution'      : (1, 1),
+            'octaves'         : 6,
+            'persistence'     : 0.5,
+            'grass_ID'        : 1,
+            'grass_RGB'       : [],
+            'water_threshold' : 0.2,
+            'water_ID'        : 0,
+            'water_RGB'       : [],
+            'vegetation_ID'   : 2,
+            'vegetation_RGB'  : [],
         },
         'resources': {
             'init_food_veg': 50,
@@ -55,10 +55,11 @@ def sim_settings():
 
     return settings
 
-
+# Initializations required ----------|
 pg.font.init()  # Init pygame fonts to create font inside settings
 
 
+# All game settings -----------------|
 @dataclass(slots=True, order=True)
 class WorldObj:
     # Skybox
@@ -87,26 +88,26 @@ class Interaction:
 @dataclass(slots=True, order=True)
 class World:
     # Chunk data
-    c_size: float = 48  # Chunk size == number of cubes along a dimension [N x N x N]
-    c_half: float = c_size // 2
-    c_area: float = c_size ** 2
-    c_vol: float = c_size ** 3
-    c_sphere_radius: float = c_half * math.sqrt(3)
+    c_size          : float = 48  # Chunk size == number of cubes along a dimension [N x N x N]
+    c_half          : float = c_size // 2
+    c_area          : float = c_size ** 2
+    c_vol           : float = c_size ** 3
+    c_sphere_radius : float = c_half * math.sqrt(3)
 
     # Voxel data (stretching factor along each dimension)
-    v_x: float = 1.0
-    v_y: float = 0.5
-    v_z: float = 1.0
-    scale: glm.vec3 = glm.vec3(v_x, v_y, v_z)
-    c_scale: glm.vec3 = c_size * scale
-    v_x_i: float = 1 / v_x
-    v_y_i: float = 1 / v_y
-    v_z_i: float = 1 / v_z
-    scale_i: glm.vec3 = glm.vec3(v_x_i, v_y_i, v_z_i)
+    v_x     : float = 1.0
+    v_y     : float = 0.5
+    v_z     : float = 1.0
+    scale   : glm.vec3 = glm.vec3(v_x, v_y, v_z)
+    c_scale : glm.vec3 = c_size * scale
+    v_x_i   : float = 1 / v_x
+    v_y_i   : float = 1 / v_y
+    v_z_i   : float = 1 / v_z
+    scale_i : glm.vec3 = glm.vec3(v_x_i, v_y_i, v_z_i)
 
     # World data
-    w_width: int = 128
-    w_height: int = 16
+    w_width: int = 2
+    w_height: int = 2
     w_depth: int = w_width
     w_area: int = w_width * w_depth
     w_vol: int = w_area * w_height
@@ -179,13 +180,13 @@ class Util:
 
 @dataclass(slots=True, order=True)
 class GameSettings:
-    world = World()
-    world_obj = WorldObj()
+    world       = World()
+    world_obj   = WorldObj()
     interaction = Interaction()
-    window = Window()
-    camera = CameraData()
-    player = PlayerData()
-    util = Util()
+    window      = Window()
+    camera      = CameraData()
+    player      = PlayerData()
+    util        = Util()
 
     # Addition settings to compute after init
     player.pos = glm.vec3(0, world.w_height * world.c_size * world.v_y, 0)
@@ -199,3 +200,61 @@ stg = GameSettings()
 
 (c_size, c_half, c_area, c_vol, c_sphere_radius, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
  w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, vso_depth, vso_p_sides, vso_p_center, vso_p_position) = stg.world
+
+powers = 1 << np.array(range(c_size), dtype="int64") # np.arange(c_size, dtype = "int64")
+
+# World Settings for Njit ------|
+spec = [
+    ('c_size', float32),
+    ('c_half', float32),
+    ('c_area', float32),
+    ('c_vol', float32),
+    ('c_sphere_radius', float32),
+
+    ('v_x', float32),
+    ('v_y', float32),
+    ('v_z', float32),
+
+    ('w_width', int32),
+    ('w_height', int32),
+    ('w_depth', int32),
+    ('w_area', int32),
+    ('w_vol', int32),
+
+    ('center_xz', float32),
+    ('center_y', float32)
+]
+
+@jitclass(spec)
+class WorldStgNjit(object):
+    def __init__(self):
+        # Chunk data
+        self.c_size = 48
+        self.c_half = self.c_size // 2
+        self.c_area = self.c_size ** 2
+        self.c_vol = self.c_size ** 3
+        self.c_sphere_radius = self.c_half * math.sqrt(3)
+
+        # Voxel data (stretching factor along each dimension)
+        self.v_x = 1.0
+        self.v_y = 0.5
+        self.v_z = 1.0
+
+        # World data
+        self.w_width = 2
+        self.w_height = 2
+        self.w_depth = self.w_width
+        self.w_area = self.w_width * self.w_depth
+        self.w_vol = self.w_area * self.w_height
+
+        # World center data
+        self.center_xz = self.w_width * self.c_half
+        self.center_y = self.w_height * self.c_half
+
+Ws = WorldStgNjit()
+
+# Settings functions ----------|
+
+# Change Setting Value
+
+# Reset to Basic

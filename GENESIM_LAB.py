@@ -105,9 +105,9 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
     def run(self):
         # Main engine loop
         while self.is_running:
-            self.handle_events()
-            self.update()
-            self.render()
+            self.handle_events()  # Handle event checks and computations
+            self.update()         # Perform attributes, variables and state updates
+            self.render()         # Perform render of current scene once every update has been done
         pg.quit()
         sys.exit()  # Comment during profiling
 
