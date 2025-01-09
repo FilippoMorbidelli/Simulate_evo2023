@@ -51,7 +51,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
             else:
                 val[0] = True
                 continue
-            if isinstance(self.app.scene.surfaces.flags[cond[0]][cond[1]], cond[2]):  # Condition validity
+            if isinstance(self.app.scene.surfaces.state[cond[0]][cond[1]], cond[2]):  # Condition validity
                 event_to_check = getattr(self.event_types, handle)  # Get event type
                 search = event_to_check(event, *effect)  # search if event is present
                 if search == "found":
@@ -128,9 +128,9 @@ class EventTypes:
             else:
                 event_in = event.key
             if event_in == user_in:
-                prev_status = self.app.scene.surfaces.flags['main_game'][1]  # Check state of main engine before change
+                prev_status = self.app.scene.surfaces.state['main_game'][1]  # Check state of main engine before change
                 for name, value in zip(flag_name, flag_value):
-                    self.app.scene.surfaces.flags[name] = value
+                    self.app.scene.surfaces.state[name] = value
                 reset_view(self.app, prev_status)
                 self.app.custom_events.major_change = True
             return "found"
@@ -155,10 +155,10 @@ class EventTypes:
                 event_in = event.button
             else:
                 event_in = event.key
-            if event_in == user_in and self.app.scene.surfaces.flags[flag][0]:
-                self.app.scene.surfaces.flags[flag] = [False, None, None]
-            elif event_in == user_in and not self.app.scene.surfaces.flags[flag][0]:
-                self.app.scene.surfaces.flags[flag] = [True, 0.1, "Update"]
+            if event_in == user_in and self.app.scene.surfaces.state[flag][0]:
+                self.app.scene.surfaces.state[flag] = [False, None, None]
+            elif event_in == user_in and not self.app.scene.surfaces.state[flag][0]:
+                self.app.scene.surfaces.state[flag] = [True, 0.1, "Update"]
 
     def sub_init_world(self):
         self.app.scene.surfaces.surf.main_game.init_world()
@@ -258,7 +258,7 @@ def events_catalog():
 
 
 def reset_view(app, prev_status):
-    main_game_status = app.scene.surfaces.flags['main_game'][1]
+    main_game_status = app.scene.surfaces.state['main_game'][1]
     if main_game_status == 1 and main_game_status != prev_status:
         pg.mouse.set_visible(False)
         pg.mouse.get_rel()

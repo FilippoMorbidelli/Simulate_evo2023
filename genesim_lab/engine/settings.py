@@ -93,6 +93,7 @@ class World:
     c_area          : float = c_size ** 2
     c_vol           : float = c_size ** 3
     c_sphere_radius : float = c_half * math.sqrt(3)
+    c_threshold     : float = c_size * 12 # Camera-Chunk distance from which the greedy mesh can be used
 
     # Voxel data (stretching factor along each dimension)
     v_x     : float = 1.0
@@ -106,8 +107,8 @@ class World:
     scale_i : glm.vec3 = glm.vec3(v_x_i, v_y_i, v_z_i)
 
     # World data
-    w_width: int = 2
-    w_height: int = 2
+    w_width: int = 64
+    w_height: int = 16
     w_depth: int = w_width
     w_area: int = w_width * w_depth
     w_vol: int = w_area * w_height
@@ -198,7 +199,7 @@ class GameSettings:
 
 stg = GameSettings()
 
-(c_size, c_half, c_area, c_vol, c_sphere_radius, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
+(c_size, c_half, c_area, c_vol, c_sphere_radius, c_threshold, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
  w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, vso_depth, vso_p_sides, vso_p_center, vso_p_position) = stg.world
 
 powers = 1 << np.array(range(c_size), dtype="int64") # np.arange(c_size, dtype = "int64")

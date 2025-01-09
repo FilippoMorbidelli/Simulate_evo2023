@@ -138,6 +138,8 @@ def add_data(vertex_data, index, *vertices):
 
 @njit
 def bit_length(v):
+    # Custom method to compute log2(v)
+    # Used to find bit length of v in numba since bit_length method is not implemented
     r =     (v > 0xFFFFFFFF) << 5; v >>= r
     shift = (v > 0xFFFF) << 4; v >>= shift; r |= shift
     shift = (v > 0xFF  ) << 3; v >>= shift; r |= shift
@@ -153,22 +155,24 @@ def greedy_mesh_builder(v_mask, face, voxel, level, gvd, indexGreedy):
 
     for row in range(row_length):
         h = 0
+        # Row is empty from start
+        if v_mask[row] >> h == 0:
+            continue
         while h < row_length:
+            # Row is empty
+            if v_mask[row] >> h == 0:
+                break
             # Find the first solid bit (non-zero bit)
-            tmp_trl_zeros = bit_length(v_mask[row] >> h & - v_mask[row] >> h) - 1
-            h += tmp_trl_zeros + 1 if tmp_trl_zeros >= 0 else row_length
-            if h >= row_length:
-                continue  # Reached the top
+            h += bit_length(v_mask[row] >> h & - (v_mask[row] >> h))
 
             # Find the height of contiguous ones starting at `h`
-            tmp_trl_ones = bit_length(~(v_mask[row] >> h) & - ~(v_mask[row] >> h)) - 1
-            trailing_ones = tmp_trl_ones + 1 if tmp_trl_ones >= 0 else 0
+            trailing_ones = bit_length(~(v_mask[row] >> h) & - ~(v_mask[row] >> h))
 
             # Create a mask for the height
             h_as_mask = (1 << trailing_ones) - 1 if trailing_ones > 0 else 0
             mask = h_as_mask << h
 
-            # Grow horizontally
+            # Grow vertically
             w = 1
             while row + w < row_length:
                 # Fetch bits spanning height in the next row
@@ -184,46 +188,46 @@ def greedy_mesh_builder(v_mask, face, voxel, level, gvd, indexGreedy):
             # Compute the two triangles and append them
             match face:
                 case 0:  # Top
-                    v0 = greedy_pack_data(row, level + 1, h, voxel, face)
-                    v1 = greedy_pack_data(row + w, level + 1, h, voxel, face)
-                    v2 = greedy_pack_data(row + w, level + 1, h + trailing_ones, voxel, face)
-                    v3 = greedy_pack_data(row, level + 1, h + trailing_ones, voxel, face)
+                    v0 = greedy_pack_data(h, level + 1, row, voxel, face)
+                    v1 = greedy_pack_data(h + trailing_ones, level + 1, row, voxel, face)
+                    v2 = greedy_pack_data(h + trailing_ones, level + 1, row + w, voxel, face)
+                    v3 = greedy_pack_data(h, level + 1, row + w, voxel, face)
                     indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 case 1:  # Bottom
-                    v0 = greedy_pack_data(row, level, h, voxel, face)
-                    v1 = greedy_pack_data(row + w, level, h, voxel, face)
-                    v2 = greedy_pack_data(row + w, level, h + trailing_ones, voxel, face)
-                    v3 = greedy_pack_data(row, level, h + trailing_ones, voxel, face)
-                    indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
+                    v0 = greedy_pack_data(h, level, row, voxel, face)
+                    v1 = greedy_pack_data(h + trailing_ones, level, row, voxel, face)
+                    v2 = greedy_pack_data(h + trailing_ones, level, row + w, voxel, face)
+                    v3 = greedy_pack_data(h, level, row + w, voxel, face)
+                    indexGreedy = add_data(gvd, indexGreedy, v0, v2, v3, v0, v1, v2)
 
                 case 2:  # Right
-                    v0 = greedy_pack_data(level + 1, h, row, voxel, face)
-                    v1 = greedy_pack_data(level + 1, h + trailing_ones, row, voxel, face)
-                    v2 = greedy_pack_data(level + 1, h + trailing_ones, row + w, voxel, face)
-                    v3 = greedy_pack_data(level + 1, h, row + w, voxel, face)
-                    indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
+                    v0 = greedy_pack_data(level + 1, row, h, voxel, face)
+                    v1 = greedy_pack_data(level + 1, row + w, h, voxel, face)
+                    v2 = greedy_pack_data(level + 1, row + w, h + trailing_ones, voxel, face)
+                    v3 = greedy_pack_data(level + 1, row, h + trailing_ones, voxel, face)
+                    indexGreedy = add_data(gvd, indexGreedy, v0, v1, v2, v0, v2, v3)
 
                 case 3:  # Left
-                    v0 = greedy_pack_data(level, h, row, voxel, face)
-                    v1 = greedy_pack_data(level, h + trailing_ones, row, voxel, face)
-                    v2 = greedy_pack_data(level, h + trailing_ones, row + w, voxel, face)
-                    v3 = greedy_pack_data(level, h, row + w, voxel, face)
-                    indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
+                    v0 = greedy_pack_data(level, row, h, voxel, face)
+                    v1 = greedy_pack_data(level, row + w, h, voxel, face)
+                    v2 = greedy_pack_data(level, row + w, h + trailing_ones, voxel, face)
+                    v3 = greedy_pack_data(level, row, h + trailing_ones, voxel, face)
+                    indexGreedy = add_data(gvd, indexGreedy, v0, v2, v1, v0, v3, v2)
 
-                case 4:  # Forward
-                    v0 = greedy_pack_data(row, h, level + 1, voxel, face)
-                    v1 = greedy_pack_data(row, h + trailing_ones, level + 1, voxel, face)
-                    v2 = greedy_pack_data(row + w, h + trailing_ones, level + 1, voxel, face)
-                    v3 = greedy_pack_data(row + w, h, level + 1, voxel, face)
-                    indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
+                case 4:  # Back
+                    v0 = greedy_pack_data(h, row, level, voxel, face)
+                    v1 = greedy_pack_data(h, row + w, level, voxel, face)
+                    v2 = greedy_pack_data(h + trailing_ones, row + w, level, voxel, face)
+                    v3 = greedy_pack_data(h + trailing_ones, row, level, voxel, face)
+                    indexGreedy = add_data(gvd, indexGreedy, v0, v1, v2, v0, v2, v3)
 
-                case 5:  # Backward
-                    v0 = greedy_pack_data(row, h, level, voxel, face)
-                    v1 = greedy_pack_data(row, h + trailing_ones, level, voxel, face)
-                    v2 = greedy_pack_data(row + w, h + trailing_ones, level, voxel, face)
-                    v3 = greedy_pack_data(row + w, h, level, voxel, face)
-                    indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
+                case 5:  # Forward
+                    v0 = greedy_pack_data(h, row, level + 1, voxel, face)
+                    v1 = greedy_pack_data(h, row + w, level + 1, voxel, face)
+                    v2 = greedy_pack_data(h + trailing_ones, row + w, level + 1, voxel, face)
+                    v3 = greedy_pack_data(h + trailing_ones, row, level + 1, voxel, face)
+                    indexGreedy = add_data(gvd, indexGreedy, v0, v2, v1, v0, v3, v2)
 
             h += trailing_ones
 
@@ -338,10 +342,10 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
                         greedy_raw_data[z_ind + c_size * y_ind + c_area * x_ind, 2] = voxel_id
                     else:
                         # voxel is meshed as is, no need for flip id check
-                        v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 2)
+                        v0 = greedy_pack_data(x_plus, y_plus, z_ind, voxel_id, 2)
                         v1 = greedy_pack_data(x_plus, y_plus, z_ind, voxel_id, 2)
                         v2 = greedy_pack_data(x_plus, y_plus, z_plus, voxel_id, 2)
-                        v3 = greedy_pack_data(x_ind, y_plus, z_plus, voxel_id, 2)
+                        v3 = greedy_pack_data(x_plus, y_plus, z_plus, voxel_id, 2)
                         indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 # left face
@@ -366,10 +370,10 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels):
                         greedy_raw_data[z_ind + c_size * y_ind + c_area * x_ind, 3] = voxel_id
                     else:
                         # voxel is meshed as is, no need for flip id check
-                        v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 3)
-                        v1 = greedy_pack_data(x_plus, y_plus, z_ind, voxel_id, 3)
-                        v2 = greedy_pack_data(x_plus, y_plus, z_plus, voxel_id, 3)
-                        v3 = greedy_pack_data(x_ind, y_plus, z_plus, voxel_id, 3)
+                        v0 = greedy_pack_data(x_ind, y_ind, z_ind, voxel_id, 3)
+                        v1 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 3)
+                        v2 = greedy_pack_data(x_ind, y_plus, z_plus, voxel_id, 3)
+                        v3 = greedy_pack_data(x_ind, y_ind, z_plus, voxel_id, 3)
                         indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 # back face

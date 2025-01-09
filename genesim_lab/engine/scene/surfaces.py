@@ -20,7 +20,7 @@ class Surfaces:
         self.active = None
 
         # Init flags, handle, update and render for each scene
-        self.flags = {  # Dictionary containing the scene status flags
+        self.state = {  # Dictionary containing the scene status flags
             # Surface: render --> [True, False]
             #          level  --> [1, 2, 3, ..., None]
             #          update --> [Update, Frozen, None]
@@ -80,7 +80,7 @@ class Surfaces:
         return surf_group
 
     def handle_current_scene(self):
-        self.active = [[scene, status] for scene, status in self.flags.items() if status[0] is True]
+        self.active = [[scene, status] for scene, status in self.state.items() if status[0] is True]
         self.active = sorted(self.active, key=lambda x: x[1][1], reverse=True)
 
     def update_current_scene(self):
@@ -88,7 +88,7 @@ class Surfaces:
             if act_surf[1][2]:
                 self.update[act_surf[0]](self.app)
         # Check if player should move, if not reset all (TBD)
-        if self.flags['main_game'][1] == 1:
+        if self.state['main_game'][1] == 1:
             self.update['player_control']()
 
     def render_current_scene(self):
@@ -181,7 +181,7 @@ class MainGame:
     def __init__(self, app):
         self.app = app
 
-        # Istantiate world
+        # Instance world
         self.world = None
 
         # Init overlay elements

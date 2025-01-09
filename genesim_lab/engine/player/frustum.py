@@ -45,7 +45,3 @@ class Frustum:
             return False
 
         return True
-
-#spec = [
-#    ('cam',
-#]

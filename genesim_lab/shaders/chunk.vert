@@ -13,12 +13,10 @@ uniform mat4 m_proj;
 uniform mat4 m_view;
 uniform mat4 m_model;
 uniform vec3 scale;
-//uniform vec3 p_pos;
 
 flat out int voxel_id;
 flat out int face_id;
 
-out vec3 voxel_color;
 out vec2 uv;
 out float shading;
 

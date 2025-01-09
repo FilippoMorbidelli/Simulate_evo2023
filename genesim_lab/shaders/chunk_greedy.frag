@@ -10,8 +10,8 @@ const vec3 inv_gamma = 1 / gamma;
 
 uniform sampler2DArray u_texture_array_0;
 
+in vec3 voxel_color;
 in vec2 uv;
-in float shading;
 
 flat in int voxel_id;
 flat in int face_id;
@@ -21,10 +21,6 @@ void main() {
     face_uv.x = uv.x / 3.0 - min(face_id, 2) / 3.0;
 
     vec3 tex_col = texture(u_texture_array_0, vec3(face_uv, voxel_id)).rgb;
-    tex_col = pow(tex_col, gamma);
 
-    tex_col *= shading;
-
-    tex_col = pow(tex_col, inv_gamma);
     fragColor = vec4(tex_col, 1);
 }
