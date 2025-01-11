@@ -2,16 +2,18 @@
 # Author: Filippo Morbidelli
 # Created on: 31/07/2023
 # Last update: 17/12/2023
-# Notes: Main module to run simulation engine
+# Notes: Main module to run simulation Engine
 
-# Import third party and engine packages ---------|
-from genesim_lab.engine.scene.scene import Scene
-from genesim_lab.engine.scene.surfaces import *
-from genesim_lab.engine.world_gen.shader_program import ShaderProgram
-from genesim_lab.engine.scene.events import *
-from genesim_lab.engine.player.player import Player
-from genesim_lab.engine.settings import *
-from genesim_lab.engine.world_gen.textures import Textures
+# Import third party and Engine packages ---------|
+from genesim_lab.Engine.scene.scene import Scene
+from genesim_lab.Engine.scene.surfaces import *
+from genesim_lab.Engine.world_gen.shader_program import ShaderProgram
+from genesim_lab.Engine.scene.events import *
+from genesim_lab.Engine.player.player import Player
+from genesim_lab.Engine.settings import *
+from genesim_lab.Engine.world_gen.textures import Textures
+from genesim_lab.Saves.SaveManager import SaveManager
+
 import moderngl as mgl
 import pygame as pg
 import sys
@@ -22,20 +24,20 @@ import io
 
 
 # Game start -----------------------------------|
-class BoxelEngine:  # Voxel engine inspired from Minecraft
+class BoxelEngine:  # Voxel Engine inspired from Minecraft
 
-    def __init__(self):  # Initialize engine
-        # Initialize engine window
+    def __init__(self):  # Initialize Engine
+        # Initialize Engine window
         pg.init()
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)  # X. OpenGL version
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)  # .X OpenGL version
         pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)  #
         pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  # 
 
-        # Initialize engine settings
+        # Initialize Engine settings
         self.stg = stg
 
-        # Set engine window size (default: full screen)
+        # Set Engine window size (default: full screen)
         if self.stg.window.full_screen:
             self.screen = pg.display.set_mode((0, 0), flags=pg.FULLSCREEN | pg.OPENGL | pg.DOUBLEBUF)
         else:
@@ -65,7 +67,10 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         # Game is running?
         self.is_running = True
 
-        # Init player control (during main engine as master only)
+        # Init Save/Load Manager
+        self.save_load = SaveManager(self)
+
+        # Init player control (during main Engine as master only)
         self.player = Player(self)
 
         # Init scene and shader programs
@@ -86,7 +91,7 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         # Update mouse position
         self.mouse = pg.mouse.get_pos()
 
-        # Update 3D shaders 2D shaders and scene
+        # Update 3D Shaders, 2D Shaders and scene
         self.scene.update()
 
     def render(self):
@@ -100,10 +105,10 @@ class BoxelEngine:  # Voxel engine inspired from Minecraft
         self.event_list = pg.event.get()
 
         # Check always functioning events (ALT+F4, ecc)
-        self.custom_events.handle_events(self)
+        self.custom_events.handle_events()
 
     def run(self):
-        # Main engine loop
+        # Main Engine loop
         while self.is_running:
             self.handle_events()  # Handle event checks and computations
             self.update()         # Perform attributes, variables and state updates
@@ -121,7 +126,7 @@ def profiling():
     ps = pstats.Stats(pr, stream=s).sort_stats('tottime')
     ps.print_stats()
 
-    with open('profiling/stats_18022024.txt', 'w+') as f:
+    with open('profiling/stats_11012025.txt', 'w+') as f:
         f.write(s.getvalue())
 
 
