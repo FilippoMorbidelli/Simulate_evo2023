@@ -93,7 +93,7 @@ class World:
     c_area          : float = c_size ** 2
     c_vol           : float = c_size ** 3
     c_sphere_radius : float = c_half * math.sqrt(3)
-    c_threshold     : float = c_size * 12 # Camera-Chunk distance from which the greedy mesh can be used
+    c_threshold     : float = c_size * 0.12 # Camera-Chunk distance from which the greedy mesh can be used
 
     # Voxel data (stretching factor along each dimension)
     v_x     : float = 1.0
@@ -107,7 +107,7 @@ class World:
     scale_i : glm.vec3 = glm.vec3(v_x_i, v_y_i, v_z_i)
 
     # World data
-    w_width: int = 4
+    w_width: int = 8
     w_height: int = 4
     w_depth: int = w_width
     w_area: int = w_width * w_depth

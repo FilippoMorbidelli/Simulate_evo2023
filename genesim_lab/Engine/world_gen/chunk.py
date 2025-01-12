@@ -35,7 +35,6 @@ class Chunk:
 
     def set_uniform(self):
         self.mesh.program['m_model'].write(self.m_model)
-        self.mesh.program_greedy['m_model'].write(self.m_model)
 
     def build_mesh(self):
         self.mesh = ChunkMesh(self)
@@ -43,11 +42,7 @@ class Chunk:
     def render(self):
         if not self.is_empty:
             self.set_uniform()
-
-            if glm.distance(self.app.player.frustum.cam.position, self.center) > self.app.stg.world.c_threshold:
-                self.mesh.render_greedy()
-            else:
-                self.mesh.render()
+            self.mesh.render()
 
     def build_voxels(self):
         # Empty chunk

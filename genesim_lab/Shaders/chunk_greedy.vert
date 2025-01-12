@@ -4,6 +4,7 @@
 #extension GL_ARB_explicit_uniform_location : require
 
 layout (location = 0) in uint packed_data;
+layout (location = 1) in int mega_node_pos;
 
 int x, y, z;
 
@@ -55,7 +56,13 @@ void main() {
     unpack(packed_data);
 
     vec3 in_position = vec3(x, y, z);
-    gl_Position = m_proj * m_view * m_model * vec4(in_position * scale, 1.0);
+
+    int y_node = int(floor(mega_node_pos / 16));
+    int z_node = int(floor((mega_node_pos % 16) / 4));
+    int x_node = int((mega_node_pos % 16) % 4);
+    vec3 node_position = vec3(x_node, y_node, z_node) * 48;
+
+    gl_Position = m_proj * m_view * m_model * vec4((in_position + node_position) * scale, 1.0);
 
     int uv_index = gl_VertexID % 6 + (face_id & 1) * 6;
 

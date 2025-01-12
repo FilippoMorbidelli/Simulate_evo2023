@@ -30,7 +30,7 @@ class World:
 
         # Build world sparse voxel octree
         self.svo = build_svo(app, self.chunks, self.svo_pointer)
-        self.queries = [self.app.ctx.query(samples=True) for _ in range(len(self.chunks))]
+        #self.queries = [self.app.ctx.query(samples=True) for _ in range(len(self.chunks))]
 
         # Player interactivity
         self.voxel_handler = VoxelHandler(self)
@@ -84,8 +84,13 @@ class World:
         # Check if node is visible and inside player frustum
         if node.visibility and self.frustum_check(node.center, sphere_radius=node.sides.x * 0.5 * math.sqrt(3)):
 
+            # Check if parent is mega node and greedy rendering is requested
+            if node.depth == (self.app.stg.world.vso_depth - 1) and glm.distance(self.app.player.frustum.cam.position, node.center) > self.app.stg.world.c_threshold:
+
+                node.render_greedy()
+
             # Check if parent at level X contains data to be rendered
-            if node.data:
+            elif node.data:
 
                 for ck_id, _ in node.data.items():
                     self.chunks[ck_id].render()
