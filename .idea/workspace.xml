@@ -5,88 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/profiling/stats_11012025.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/overlay_crosshair.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_game/overlay_crosshair.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/sky_array.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_game/terrain/sky_array.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/skybox_back.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_game/terrain/skybox_back.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/skybox_bottom.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_game/terrain/skybox_bottom.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/skybox_front.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_game/terrain/skybox_front.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/skybox_left.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_game/terrain/skybox_left.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/skybox_right.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_game/terrain/skybox_right.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/skybox_top.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_game/terrain/skybox_top.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/terrain_array.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_game/terrain/terrain_array.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_game/terrain/voxel_blank.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_game/terrain/voxel_blank.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/background_logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/background_logo.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/background_menu.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/background_menu.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_continue_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_continue_F.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_continue_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_continue_T.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_play_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_play_F.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_play_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_play_T.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_quit_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_quit_F.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_quit_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_quit_T.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_settings_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_settings_F.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/main_menu/button_settings_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_settings_T.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/other/cursor.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/other/cursor.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/pause_menu/background_window.png" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/background_window.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/pause_menu/background_window.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/background_window.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/pause_menu/button_quit_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_quit_F.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/pause_menu/button_quit_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_quit_T.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/pause_menu/button_return_main_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_return_main_F.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/pause_menu/button_return_main_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_return_main_T.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/pause_menu/button_save_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_save_F.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/pause_menu/button_save_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_save_T.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/pause_menu/button_settings_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_settings_F.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/assets/pause_menu/button_settings_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_settings_T.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/camera.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/frustum.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/frustum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/player.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/player/voxel_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/voxel_handler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/scene.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/scene.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/sprite.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/chunk.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/chunk.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/shader_program.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/shader_program.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/sparsevoxeloctree.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/sparsevoxeloctree.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/textures.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/textures.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_objects/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_objects/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_objects/celestial_body.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_objects/celestial_body.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_objects/genetic_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_objects/genetic_db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_objects/life.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_objects/life.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_objects/resources.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_objects/resources.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_objects/voxel_marker.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_objects/voxel_marker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/engine/world_objects/world_clock.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_objects/world_clock.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/base_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Meshes/base_mesh.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/celestial_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Meshes/celestial_mesh.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/chunk_mesh_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/cube_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Meshes/cube_mesh.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/meshes/quad_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Meshes/quad_mesh.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/2D_sprite.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/2D_sprite.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/2D_sprite.vert" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/celestial.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/celestial.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/celestial.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/celestial.vert" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/chunk.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/chunk.vert" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk_greedy.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/chunk_greedy.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/chunk_greedy.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/chunk_greedy.vert" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/quad.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/quad.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/quad.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/quad.vert" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/skybox.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/skybox.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/skybox.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/skybox.vert" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/voxel_marker.frag" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/voxel_marker.frag" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/shaders/voxel_marker.vert" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Shaders/voxel_marker.vert" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/sound/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Sound/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -214,7 +135,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/genesim_lab/Engine/world_gen/chunk.py</url>
-          <line>46</line>
+          <line>51</line>
           <option name="timeStamp" value="53" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">

@@ -30,7 +30,6 @@ class World:
 
         # Build world sparse voxel octree
         self.svo = build_svo(app, self.chunks, self.svo_pointer)
-        self.queries = [self.app.ctx.query(samples=True) for _ in range(len(self.chunks))]
 
         # Player interactivity
         self.voxel_handler = VoxelHandler(self)
