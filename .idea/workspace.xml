@@ -5,8 +5,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/saves_menu/static_alt_load.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/saves_menu/static_alt_save.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/background_logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/main_menu/background_logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/background_menu.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/main_menu/background_menu.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_continue_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/main_menu/button_continue_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_continue_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/main_menu/button_continue_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_play_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/main_menu/button_play_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_play_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/main_menu/button_play_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_quit_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/main_menu/button_quit_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_quit_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/main_menu/button_quit_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_settings_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/main_menu/button_settings_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/main_menu/button_settings_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/main_menu/button_settings_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/background_window.png" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/pause_menu/background_window.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/background_window.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/pause_menu/background_window.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_quit_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/pause_menu/button_quit_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_quit_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/pause_menu/button_quit_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_return_main_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/pause_menu/button_return_main_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_return_main_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/pause_menu/button_return_main_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_save_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/pause_menu/button_save_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_save_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/pause_menu/button_save_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_settings_F.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/pause_menu/button_settings_F.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/pause_menu/button_settings_T.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/pause_menu/button_settings_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/sprite.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,11 +92,11 @@
       <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\world" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\genesim_lab\Assets\menus" />
       <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\scene" />
       <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\world_gen" />
       <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\player" />
       <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine" />
-      <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\management" />
     </key>
   </component>
   <component name="RunManager">

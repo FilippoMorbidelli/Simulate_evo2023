@@ -163,6 +163,26 @@ class ButtonSprite(pg.sprite.Sprite):
     def update(self, *args):
         pass
 
+class StaticAltSprite(pg.sprite.Sprite):
+    def __init__(self, app, scene, flag, alts, xy, ext = "svg"):
+        super().__init__()
+        # Generate rect and load associated textures
+        self.sprite = {}
+        for a in alts:
+            self.sprite[a] = pg.image.load(f'genesim_lab/assets/{scene}/static_alt_{a}.{ext}').convert_alpha()
+        wh = self.sprite[a].get_size()
+        self.rect = pg.Rect(xy[0], xy[1], wh[0], wh[1])  # Generate sprite rect from main window
+        # Set default sprite
+        self.image = self.sprite[a]
+        # Set other parameters
+        self.mask = pg.mask.from_surface(self.image)
+        self.name = f"static_alt_{alts[-1]}"
+        self.flag = flag  # Flag to determine if sprite is dynamic or not
+        self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame
+
+    def alternate(self, alt):
+        self.image = self.sprite[alt]
+
 
 class UtilityStaticText(pg.sprite.Sprite):
     def __init__(self, app, name, text, rect=None, align="left"):
@@ -219,7 +239,7 @@ class FpsSprite(pg.sprite.Sprite):
         super().__init__()
         self.image = pg.Surface((100, 100), pg.SRCALPHA, 32)
         self.image.blit(app.stg.util.text_font.render(f'{app.clock.get_fps() :.0f}',
-                                                              True, app.stg.util.text_color), (0, 0))
+                                                      True, app.stg.util.text_color), (0, 0))
         self.rect = pg.Rect(0, 0, 100, 100)
         self.name = "fps_counter"
         self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame

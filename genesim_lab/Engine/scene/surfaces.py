@@ -88,7 +88,7 @@ class Surfaces:
         surf_group.utility       = UtilityMenu(self.app)
         surf_group.main_game     = MainGame(self.app)
         surf_group.main_menu     = MainMenu(self.app)
-        surf_group.saves_menu    = SavesMenu(self.app)
+        surf_group.saves_menu    = SaveLoadMenu(self.app)
         surf_group.settings_menu = SettingsMenu(self.app)
         surf_group.pause_menu    = PauseMenu(self.app)
         surf_group.other         = Other(self.app)
@@ -128,23 +128,23 @@ class MainMenu:
         # Load first backgrounds and then foremost sprites, defining the z order
 
         # Background menu button
-        background_menu = BackgroundSprite(app, "main_menu", "menu",  "svg", False)
+        background_menu = BackgroundSprite(app, "menu/main_menu", "menu",  "svg", False)
         app.shader_prog_2D.main_menu.add(background_menu)
         # Background team logo button
-        background_logo = BackgroundSprite(app, "main_menu", "logo", "svg", False)
+        background_logo = BackgroundSprite(app, "menu/main_menu", "logo", "svg", False)
         app.shader_prog_2D.main_menu.add(background_logo)
 
         # Play button
-        button_play = ButtonSprite(app, "main_menu", "play", "svg", True)
+        button_play = ButtonSprite(app, "menu/main_menu", "play", "svg", True)
         app.shader_prog_2D.main_menu.add(button_play)
         # Continue button (with SaveFiles)
-        button_continue = ButtonSprite(app, "main_menu", "continue", "svg", True)
+        button_continue = ButtonSprite(app, "menu/main_menu", "continue", "svg", True)
         app.shader_prog_2D.main_menu.add(button_continue)
         # Settings button
-        button_settings = ButtonSprite(app, "main_menu", "settings", "svg", True)
+        button_settings = ButtonSprite(app, "menu/main_menu", "settings", "svg", True)
         app.shader_prog_2D.main_menu.add(button_settings)
         # Quit button
-        button_quit = ButtonSprite(app, "main_menu", "quit", "svg", True)
+        button_quit = ButtonSprite(app, "menu/main_menu", "quit", "svg", True)
         app.shader_prog_2D.main_menu.add(button_quit)
 
 
@@ -163,27 +163,32 @@ class PauseMenu:
     def __init__(self, app):
         # Init each sprite for the pause menu scene
         # Background transparent window button
-        background_window = BackgroundSprite(app, "pause_menu", "window", "svg", False)
+        background_window = BackgroundSprite(app, "menu/pause_menu", "window", "svg", False)
         app.shader_prog_2D.pause_menu.add(background_window)
 
         # Return to main menu button
-        button_return_main = ButtonSprite(app, "pause_menu", "return_main", "svg", True)
+        button_return_main = ButtonSprite(app, "menu/pause_menu", "return_main", "svg", True)
         app.shader_prog_2D.pause_menu.add(button_return_main)
         # Save button
-        button_save = ButtonSprite(app, "pause_menu", "save", "svg", True)
+        button_save = ButtonSprite(app, "menu/pause_menu", "save", "svg", True)
         app.shader_prog_2D.pause_menu.add(button_save)
         # Settings button
-        button_settings = ButtonSprite(app, "pause_menu", "settings", "svg", True)
+        button_settings = ButtonSprite(app, "menu/pause_menu", "settings", "svg", True)
         app.shader_prog_2D.pause_menu.add(button_settings)
         # Quit button
-        button_quit = ButtonSprite(app, "pause_menu", "quit", "svg", True)
+        button_quit = ButtonSprite(app, "menu/pause_menu", "quit", "svg", True)
         app.shader_prog_2D.pause_menu.add(button_quit)
 
 
-class SavesMenu:
+class SaveLoadMenu:
 
     def __init__(self, app):
-        pass
+        # Init each sprite for the SaveLoad menu scene
+        # Background
+
+        # Title (alternating between Load and Save)
+        static_alt_title = StaticAltSprite(app, "menu/saves_menu", True, ["load", "save"], [75, 30])
+        app.shader_prog_2D.saves_menu.add(static_alt_title)
 
 
 class SettingsMenu:

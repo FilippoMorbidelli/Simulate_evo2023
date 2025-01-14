@@ -259,6 +259,107 @@ def events_catalog():
     }
     return catalog
 
+def events_catalog2():
+    # Full catalog containing every user interaction in the game
+    # The catalog is organized based of the current scene the player is at
+    # Every interaction is represented by:
+    # Interaction name = [operation type, event conditions, event outcomes]
+    catalog = {
+        # Other events / always active events
+        GS.Other : {
+            "emergency_quit": [
+                "quit_game",  # Event handle to use for this custom event
+                [pg.KEYDOWN, "key", [pg.K_LALT, pg.K_F4]],  # Event data
+                [],
+            ],
+            "debug_window": [
+                "overlap_scene",  # Event handle to use for this custom event
+                [pg.KEYDOWN, "key", pg.K_F1, GS.UtilityOverlay],  # Event data
+                [],
+            ],
+        },
+
+        GS.MainMenu : {
+            # sprite = [handle type,[event.type, event.button, flag_names, flag_values]]
+            "button_play": [
+                "change_scene",  # Event handle to use for this custom event
+                [pg.MOUSEBUTTONDOWN, "button", 1],
+                [set_primary(GS.MainGame), reset_status(GS.MainMenu)],
+            ],
+            "button_continue": [
+                "change_scene",  # Event handle to use for this custom event
+                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SaveLoadMenu, GS.MainMenu], [[True, 1, "Update"],  # Event data
+                                                                                [False, None, None]]],
+                [True],  # Event validity status
+            ],
+            "button_settings": [
+                "change_scene",  # Event handle to use for this custom event
+                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SaveLoadMenu, GS.MainMenu], [[True, 1, "Update"],  # Event data
+                                                                                   [False, None, None]]],
+                [True],  # Event validity status
+            ],
+            # sprite = [handle type,[event.type, event.button, game_running]]
+            "button_quit": [
+                "quit_game",  # Event handle to use for this custom event
+                [pg.MOUSEBUTTONDOWN, "button", 1, False],  # Event data
+                [True],  # Event validity status
+            ]
+        },
+
+        GS.PauseMenu : {
+            "button_return_main": [
+                "change_scene",  # Event handle to use for this custom event
+                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.PauseMenu, GS.MainMenu, GS.MainGame],  # Event data
+                 [[False, None, None], [True, 1, "Update"], [False, None, None]]],
+                [True],  # Event validity status
+            ],
+            "button_save": [
+                "change_scene",  # Event handle to use for this custom event
+                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SaveLoadMenu, GS.PauseMenu], [[True, 1, "Update"],  # Event data
+                                                                                 [False, None, None]]],
+                [True],  # Event validity status
+            ],
+            "button_settings": [
+                "change_scene",  # Event handle to use for this custom event
+                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SettingsMenu, GS.PauseMenu], [[True, 1, "Update"],  # Event data
+                                                                                    [False, None, None]]],
+                [True],  # Event validity status
+            ],
+            "button_quit": [
+                "quit_game",  # Event handle to use for this custom event
+                [pg.MOUSEBUTTONDOWN, "button", 1, False],  # Event data
+                [True],  # Event validity status
+            ],
+            "close_pause_menu": [
+                "change_scene",  # Op type
+                [pg.KEYDOWN, "key", pg.K_ESCAPE],  # Activation conditions
+                [set_primary(GS.MainGame), reset_status(GS.PauseMenu)],  # Outcomes
+            ]
+        },
+
+        GS.MainGame : {
+            "init_game": [
+                "init_world",  # Event handle to use for this custom event
+                [],
+                [],
+            ],
+            "open_pause_menu": [
+                "change_scene",  # Event handle to use for this custom event
+                [pg.KEYDOWN, "key", pg.K_ESCAPE],
+                [set_primary(GS.PauseMenu), set_custom(GS.MainGame, 2, "Frozen")],  # Event data
+            ]
+        },
+    }
+    return catalog
+
+def reset_status(scene):
+    scene = [False, None, None]
+
+def set_primary(scene):
+    scene = [True, 1, "Update"]
+
+def set_custom(scene, depth, activity="Update"):
+    scene = [True, depth, activity]
 
 def reset_view(app, prev_status):
     main_game_status = app.scene.surfaces.state[GS.MainGame][SD.Depth]

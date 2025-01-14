@@ -67,9 +67,6 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         # Game is running?
         self.is_running = True
 
-        # Init Save/Load Manager
-        self.save_load = SaveManager(self)
-
         # Init player control (during main Engine as master only)
         self.player = Player(self)
 
@@ -78,6 +75,9 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         self.shader_prog_2D = init_shaders_2d(self)
         self.shader_prog_3D = ShaderProgram(self)
         self.scene = Scene(self)
+
+        # Init Save/Load Manager
+        self.save_load = SaveManager(self)
 
         # Init custom events and event list
         self.custom_events = EventHandler(self)
