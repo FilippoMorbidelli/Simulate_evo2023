@@ -111,6 +111,22 @@ class Surfaces:
         for act_surf in self.active:  # Search for active surface to update
             self.render[act_surf]()
 
+    # These methods are used by events to change state of the different scenes
+    def reset_status(self, scene):
+        self.state[scene] = [False, None, None]
+
+    def set_primary(self, scene):
+        # Reset all statuses
+        self.state = dict.fromkeys(self.state, [False, None, None])
+        # Set the input as primary+
+        self.state[scene] = [True, 1, "Update"]
+
+    def set_only_primary(self, scene):
+        self.state[scene] = [True, 1, "Update"]
+
+    def set_custom(self, scene, depth, activity="Update"):
+        self.state[scene] = [True, depth, activity]
+
 
 class Other:
 
@@ -187,7 +203,7 @@ class SaveLoadMenu:
         # Background
 
         # Title (alternating between Load and Save)
-        static_alt_title = StaticAltSprite(app, "menu/saves_menu", True, ["load", "save"], [75, 30])
+        static_alt_title = StaticAltSprite(app, "menu/saves_menu", False, ["load", "save"], [75, 30])
         app.shader_prog_2D.saves_menu.add(static_alt_title)
 
 

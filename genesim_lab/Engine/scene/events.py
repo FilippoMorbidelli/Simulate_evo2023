@@ -13,11 +13,11 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
     def __init__(self, app):
         # Init flags to define current scene and sprite to search on
         self.app = app
-        self.scene_status = app.scene.surfaces.state # Current state and data of each scene
+        self.scene_ptr = app.scene.surfaces # Current state and data of each scene
         self.master_scene = None  # Master scene to search sprite on
         self.active_sprite = None  # Active sprite to search for events
-        self.catalog = events_catalog()  # Compute event catalog for each action
-        self.event_types = EventTypes(self.app)  # Init event types class
+        self.catalog = self.events_catalog()  # Compute event catalog for each action
+        self.event_types = EventTypes(app)  # Init event types class
         self.major_change = False  # Detects if a major change like a scene change has happened to stop event search
 
         # Custom FPS event to update it every half second
@@ -25,74 +25,64 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
         pg.time.set_timer(self.FPS_EVENT, 500)
 
     def find_active_sprite(self, scene):
+        # Try to iterate over scene sprites
         try:
             for sprite in scene:
+                # If sprite is static skip
                 if sprite.flag:
-                    try:
-                        check_over = sprite.mask.get_at(self.app.mouse)
-                    except:
-                        break
+                    # Find if collision is true
+                    mouse_pos = self.app.mouse[0] - sprite.rect.x, self.app.mouse[1] - sprite.rect.y
+                    check_over = sprite.mask.get_at(mouse_pos)
+                    # Check if already over
                     if sprite.over != check_over:
+                        # Set over attribute
                         sprite.over = check_over
                         if sprite.over:
-                            sprite.image = sprite.sprite_T  # Select sprite active
-                            self.active_sprite = sprite.name  # Give sprite to event checker
+                            # Switch sprite active
+                            sprite.image = sprite.sprite_T
+                            self.active_sprite = sprite.name
                             break  # Break current search since over sprite has been found
-                        elif not sprite.over:
-                            sprite.image = sprite.sprite_F  # Deselect sprite active
-                            self.active_sprite = None  # No active over sprite
-        except:
+                        else:
+                            # Switch sprite active
+                            sprite.image = sprite.sprite_F
+                            self.active_sprite = None
+        # No sprite is present so no sprite can be active
+        except(Exception,):
             self.active_sprite = None
 
-    def search_generic_event(self, event):
-        for name, data in self.catalog[GS.Other].items():  # Extract event data
-            handle, cond, effect, val = data
-
-            # Reset event validity if not valid
-            if not val[0]:
-                val[0] = True
-
-            # Search if event is called
-            if isinstance(self.scene_status[cond[0]][cond[1]], cond[2]):  # Condition validity
-                event_to_check = getattr(self.event_types, handle)  # Get event type
-                search = event_to_check(event, *effect)  # search if event is present
-                if search == "found":
-                    try:
-                        self.catalog[GS.Other][val[1]][3][0] = val[2]
-                    except:
-                        pass
-
     def handle_events(self):
-        # Search for master scene and sprite on which mouse is currently over
-        self.app.scene.surfaces.handle_current_scene()  # Extract active surfaces from flags
+        # This function handle events that can happen in the current scene
+        # Handle current active scenes and order them
+        self.scene_ptr.handle_current_scene()
 
-        # Select master surface and active sprite if any
-        for active in self.app.scene.surfaces.active:  # Iter over all active surfaces
-            if self.scene_status[active][SD.Depth] == 1:
-                self.master_scene = active  # Save master surface
-                self.find_active_sprite(self.app.scene.surfaces.handle[active])  # Find active sprite on scene
+        # Find master surface
+        self.master_scene = self.scene_ptr.active[0]
+        # Find active sprite (if any)
+        self.find_active_sprite(self.scene_ptr.handle[self.master_scene])
 
-        # Switch between case with active sprite or not active sprite (check only always active events)
+        # Check events happening
         match (self.master_scene, self.active_sprite):
-            case (GS.MainGame, _):  # Main Game, any condition
-                for event in self.app.event_list:
-                    # Generic events
-                    self.search_generic_event(event=event)
-                    if self.major_change:
-                        self.major_change = False
-                        break
 
+            # [Main Game, check all events]
+            case (GS.MainGame, _):
+                # Iterate over each event
+                for event in self.app.event_list:
+                    # Other events
+                    self.search_generic_event(event=event)
+                    # Non-Sprite events
+                    self.search_non_sprite_event(event=event)
+                    # Sprite events
+                    self.search_sprite_event(event=event)
                     # Player events
                     self.app.player.handle_event(event=event)
-
-                    # Sprite events
-
                     # World events
+                    # --
 
-            case (_, str()):  # Any scene, any active sprite
-                # Check always active and on condition events
+            # [Any other scene, check all events]
+            case (_, str()):
+                # Iterate over each event
                 for event in self.app.event_list:
-                    # Generic events
+                    # Other events
                     self.search_generic_event(event=event)
                     if self.major_change:
                         self.major_change = False
@@ -110,268 +100,172 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                         self.major_change = False
                         break
 
-            case (_, None):  # Any scene, inactive sprite
-                # Check always active and on condition events
+            # [ Any other scene, check non-sprite events]
+            case (_, None):
+                # Iterate over each event
                 for event in self.app.event_list:
                     self.search_generic_event(event=event)
                     if self.major_change:
                         self.major_change = False
                         break
 
+    def search_generic_event(self, event):
+        # Iterate over each event of class "OTHER"
+        for name, data in self.catalog[GS.Other].items():
+            e_type, conditions, outcomes = data
+            # Retrieve event type
+            event_fnc = getattr(self.event_types, e_type)
+            # Compute event
+            event_fnc(event, *conditions, outcomes)
+
+    def search_sprite_event(self, event):
+        pass
+
+    def search_non_sprite_event(self, event):
+        pass
+
+    def events_catalog(self):
+        # Full catalog containing every user interaction in the game
+        # The catalog is organized based of the current scene the player is at
+        # Every interaction is represented by:
+        # Interaction name = [event type, event conditions, event outcomes]
+        catalog = {
+            # Other events / always active events
+            GS.Other: {
+                "emergency_quit" : [
+                    "quit_game",  # Event handle to use for this custom event
+                    [pg.KEYDOWN, "key", [pg.K_LALT, pg.K_F4]],  # Event data
+                    [],
+                ],
+                "debug_window" : [
+                    "overlap_scene",  # Event handle to use for this custom event
+                    [pg.KEYDOWN, "key", pg.K_F1, GS.UtilityOverlay],  # Event data
+                    [],
+                ],
+            },
+            # Main menu interactions
+            GS.MainMenu: {
+                # sprite = [handle type,[event.type, event.button, flag_names, flag_values]]
+                "button_play" : [
+                    "change_scene",  # Event handle to use for this custom event
+                    [pg.MOUSEBUTTONDOWN, "button", 1],
+                    [self.scene_ptr.set_primary(GS.MainGame)],
+                ],
+                "button_continue" : [
+                    "change_scene",  # Event handle to use for this custom event
+                    [pg.MOUSEBUTTONDOWN, "button", 1],
+                    [self.scene_ptr.set_primary(GS.SaveLoadMenu)],
+                ],
+                "button_settings" : [
+                    "change_scene",  # Event handle to use for this custom event
+                    [pg.MOUSEBUTTONDOWN, "button", 1],
+                    [self.scene_ptr.set_primary(GS.SaveLoadMenu)],
+                ],
+                # sprite = [handle type,[event.type, event.button, game_running]]
+                "button_quit" : [
+                    "quit_game",  # Event handle to use for this custom event
+                    [pg.MOUSEBUTTONDOWN, "button", 1],  # Event data
+                    [],
+                ]
+            },
+            # Pause menu interactions
+            GS.PauseMenu: {
+                "button_return_main" : [
+                    "change_scene",  # Event handle to use for this custom event
+                    [pg.MOUSEBUTTONDOWN, "button", 1],
+                    [self.scene_ptr.set_primary(GS.MainMenu)],  # Event data
+                ],
+                "button_save" : [
+                    "change_scene",  # Event handle to use for this custom event
+                    [pg.MOUSEBUTTONDOWN, "button", 1],
+                    [self.scene_ptr.set_primary(GS.SaveLoadMenu)],
+                ],
+                "button_settings" : [
+                    "change_scene",  # Event handle to use for this custom event
+                    [pg.MOUSEBUTTONDOWN, "button", 1],
+                    [self.scene_ptr.set_primary(GS.SettingsMenu)],
+                ],
+                "button_quit": [
+                    "quit_game",  # Event handle to use for this custom event
+                    [pg.MOUSEBUTTONDOWN, "button", 1],  # Event data
+                    [],
+                ],
+                "close_pause_menu": [
+                    "change_scene",  # Op type
+                    [pg.KEYDOWN, "key", pg.K_ESCAPE],  # Activation conditions
+                    [self.scene_ptr.set_primary(GS.MainGame)],  # Outcomes
+                ]
+            },
+
+            GS.MainGame: {
+                "init_game": [
+                    "init_world",  # Event handle to use for this custom event
+                    [],
+                    [],
+                ],
+                "open_pause_menu": [
+                    "change_scene",  # Event handle to use for this custom event
+                    [pg.KEYDOWN, "key", pg.K_ESCAPE],
+                    [self.scene_ptr.set_only_primary(GS.PauseMenu), self.scene_ptr.set_custom(GS.MainGame, 2, "Frozen")],
+                ]
+            },
+        }
+        return catalog
+
 
 # Single events --------------------------------|
 class EventTypes:
     def __init__(self, app):
         self.app = app
+        self.scene_ptr = app.scene.surfaces  # Current state and data of each scene
 
-    def change_scene(self, event, e_type, in_type, user_in, flag_name, flag_value):
-        if event.type == e_type:
-            if in_type == 'button':
+    def change_scene(self, event, input_action, input_type, input_keys, actions):
+        # Check if the input action is the same as requested
+        if event.type == input_action:
+            # Check input type (mouse or keyboard)
+            if input_type == 'button':
                 event_in = event.button
             else:
                 event_in = event.key
-            if event_in == user_in:
-                prev_status = self.app.scene.surfaces.state[GS.MainGame][SD.Depth]  # Check state of main Engine before change
-                for name, value in zip(flag_name, flag_value):
-                    self.app.scene.surfaces.state[name] = value
-                reset_view(self.app, prev_status)
-                self.app.custom_events.major_change = True
-            return "found"
-        else:
-            return "not found"
+            # Check that user input is correct
+            if event_in == input_keys:
+                # Compute actions
+                for act in actions:
+                    act()
+                # Manage mouse since scene changed
+                self.manage_mouse()
 
-    def quit_game(self, event, e_type, in_type, user_in, flag_value):
-        if event.type == e_type or event.type == pg.QUIT:
-            if in_type == 'button':
+    def quit_game(self, event, input_action, input_type, input_keys, _):
+        # Check if the input action is the same as requested
+        if event.type == input_action or event.type == pg.QUIT:
+            # Check input type (mouse or keyboard)
+            if input_type == 'button':
                 event_in = event.button
             else:
                 event_in = event.key
-            if event_in == user_in:
-                self.app.is_running = flag_value
-            return "found"
-        else:
-            return "not found"
-
-    def overlap_scene(self, event, e_type, in_type, user_in, flag):
-        if event.type == e_type:
-            if in_type == 'button':
-                event_in = event.button
-            else:
-                event_in = event.key
-            if event_in == user_in and self.app.scene.surfaces.state[flag][0]:
-                self.app.scene.surfaces.state[flag] = [False, None, None]
-            elif event_in == user_in and not self.app.scene.surfaces.state[flag][0]:
-                self.app.scene.surfaces.state[flag] = [True, 0.1, "Update"]
+            # Check that user input is correct
+            if event_in == input_keys:
+                # Close game
+                self.app.is_running = False
 
     def sub_init_world(self):
         self.app.scene.surfaces.surf.main_game.init_world()
 
-
-def events_catalog():
-    catalog = {
-        GS.Other : {
-            # name = [handle type, ban event, [conditions], [event.type, event.key, flag_names, flag_values]]
-            "close_pause_menu": [
-                "change_scene",  # Event handle to use for this custom event
-                [GS.PauseMenu, 1, int],  # Additional condition
-                [pg.KEYDOWN, "key", pg.K_ESCAPE, [GS.MainGame, GS.PauseMenu], [[True, 1, "Update"],  # Event data
-                                                                               [False, None, None]]],
-                [True, "open_pause_menu", False],   # Event validity status and effect on other event status
-            ],
-            "open_pause_menu": [
-                "change_scene",  # Event handle to use for this custom event
-                [GS.MainGame, 1, int],  # Additional condition
-                [pg.KEYDOWN, "key", pg.K_ESCAPE, [GS.MainGame, GS.PauseMenu], [[True, 2, "Frozen"],  # Event data
-                                                                               [True, 1, "Update"]]],
-                [True, "close_pause_menu", False],  # Event validity status and effect on other event status
-            ],
-            "emergency_quit": [
-                "quit_game",  # Event handle to use for this custom event
-                [GS.Running, 0, int],  # Additional condition (trick to get always true)
-                [pg.KEYDOWN, "key", [pg.K_LALT, pg.K_F4], False],  # Event data
-                [True],  # Event validity status
-            ],
-            "debug_window": [
-                "overlap_scene",  # Event handle to use for this custom event
-                [GS.Running, 0, int],  # Additional condition (trick to get always true)
-                [pg.KEYDOWN, "key", pg.K_F1, GS.UtilityOverlay],  # Event data
-                [True],  # Event validity status
-            ],
-        },
-        GS.MainMenu : {
-            # sprite = [handle type,[event.type, event.button, flag_names, flag_values]]
-            "button_play": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.MainGame, GS.MainMenu], [[True, 1, "Update"],  # Event data
-                                                                               [False, None, None]]],
-                [True],  # Event validity status
-            ],
-            "button_continue": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SaveLoadMenu, GS.MainMenu], [[True, 1, "Update"],  # Event data
-                                                                                [False, None, None]]],
-                [True],  # Event validity status
-            ],
-            "button_settings": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SaveLoadMenu, GS.MainMenu], [[True, 1, "Update"],  # Event data
-                                                                                   [False, None, None]]],
-                [True],  # Event validity status
-            ],
-            # sprite = [handle type,[event.type, event.button, game_running]]
-            "button_quit": [
-                "quit_game",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, False],  # Event data
-                [True],  # Event validity status
-            ]
-        },
-        GS.PauseMenu : {
-            "button_return_main": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.PauseMenu, GS.MainMenu, GS.MainGame],  # Event data
-                 [[False, None, None], [True, 1, "Update"], [False, None, None]]],
-                [True],  # Event validity status
-            ],
-            "button_save": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SaveLoadMenu, GS.PauseMenu], [[True, 1, "Update"],  # Event data
-                                                                                 [False, None, None]]],
-                [True],  # Event validity status
-            ],
-            "button_settings": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SettingsMenu, GS.PauseMenu], [[True, 1, "Update"],  # Event data
-                                                                                    [False, None, None]]],
-                [True],  # Event validity status
-            ],
-            "button_quit": [
-                "quit_game",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, False],  # Event data
-                [True],  # Event validity status
-            ]
-
-        },
-        GS.MainGame : {
-            "init_game": [
-                "init_world",  # Event handle to use for this custom event
-            ]
-        },
-    }
-    return catalog
-
-def events_catalog2():
-    # Full catalog containing every user interaction in the game
-    # The catalog is organized based of the current scene the player is at
-    # Every interaction is represented by:
-    # Interaction name = [operation type, event conditions, event outcomes]
-    catalog = {
-        # Other events / always active events
-        GS.Other : {
-            "emergency_quit": [
-                "quit_game",  # Event handle to use for this custom event
-                [pg.KEYDOWN, "key", [pg.K_LALT, pg.K_F4]],  # Event data
-                [],
-            ],
-            "debug_window": [
-                "overlap_scene",  # Event handle to use for this custom event
-                [pg.KEYDOWN, "key", pg.K_F1, GS.UtilityOverlay],  # Event data
-                [],
-            ],
-        },
-
-        GS.MainMenu : {
-            # sprite = [handle type,[event.type, event.button, flag_names, flag_values]]
-            "button_play": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1],
-                [set_primary(GS.MainGame), reset_status(GS.MainMenu)],
-            ],
-            "button_continue": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SaveLoadMenu, GS.MainMenu], [[True, 1, "Update"],  # Event data
-                                                                                [False, None, None]]],
-                [True],  # Event validity status
-            ],
-            "button_settings": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SaveLoadMenu, GS.MainMenu], [[True, 1, "Update"],  # Event data
-                                                                                   [False, None, None]]],
-                [True],  # Event validity status
-            ],
-            # sprite = [handle type,[event.type, event.button, game_running]]
-            "button_quit": [
-                "quit_game",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, False],  # Event data
-                [True],  # Event validity status
-            ]
-        },
-
-        GS.PauseMenu : {
-            "button_return_main": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.PauseMenu, GS.MainMenu, GS.MainGame],  # Event data
-                 [[False, None, None], [True, 1, "Update"], [False, None, None]]],
-                [True],  # Event validity status
-            ],
-            "button_save": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SaveLoadMenu, GS.PauseMenu], [[True, 1, "Update"],  # Event data
-                                                                                 [False, None, None]]],
-                [True],  # Event validity status
-            ],
-            "button_settings": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, [GS.SettingsMenu, GS.PauseMenu], [[True, 1, "Update"],  # Event data
-                                                                                    [False, None, None]]],
-                [True],  # Event validity status
-            ],
-            "button_quit": [
-                "quit_game",  # Event handle to use for this custom event
-                [pg.MOUSEBUTTONDOWN, "button", 1, False],  # Event data
-                [True],  # Event validity status
-            ],
-            "close_pause_menu": [
-                "change_scene",  # Op type
-                [pg.KEYDOWN, "key", pg.K_ESCAPE],  # Activation conditions
-                [set_primary(GS.MainGame), reset_status(GS.PauseMenu)],  # Outcomes
-            ]
-        },
-
-        GS.MainGame : {
-            "init_game": [
-                "init_world",  # Event handle to use for this custom event
-                [],
-                [],
-            ],
-            "open_pause_menu": [
-                "change_scene",  # Event handle to use for this custom event
-                [pg.KEYDOWN, "key", pg.K_ESCAPE],
-                [set_primary(GS.PauseMenu), set_custom(GS.MainGame, 2, "Frozen")],  # Event data
-            ]
-        },
-    }
-    return catalog
-
-def reset_status(scene):
-    scene = [False, None, None]
-
-def set_primary(scene):
-    scene = [True, 1, "Update"]
-
-def set_custom(scene, depth, activity="Update"):
-    scene = [True, depth, activity]
-
-def reset_view(app, prev_status):
-    main_game_status = app.scene.surfaces.state[GS.MainGame][SD.Depth]
-    if main_game_status == 1 and main_game_status != prev_status:
-        pg.mouse.set_visible(False)
-        pg.mouse.get_rel()
-    elif prev_status == 1 and main_game_status != prev_status:
-        pg.mouse.set_pos(app.screen.get_rect().center)
-        pg.mouse.set_visible(True)
-    elif main_game_status is None:
-        app.player.reset()
-
+    def manage_mouse(self):
+        # Retrieve Main Game depth
+        mg_depth = self.scene_ptr.state[GS.MainGame][SD.Depth]
+        # Manage mouse depending on Main Game state
+        # Hide mouse since Main Game is main scene
+        if mg_depth == 1 :
+            pg.mouse.set_visible(False)
+            pg.mouse.get_rel()
+        # Main game not primary scene so show and set mouse pos
+        elif mg_depth > 1:
+            pg.mouse.set_pos(self.app.screen.get_rect().center)
+            pg.mouse.set_visible(True)
+        # Exit from Main Game, reset player
+        elif mg_depth is None:
+            self.app.player.reset()
 
 # Custom exceptions --
 class SceneChanged(Exception):

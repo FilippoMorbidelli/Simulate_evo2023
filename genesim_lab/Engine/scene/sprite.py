@@ -150,15 +150,16 @@ class BackgroundSprite(pg.sprite.Sprite):
 class ButtonSprite(pg.sprite.Sprite):
     def __init__(self, app, scene, button, ext, flag):
         super().__init__()
-        self.rect = app.stg.window.rect  # Generate sprite rect from main window
+        self.rect     = app.stg.window.rect  # Generate sprite rect from main window
         self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.{ext}').convert_alpha()
         self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.{ext}').convert_alpha()
-        self.image = self.sprite_F
-        self.mask = pg.mask.from_surface(self.image)
-        self.over = self.mask.get_at(app.mouse)  # Add check if mouse is over from start
-        self.name = f"button_{button}"
-        self.flag = flag  # Flag to determine if sprite is dynamic or not
-        self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame
+        self.image    = self.sprite_F
+        self.mask     = pg.mask.from_surface(self.image)
+
+        self.over : int  = self.mask.get_at(app.mouse)  # Add check if mouse is over from start
+        self.name : str  = f"button_{button}"
+        self.flag : bool = flag  # Flag to determine if sprite is dynamic or not
+        self.forced_reconstruct : bool = False  # Flag to determine if vertices for vbo must be reconstructed every frame
 
     def update(self, *args):
         pass
