@@ -3,24 +3,24 @@
 # Created on: 03/12/2023
 # Last update: 17/12/2023
 # Notes: Handles main menu, settings, play and other menu
+import copy
 
 # Import packages ------------------------------|
 from genesim_lab.Engine.world_gen.world import World
 from genesim_lab.Engine.scene.sprite import *
-from enum import IntEnum, StrEnum
+from enum import IntEnum
+from copy import deepcopy
 
 
 # New Types ------------------------------------|
-class GS(StrEnum):  # GS stands for GameState
-    MainMenu       = "MainMenu"
-    MainGame       = "MainGame"
-    PauseMenu      = "PauseMenu"
-    SaveLoadMenu   = "SaveLoadMenu"
-    SettingsMenu   = "SettingsMenu"
-    UtilityOverlay = "UtilityOverlay"
-    Other          = "Other"
-
-    PlayerControl  = "PlayerControl"
+class GS(IntEnum):  # GS stands for GameState
+    MainMenu       = 0
+    MainGame       = 1
+    PauseMenu      = 2
+    SaveLoadMenu   = 3
+    SettingsMenu   = 4
+    UtilityOverlay = 5
+    Other          = 6
 
 # All surfaces ---------------------------------|
 class Surfaces:
@@ -63,7 +63,6 @@ class Surfaces:
             GS.SaveLoadMenu   : self.app.shader_prog_2D.saves_menu.update,
             GS.SettingsMenu   : self.app.shader_prog_2D.settings_menu.update,
             GS.PauseMenu      : self.app.shader_prog_2D.pause_menu.update,
-            GS.PlayerControl  : self.app.player.update,
             GS.Other          : self.app.shader_prog_2D.other.update,
         }
         self.render = {
@@ -105,8 +104,8 @@ class Surfaces:
             if self.state[act_surf]["Update"]:
                 self.update[act_surf](self.app)
         # Player movement is allowed only when MainGame is main rendered page
-        if self.state[GS.MainGame]["Depth"] == 1:
-            self.update[GS.PlayerControl]()
+        if self.state[GS.MainGame]["Depth"] == self.max:
+            self.app.player.update()
 
     def render_current_scene(self):
         for act_surf in self.active:  # Search for active surface to update
@@ -118,7 +117,8 @@ class Surfaces:
 
     def set_primary(self, scene):
         # Reset all statuses
-        self.state = dict.fromkeys(self.state, {"Render" : False, "Depth" : None, "Update" : False})
+        reset = {"Render" : False, "Depth" : None, "Update" : False}
+        self.state = {my_key : copy.deepcopy(reset) for my_key in GS}
         # Set the input as primary+
         self.state[scene] = {"Render" : True, "Depth" : 1, "Update" : True}
 

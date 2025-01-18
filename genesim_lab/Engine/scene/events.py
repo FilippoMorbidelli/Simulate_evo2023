@@ -12,12 +12,12 @@ from genesim_lab.Engine.scene.surfaces import GS
 class EventHandler:  # Manage every event related to player and scenes (simulation events may be on other function)
     def __init__(self, app):
         # Init flags to define current scene and sprite to search on
-        self.app = app
-        self.scene_ptr = app.scene.surfaces # Current state and data of each scene
-        self.master_scene = None  # Master scene to search sprite on
+        self.app           = app
+        self.scene_ptr     = app.scene.surfaces # Current state and data of each scene
+        self.master_scene  = None  # Master scene to search sprite on
         self.active_sprite = None  # Active sprite to search for events
-        self.event_types = EventTypes(app)  # Init event types class
-        self.catalog = self.events_catalog()  # Compute event catalog for each action
+        self.event_types   = EventTypes(app)  # Init event types class
+        self.catalog       = self.events_catalog()  # Compute event catalog for each action
 
         # Custom FPS event to update it every half second
         self.FPS_EVENT = pg.USEREVENT + 1
@@ -52,7 +52,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
     def handle_events(self):
         # This function handle events that can happen in the current scene
         # Find master surface
-        self.master_scene = self.scene_ptr.master
+        self.master_scene = self.scene_ptr.master # TBD no sense to update it each frame
         # Find active sprite (if any)
         self.find_active_sprite(self.scene_ptr.handle[self.master_scene])
 
@@ -102,9 +102,6 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                     if self.search_non_sprite_event(event=event):
                         continue
 
-        # Handle current active scenes after event management
-        self.scene_ptr.handle_current_scene()
-
     # Function that retrieves from catalog each Generic event and calls the specific function
     def search_generic_event(self, event):
         # Iterate over each event of class "OTHER"
@@ -121,16 +118,17 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
 
     # Function that retrieves from catalog each Master Scene event related to sprites and calls the specific function
     def search_sprite_event(self, event):
-        # Iterate over each event of class Master Scene
-        for name, data in self.catalog[self.master_scene]["sprite"].items():
-            e_type, conditions, outcomes = data
-            # Retrieve event type
-            event_fnc = getattr(self.event_types, e_type)
-            # Compute event
-            if event_fnc(event, *conditions, outcomes):
-                # Event found, return up
-                return True
-            # Event not found in catalog
+        if event.type == 1025:
+            pass
+        # No need to Iterate over each event of class Master Scene
+        e_type, conditions, outcomes = self.catalog[self.master_scene]["sprite"][self.active_sprite]
+        # Retrieve event type
+        event_fnc = getattr(self.event_types, e_type)
+        # Compute event
+        if event_fnc(event, *conditions, outcomes):
+            # Event found, return up
+            return True
+        # Event not found in catalog
         return False
 
     # Function that retrieves from catalog each Master Scene event related to Non-sprites and calls the specific function
@@ -164,7 +162,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                 "debug_window" : [
                     "change_scene",  # Event handle to use for this custom event
                     [pg.KEYDOWN, "key", pg.K_F1],  # Event data
-                    [lambda : self.scene_ptr.set_switch(GS.UtilityOverlay, self.scene_ptr.state[self.master_scene]["Depth"] + 0.1)],
+                    [lambda : self.scene_ptr.set_switch(GS.UtilityOverlay, self.scene_ptr.max + 0.1)],
                 ],
             },
             # Main menu interactions
@@ -249,6 +247,7 @@ class EventTypes:
     def __init__(self, app):
         self.app = app
         self.scene_ptr = app.scene.surfaces  # Current state and data of each scene
+        self.prev_max      = None  # Depth of master scene (no overlays)
 
     def change_scene(self, event, input_action, input_type, input_keys, actions):
         # Check if the input action is the same as requested
@@ -263,6 +262,8 @@ class EventTypes:
                 # Compute actions
                 for act in actions:
                     act()
+                # Handle current active scenes after event management
+                self.scene_ptr.handle_current_scene()
                 # Manage mouse since scene changed
                 self.manage_mouse()
                 # Confirm event found
@@ -291,17 +292,20 @@ class EventTypes:
         # Retrieve Main Game depth
         mg_depth = self.scene_ptr.state[GS.MainGame]["Depth"]
         # Manage mouse depending on Main Game state
-        # Hide mouse since Main Game is main scene
-        if mg_depth == 1 :
-            pg.mouse.set_visible(False)
-            pg.mouse.get_rel()
-        # Main game not primary scene so show and set mouse pos
-        elif mg_depth > 1:
-            pg.mouse.set_pos(self.app.screen.get_rect().center)
-            pg.mouse.set_visible(True)
-        # Exit from Main Game, reset player
-        elif mg_depth is None:
-            self.app.player.reset()
+        if self.prev_max != self.scene_ptr.max:
+            # Hide mouse since Main Game is main scene
+            if mg_depth == self.scene_ptr.max :
+                pg.mouse.set_visible(False)
+                pg.mouse.get_rel()
+            # Main game not primary scene so show and set mouse pos
+            elif mg_depth != self.scene_ptr.max:
+                pg.mouse.set_pos(self.app.screen.get_rect().center)
+                pg.mouse.set_visible(True)
+            # Exit from Main Game, reset player
+            elif mg_depth is None:
+                self.app.player.reset()
+            # Update previous max
+            self.prev_max = self.scene_ptr.max
 
 # Custom exceptions --
 class SceneChanged(Exception):
