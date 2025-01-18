@@ -135,11 +135,6 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/Engine/world_gen/chunk.py</url>
-          <line>51</line>
-          <option name="timeStamp" value="53" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py</url>
           <line>435</line>
           <option name="timeStamp" value="55" />
@@ -158,6 +153,11 @@
           <url>file://$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py</url>
           <line>443</line>
           <option name="timeStamp" value="75" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py</url>
+          <line>146</line>
+          <option name="timeStamp" value="101" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

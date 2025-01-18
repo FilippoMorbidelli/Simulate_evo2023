@@ -7,26 +7,20 @@
 # Import packages ------------------------------|
 from genesim_lab.Engine.world_gen.world import World
 from genesim_lab.Engine.scene.sprite import *
-from enum import IntEnum
+from enum import IntEnum, StrEnum
 
 
 # New Types ------------------------------------|
-class GS(IntEnum):  # GS stands for GameState
-    MainMenu       = 1
-    MainGame       = 2
-    PauseMenu      = 3
-    SaveLoadMenu   = 4
-    SettingsMenu   = 5
-    UtilityOverlay = 6
-    Other          = 7
-    Running        = 8
+class GS(StrEnum):  # GS stands for GameState
+    MainMenu       = "MainMenu"
+    MainGame       = "MainGame"
+    PauseMenu      = "PauseMenu"
+    SaveLoadMenu   = "SaveLoadMenu"
+    SettingsMenu   = "SettingsMenu"
+    UtilityOverlay = "UtilityOverlay"
+    Other          = "Other"
 
-    PlayerControl  = 20
-
-class SD(IntEnum):  # SD stands for StateData
-    Render = 0
-    Depth  = 1
-    Update = 2
+    PlayerControl  = "PlayerControl"
 
 # All surfaces ---------------------------------|
 class Surfaces:
@@ -36,6 +30,8 @@ class Surfaces:
 
         self.surf = self.init_surfaces()
         self.active = None
+        self.master = None
+        self.max = None
 
         # Init flags, handle, update and render for each scene
         self.state = {
@@ -43,14 +39,13 @@ class Surfaces:
             # Surface: render --> [True, False]
             #          depth  --> [1, 2, 3, ..., None]
             #          update --> [Update, Frozen, None]
-            GS.MainMenu       : [True, 1, "Update"],
-            GS.MainGame       : [False, None, None],
-            GS.SaveLoadMenu   : [False, None, None],
-            GS.SettingsMenu   : [False, None, None],
-            GS.PauseMenu      : [False, None, None],
-            GS.UtilityOverlay : [False, None, None],
-            GS.Other          : [False, None, None],
-            GS.Running        : [1]
+            GS.MainMenu       : {"Render" : True , "Depth" : 1   , "Update" : False},
+            GS.MainGame       : {"Render" : False, "Depth" : None, "Update" : False},
+            GS.SaveLoadMenu   : {"Render" : False, "Depth" : None, "Update" : False},
+            GS.SettingsMenu   : {"Render" : False, "Depth" : None, "Update" : False},
+            GS.PauseMenu      : {"Render" : False, "Depth" : None, "Update" : False},
+            GS.UtilityOverlay : {"Render" : False, "Depth" : None, "Update" : False},
+            GS.Other          : {"Render" : False, "Depth" : None, "Update" : False}
         }
         self.handle = {
             GS.MainMenu       : app.shader_prog_2D.main_menu,
@@ -81,6 +76,9 @@ class Surfaces:
             GS.Other          : self.app.shader_prog_2D.other.draw2d
         }
 
+        # Compute current Scene state
+        self.handle_current_scene()
+
     def init_surfaces(self):
         surf_group = type("Contains each single surface", (), {})()
 
@@ -96,15 +94,18 @@ class Surfaces:
         return surf_group
 
     def handle_current_scene(self):
-        self.active = [scene for scene, status in self.state.items() if status[SD.Render] is True]
-        self.active = sorted(self.active, key=lambda x: self.state[x][SD.Depth], reverse=True)  # Sort active scenes depending on depth
+        self.active = [scene for scene, status in self.state.items() if status["Render"] is True]
+        self.active = sorted(self.active, key=lambda x: self.state[x]["Depth"])  # Sort active scenes depending on depth
+
+        self.master = [i for i in self.active if type(self.state[i]["Depth"]) is int][-1]
+        self.max = self.state[self.master]["Depth"]
 
     def update_current_scene(self):
         for act_surf in self.active:  # Search for active surface to update
-            if self.state[act_surf][SD.Update]:
+            if self.state[act_surf]["Update"]:
                 self.update[act_surf](self.app)
         # Player movement is allowed only when MainGame is main rendered page
-        if self.state[GS.MainGame][SD.Depth] == 1:
+        if self.state[GS.MainGame]["Depth"] == 1:
             self.update[GS.PlayerControl]()
 
     def render_current_scene(self):
@@ -113,19 +114,47 @@ class Surfaces:
 
     # These methods are used by events to change state of the different scenes
     def reset_status(self, scene):
-        self.state[scene] = [False, None, None]
+        self.state[scene] = {"Render" : False, "Depth" : None, "Update" : False}
 
     def set_primary(self, scene):
         # Reset all statuses
-        self.state = dict.fromkeys(self.state, [False, None, None])
+        self.state = dict.fromkeys(self.state, {"Render" : False, "Depth" : None, "Update" : False})
         # Set the input as primary+
-        self.state[scene] = [True, 1, "Update"]
+        self.state[scene] = {"Render" : True, "Depth" : 1, "Update" : True}
 
-    def set_only_primary(self, scene):
-        self.state[scene] = [True, 1, "Update"]
+    def set_only_primary(self, scene, overlay = GS.UtilityOverlay):
+        # Update Scene to Primary level without resetting others
+        self.state[scene] = {"Render" : True, "Depth" : self.max + 1, "Update" : True}
+        # Update Overlay
+        if self.state[overlay]["Render"]:
+            self.update_overlay(overlay)
 
-    def set_custom(self, scene, depth, activity="Update"):
-        self.state[scene] = [True, depth, activity]
+    def set_custom(self, scene, depth = False, activity = True, overlay = GS.UtilityOverlay):
+        # Update custom scene
+        # Update Render
+        self.state[scene]["Render"] = True
+        # Update Depth, if passed
+        if depth:
+            self.state[scene]["Depth"] = depth
+        # Update Activity
+        self.state[scene]["Update"] = activity
+        # Update Overlay
+        if self.state[overlay]["Render"]:
+            self.update_overlay(overlay)
+
+    def set_switch(self, scene, depth, update = True):
+        # Switch Scene render
+        self.state[scene]["Render"] = not self.state[scene]["Render"]
+        # Switch Arguments
+        if self.state[scene]["Render"]:
+            self.state[scene]["Depth"] = depth
+            self.state[scene]["Update"] = update
+        else:
+            self.state[scene]["Depth"] = None
+            self.state[scene]["Update"] = False
+
+    def update_overlay(self, overlay):
+        self.state[overlay]["Depth"] = self.state[self.master]["Depth"] + 0.1
 
 
 class Other:

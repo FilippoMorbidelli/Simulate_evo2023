@@ -156,7 +156,7 @@ class ButtonSprite(pg.sprite.Sprite):
         self.image    = self.sprite_F
         self.mask     = pg.mask.from_surface(self.image)
 
-        self.over : int  = self.mask.get_at(app.mouse)  # Add check if mouse is over from start
+        self.over : int  = 0 #self.mask.get_at(app.mouse)  # Add check if mouse is over from start
         self.name : str  = f"button_{button}"
         self.flag : bool = flag  # Flag to determine if sprite is dynamic or not
         self.forced_reconstruct : bool = False  # Flag to determine if vertices for vbo must be reconstructed every frame
