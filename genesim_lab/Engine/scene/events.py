@@ -8,6 +8,7 @@
 import pygame as pg
 from genesim_lab.Engine.scene.surfaces import GS
 
+
 # Main event handler ---------------------------|
 class EventHandler:  # Manage every event related to player and scenes (simulation events may be on other function)
     def __init__(self, app):
@@ -70,8 +71,9 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                     if self.search_non_sprite_event(event=event):
                         continue
                     # Sprite User events
-                    if self.search_sprite_event(event=event):
-                        continue
+                    if self.active_sprite is not None:
+                        if self.search_sprite_event(event=event):
+                            continue
                     # Player events
                     self.app.player.handle_event(event=event) # TBD
                     # World events
@@ -118,8 +120,6 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
 
     # Function that retrieves from catalog each Master Scene event related to sprites and calls the specific function
     def search_sprite_event(self, event):
-        if event.type == 1025:
-            pass
         # No need to Iterate over each event of class Master Scene
         e_type, conditions, outcomes = self.catalog[self.master_scene]["sprite"][self.active_sprite]
         # Retrieve event type

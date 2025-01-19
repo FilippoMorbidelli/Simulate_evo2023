@@ -63,6 +63,7 @@ class GLTextures2D(pg.sprite.Group):
     def render(self, sprite, surface):
         # Check if VBO for sprite exists, in case builds it or update it (forced_reconstruct == True)
         if sprite.name not in self.gl_vertices or sprite.forced_reconstruct:
+            self.scale_sprite(sprite)
             w, h = surface.get_size()
             left, top, width, height = sprite.rect
             right = left + width
@@ -99,6 +100,24 @@ class GLTextures2D(pg.sprite.Group):
         for sprite in self:
             sprite.update(app)
 
+    def scale_sprite(self, sprite):
+        # Get Screen size
+        w, h = self.app.screen.get_size()
+        # Compute scale factor
+        sf_w = w / self.app.stg.window.w_ref
+        sf_h = h / self.app.stg.window.h_ref
+        # Get Sprite size
+        sp_left, sp_top, sp_w, sp_h = sprite.rect
+        # Scale dims and anchor
+        sp_left = sp_left * sf_w
+        sp_top = sp_top * sf_h
+        sp_w = sp_w * sf_w
+        sp_h = sp_h * sf_h
+        # Update sprite
+        sprite.image = pg.transform.scale(sprite.image, (sp_w, sp_h))
+        sprite.rect = pg.Rect(sp_left, sp_top, sp_w, sp_h)
+        sprite.mask = pg.mask.from_surface(sprite.image)
+
 
 # 2D Sprite classes ----------------------------|
 class DynamicSprite(pg.sprite.Sprite):
@@ -121,7 +140,7 @@ class OverlaySprite(pg.sprite.Sprite):
     def __init__(self, app, scene, name, ext, flag):
         super().__init__()
         self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/overlay_{name}.{ext}').convert_alpha()
-        self.rect = self.sprite.get_rect(center=app.stg.window.rect.center)  # Generate sprite rect from main window
+        self.rect = self.sprite.get_rect(center=(960, 540))  # Generate sprite rect from main window
         self.image = self.sprite
         self.mask = pg.mask.from_surface(self.image)
         self.name = f"overlay_{name}"
@@ -135,10 +154,12 @@ class OverlaySprite(pg.sprite.Sprite):
 class BackgroundSprite(pg.sprite.Sprite):
     def __init__(self, app, scene, button, ext, flag):
         super().__init__()
-        self.rect = app.stg.window.rect  # Generate sprite rect from main window
+        #self.rect = app.stg.window.rect  # Generate sprite rect from main window
         self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/background_{button}.{ext}').convert_alpha()
         self.image = self.sprite
         self.mask = pg.mask.from_surface(self.image)
+        wh = self.sprite.get_size()
+        self.rect = pg.Rect(0, 0, wh[0], wh[1])
         self.name = f"background_{button}"
         self.flag = flag  # Flag to determine if button is dynamic or not
         self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame
@@ -150,11 +171,13 @@ class BackgroundSprite(pg.sprite.Sprite):
 class ButtonSprite(pg.sprite.Sprite):
     def __init__(self, app, scene, button, ext, flag):
         super().__init__()
-        self.rect     = app.stg.window.rect  # Generate sprite rect from main window
+        #self.rect     = app.stg.window.rect  # Generate sprite rect from main window
         self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.{ext}').convert_alpha()
         self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.{ext}').convert_alpha()
         self.image    = self.sprite_F
         self.mask     = pg.mask.from_surface(self.image)
+        wh = self.sprite_F.get_size()
+        self.rect = pg.Rect(0, 0, wh[0], wh[1])
 
         self.over : int  = 0 #self.mask.get_at(app.mouse)  # Add check if mouse is over from start
         self.name : str  = f"button_{button}"

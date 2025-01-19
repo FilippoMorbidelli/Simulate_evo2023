@@ -131,10 +131,12 @@ class World:
 
 @dataclass(slots=True, order=True)
 class Window:
-    h: int = 900  # Height of window
-    l: int = 1600  # Length of window
-    full_screen: bool = True  # Automatically opens Engine in full screen
-    rect: pg.Rect = None  # Current rect of main window
+    h : int            = 900  # Height of window
+    w : int            = 1600  # Width of window
+    full_screen : bool = True  # Automatically opens Engine in full screen
+    rect : pg.Rect     = None  # Current rect of main window
+    w_ref : int        = 1920 # Sprite reference width
+    h_ref : int        = 1080 # Sprite reference height
 
     def __iter__(self):
         for field in dataclasses.fields(self):
