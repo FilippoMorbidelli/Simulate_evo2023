@@ -15,8 +15,8 @@ class SaveManager:
         self.main_game = self.app.scene.surfaces.surf.main_game
 
         self.current_save = ""
-        self.path = "/SaveFiles/"
-        self.path_world = "/world/whole.txt"
+        self.path = "../SaveFiles/"
+        self.path_world = "../world/whole.txt"
 
     def save_whole_file(self, save_name = ""):
         # Write whole world chunks to txt.file

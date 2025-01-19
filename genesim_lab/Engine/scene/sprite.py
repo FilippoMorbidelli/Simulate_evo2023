@@ -152,15 +152,15 @@ class OverlaySprite(pg.sprite.Sprite):
 
 
 class BackgroundSprite(pg.sprite.Sprite):
-    def __init__(self, app, scene, button, ext, flag):
+    def __init__(self, app, scene, button, ext, flag, anchor = (0, 0), name_add = ""):
         super().__init__()
         #self.rect = app.stg.window.rect  # Generate sprite rect from main window
         self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/background_{button}.{ext}').convert_alpha()
         self.image = self.sprite
         self.mask = pg.mask.from_surface(self.image)
         wh = self.sprite.get_size()
-        self.rect = pg.Rect(0, 0, wh[0], wh[1])
-        self.name = f"background_{button}"
+        self.rect = pg.Rect(anchor[0], anchor[1], wh[0], wh[1])
+        self.name = f"background_{button}" + name_add
         self.flag = flag  # Flag to determine if button is dynamic or not
         self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame
 
@@ -169,18 +169,17 @@ class BackgroundSprite(pg.sprite.Sprite):
 
 
 class ButtonSprite(pg.sprite.Sprite):
-    def __init__(self, app, scene, button, ext, flag):
+    def __init__(self, app, scene, button, ext, flag, anchor = (0, 0), name_add = ""):
         super().__init__()
-        #self.rect     = app.stg.window.rect  # Generate sprite rect from main window
         self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.{ext}').convert_alpha()
         self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.{ext}').convert_alpha()
         self.image    = self.sprite_F
         self.mask     = pg.mask.from_surface(self.image)
         wh = self.sprite_F.get_size()
-        self.rect = pg.Rect(0, 0, wh[0], wh[1])
+        self.rect = pg.Rect(anchor[0], anchor[1], wh[0], wh[1])
 
         self.over : int  = 0 #self.mask.get_at(app.mouse)  # Add check if mouse is over from start
-        self.name : str  = f"button_{button}"
+        self.name : str  = f"button_{button}" + name_add
         self.flag : bool = flag  # Flag to determine if sprite is dynamic or not
         self.forced_reconstruct : bool = False  # Flag to determine if vertices for vbo must be reconstructed every frame
 
@@ -199,6 +198,7 @@ class StaticAltSprite(pg.sprite.Sprite):
         # Set default sprite
         self.image = self.sprite[a]
         # Set other parameters
+        self.alt = a
         self.mask = pg.mask.from_surface(self.image)
         self.name = f"static_alt_{alts[-1]}"
         self.flag = flag  # Flag to determine if sprite is dynamic or not
@@ -206,6 +206,7 @@ class StaticAltSprite(pg.sprite.Sprite):
 
     def alternate(self, alt):
         self.image = self.sprite[alt]
+        self.alt = alt
 
 
 class UtilityStaticText(pg.sprite.Sprite):
@@ -273,3 +274,10 @@ class FpsSprite(pg.sprite.Sprite):
             self.image = pg.Surface((100, 100), pg.SRCALPHA, 32)
             self.image.blit(app.stg.util.text_font.render(f'{app.clock.get_fps() :.0f}',
                                                                   True, app.stg.util.text_color), (0, 0))
+
+def blit_text_to_surf(app, sprite, text, anchor = (0, 0)):
+    text_surf = app.stg.util.text_font.render(text, True, app.stg.util.text_color)
+    # Blit text to sprite image
+    sprite.image.blit(text_surf, anchor)
+    sprite.sprite_F.blit(text_surf, anchor)
+    sprite.sprite_T.blit(text_surf, anchor)

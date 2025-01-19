@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="500"
+   height="150"
+   viewBox="0 0 500 150"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   sodipodi:docname="save_container.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="2.0485264"
+     inkscape:cx="215.52077"
+     inkscape:cy="29.533424"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="0.26458333"
+       spacingy="0.26458333"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect8"
+       style="fill:#280b0b;stroke-width:1.75748031;stroke-dasharray:none;stroke:#420808;stroke-opacity:1"
+       d="M 18.521484 10.583984 C 14.927428 10.583984 11.90779 12.949953 10.923828 16.214844 C 7.6580055 17.198237 5.2910156 20.217782 5.2910156 23.8125 L 5.2910156 129.64648 C 5.2910156 133.24122 7.6579868 136.26076 10.923828 137.24414 C 11.90779 140.50903 14.927428 142.875 18.521484 142.875 C 21.988469 142.875 24.913615 140.67028 26 137.58398 L 478.89648 137.58398 C 483.29385 137.58398 486.83398 134.04385 486.83398 129.64648 C 486.83398 125.24911 483.29385 121.70898 478.89648 121.70898 L 26.458984 121.70898 L 26.458984 105.83398 L 29.103516 105.83398 C 30.569306 105.83398 31.75 104.65329 31.75 103.1875 L 31.75 34.396484 C 31.75 32.930694 30.569306 31.75 29.103516 31.75 L 26.458984 31.75 L 26.458984 18.521484 C 26.458984 14.124114 22.918855 10.583984 18.521484 10.583984 z " />
+  </g>
+</svg>

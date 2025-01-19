@@ -175,6 +175,7 @@ class Util:
     fps_limit: int = 1000  # Limit frame rate to value
     text_font: pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
     text_color: tuple = (255, 255, 255)  # Color of displayed text
+    save_path: str = "SaveFiles/"  # Path in Game directory containing the save files
 
     def __iter__(self):
         for field in dataclasses.fields(self):

@@ -5,9 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/SaveFiles/save0/SaveInfo.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaveFiles/save1/SaveInfo.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/saves_menu/background_save_container.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/saves_menu/button_save_label_F.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/saves_menu/button_save_label_T.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Assets/menu/saves_menu/static_alt_load.svg" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/saves_menu/static_alt_load.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/sprite.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,23 +56,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;Python.GENESIM_LAB.executor&quot;: &quot;Run&quot;,
-    &quot;Python.events.executor&quot;: &quot;Run&quot;,
-    &quot;Python.player.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.settings.executor&quot;: &quot;Run&quot;,
-    &quot;Python.sprite.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Filippo Morbidelli/PycharmProjects/Simulate_evo2023/GENESIM_LAB.py&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;Errors&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python.GENESIM_LAB.executor": "Run",
+    "Python.events.executor": "Run",
+    "Python.player.executor": "Debug",
+    "Python.settings.executor": "Run",
+    "Python.sprite.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/Filippo Morbidelli/PycharmProjects/Simulate_evo2023/SaveFiles/save1",
+    "settings.editor.selected.configurable": "Errors"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Filippo Morbidelli\PycharmProjects\Simulate_evo2023\SaveFiles\save1" />
       <recent name="C:\Users\k1filo20\Documents\GitHub\Simulate_evo2023\genesim_lab\engine\world" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -155,8 +165,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/genesim_lab/Engine/scene/events.py</url>
-          <line>121</line>
-          <option name="timeStamp" value="116" />
+          <line>122</line>
+          <option name="timeStamp" value="143" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -174,6 +184,8 @@
         <watch expression="self.chunk" />
         <watch expression="aa" />
         <watch expression="chunk_ids.dtype" />
+        <watch expression="temp_surf" />
+        <watch expression="temp_surf" />
       </configuration>
     </watches-manager>
   </component>

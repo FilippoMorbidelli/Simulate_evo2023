@@ -3,13 +3,14 @@
 # Created on: 03/12/2023
 # Last update: 17/12/2023
 # Notes: Handles main menu, settings, play and other menu
-import copy
 
 # Import packages ------------------------------|
 from genesim_lab.Engine.world_gen.world import World
 from genesim_lab.Engine.scene.sprite import *
 from enum import IntEnum
-from copy import deepcopy
+import copy
+from pathlib import Path
+import os
 
 
 # New Types ------------------------------------|
@@ -228,13 +229,48 @@ class PauseMenu:
 class SaveLoadMenu:
 
     def __init__(self, app):
+        # Save Files path
+        self.save_path = Path(__file__).parent.parent.parent.parent / app.stg.util.save_path
+        self.save_info = "SaveInfo.txt"
+        self.save_anchor_basic = [350, 200]
+        self.save_anchor_n = [0, 160]
+        self.max_saves = 5
         # Init each sprite for the SaveLoad menu scene
         # Background
 
+        # Temp background TO BE REMOVED!!!!
+        temp_surf = pg.sprite.Sprite()
+        temp_surf.flag = False
+        temp_surf.name = "blank_screen"
+        temp_surf.forced_reconstruct = False
+        temp_surf.rect = app.stg.window.rect
+        temp_surf.image = pg.Surface(app.stg.window.rect.size, pg.SRCALPHA, 32)
+        temp_surf.image.fill((0, 0, 0))
+        app.shader_prog_2D.saves_menu.add(temp_surf)
         # Title (alternating between Load and Save)
         static_alt_title = StaticAltSprite(app, "menu/saves_menu", False, ["load", "save"], [75, 30])
         app.shader_prog_2D.saves_menu.add(static_alt_title)
-
+        # Save File blank container
+        for n in range(self.max_saves):
+            anchor = (self.save_anchor_basic[0] +  n * self.save_anchor_n[0], self.save_anchor_basic[1] +  n * self.save_anchor_n[1])
+            container_save_n = BackgroundSprite(app, "menu/saves_menu", "save_container", "svg", False, anchor, str(n))
+            app.shader_prog_2D.saves_menu.add(container_save_n)
+        # Save File info and interaction
+        for save in os.listdir(self.save_path):
+            with open(self.save_path / save / self.save_info, "r") as f:
+                # Extract save info
+                info = f.read().split(",")
+                name, date, num = info
+                # Create Save interactable
+                anchor = (self.save_anchor_basic[0] +  int(num) * self.save_anchor_n[0], self.save_anchor_basic[1] +  int(num) * self.save_anchor_n[1])
+                button_save_n = ButtonSprite(app, "menu/saves_menu", "save_label", "svg", True, anchor, str(int(num)))
+                # Write Save Info on interactable
+                blit_text_to_surf(app, button_save_n, name, anchor=(80, 45))
+                blit_text_to_surf(app, button_save_n, date, anchor=(180, 45))
+                # Add to Class
+                app.shader_prog_2D.saves_menu.add(button_save_n)
+                # Close file
+                f.close()
 
 class SettingsMenu:
 
