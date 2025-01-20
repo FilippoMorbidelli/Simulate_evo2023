@@ -4,7 +4,8 @@
 # Objectives:
 
 # Import third party and Engine packages --------------|
-
+from pathlib import Path
+import os
 
 # Save and Load Manager -------------------------------|
 class SaveManager:
@@ -15,17 +16,21 @@ class SaveManager:
         self.main_game = self.app.scene.surfaces.surf.main_game
 
         self.current_save = ""
-        self.path = "../SaveFiles/"
-        self.path_world = "../world/whole.txt"
+        self.save_path = Path(__file__).parent.parent / app.stg.util.save_path
+        self.path_world = "world/whole.txt"
+        self.path_player = "player.txt"
 
     def save_whole_file(self, save_name = ""):
         # Write whole world chunks to txt.file
         if not save_name:
             save_name = self.current_save
-
-        with open(self.path + save_name + self.path_world, 'w') as f:
+        # Save World voxels
+        with open(self.save_path + save_name + self.path_world, 'w') as f:
             for v_row in self.main_game.voxels:
                 f.write(v_row)
+        # Save player state
+        with open(self.save_path + save_name + self.path_player) as f:
+            pass
 
     def load_whole_file(self, save_name):
         # Read whole file data and set data to voxel container
