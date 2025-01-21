@@ -4,13 +4,13 @@
 # Last update: 03/12/2023
 # Notes: Handles events and actions to compute
 
-# Import packages ------------------------------|
+# Import packages ------------------------------------------------------------------------------------------------------
 import pygame as pg
-import string
+from string import digits
 from genesim_lab.Engine.scene.surfaces import GS
 
 
-# Main event handler ---------------------------|
+# Main event handler ---------------------------------------------------------------------------------------------------
 class EventHandler:  # Manage every event related to player and scenes (simulation events may be on other function)
     def __init__(self, app):
         # Init flags to define current scene and sprite to search on
@@ -20,11 +20,15 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
         self.active_sprite = None  # Active sprite to search for events
         self.event_types   = EventTypes(app)  # Init event types class
         self.catalog       = self.events_catalog()  # Compute event catalog for each action
+        # Other
+        self.ui_string     = ""
+        self.ui_action     = ""
 
         # Custom FPS event to update it every half second
         self.FPS_EVENT = pg.USEREVENT + 1
         pg.time.set_timer(self.FPS_EVENT, 500)
 
+#---## Main Event handler functions ------------------------------------------------------------------------------------
     def find_active_sprite(self, scene):
         # Try to iterate over scene sprites
         try:
@@ -85,6 +89,24 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                     # World events
                     # TBD
 
+            # [User input requested, check related events and others only]
+            case (GS.UserInput, _):
+                # Iterate over each event
+                for event in self.app.event_list:
+                    # Other User events
+                    if self.search_generic_event(event=event):
+                        continue
+                    # Text Input
+                    self.search_user_input(event=event)
+                # Blit what the player wrote on screen REMOVE TO AFTER RENDER
+                if self.ui_string:
+                    if self.app.time: # tbd
+                        string = self.ui_string + "|"
+                    else:
+                        string = self.ui_string
+                    self.app.screen.blit(self.app.stg.util.ui_font.render(string, 1, (255, 255, 255))[0],
+                                ((self.app.screen.get_width() / 2), (self.app.screen.get_height() / 2)))
+
             # [Any other scene, check all events]
             case (_, _):
                 # Iterate over each event
@@ -100,6 +122,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                         if self.search_sprite_event(event=event):
                             continue
 
+#---## Search Event functions ------------------------------------------------------------------------------------------
     # Function that retrieves from catalog each Generic event and calls the specific function
     def search_generic_event(self, event):
         # Iterate over each event of class "OTHER"
@@ -117,7 +140,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
     # Function that retrieves from catalog each Master Scene event related to sprites and calls the specific function
     def search_sprite_event(self, event):
         # Strip and save ID of multiple sprite
-        act_sprite = self.active_sprite.rstrip(string.digits)
+        act_sprite = self.active_sprite.rstrip(digits)
         # Save it TBD
         # No need to Iterate over each event of class Master Scene
         e_type, conditions, outcomes = self.catalog[self.master_scene]["sprite"][act_sprite]
@@ -144,6 +167,25 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
             # Event not found in catalog
         return False
 
+    def search_user_input(self, event):
+        # Check that event is key pressed
+        if event.type == pg.KEYDOWN:
+            # Retrieve key
+            in_key = event.key
+            # Perform related action
+            if in_key == pg.K_BACKSPACE:
+                self.ui_string = self.ui_string[:-1]
+            elif in_key == pg.K_RETURN:
+                self.scene_ptr.reset_status(GS.UserInput)
+                self.event_types.user_input_action(self.ui_action)
+                self.ui_string = ""
+                self.ui_action = ""
+            elif in_key == pg.K_MINUS:
+                self.ui_string += "_"
+            elif in_key <= 127:
+                self.ui_string+= chr(in_key)
+
+#---## Event Catalog ---------------------------------------------------------------------------------------------------
     def events_catalog(self):
         # Full catalog containing every user interaction in the game
         # The catalog is organized based of the current scene the player is at.
@@ -247,14 +289,19 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                     "button_save_label": [
                         "change_scene",  # Event handle to use for this custom event
                         [pg.MOUSEBUTTONDOWN, "button", 1],
-                        [],  # Event data
+                        [lambda : self.app.save_load.manage_sl(self.active_sprite)],  # Event data
+                    ],
+                    "button_save_new": [
+                        "change_scene",  # Event handle to use for this custom event
+                        [pg.MOUSEBUTTONDOWN, "button", 1],
+                        [lambda: self.scene_ptr.set_userinput("save") if self.app.scene.sprite_util["SaveLoad"] == "save" else None],  # mAYBE PUT START NEW GAME SAVE?
                     ]
                 },
                 "non_sprite" : {
                     "return_main_menu": [
                         "change_scene",  # Event handle to use for this custom event
                         [pg.KEYDOWN, "key", pg.K_ESCAPE],
-                        [lambda: self.scene_ptr.set_primary(GS.MainMenu) if self.app.shader_prog_2D.saves_menu.sprites()[1].alt == "load" else self.scene_ptr.reset_status(GS.SaveLoadMenu)],
+                        [lambda: self.scene_ptr.set_primary(GS.MainMenu) if self.app.scene.sprite_util["SaveLoad"] == "load" else self.scene_ptr.reset_status(GS.SaveLoadMenu)],
                     ]
                 }
             }
@@ -262,7 +309,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
         return catalog
 
 
-# Single events --------------------------------|
+# Event Types ----------------------------------------------------------------------------------------------------------
 class EventTypes:
     def __init__(self, app):
         self.app       = app
@@ -322,7 +369,7 @@ class EventTypes:
         # Manage mouse depending on Main Game state
         if self.prev_max != self.scene_ptr.max:
             # Hide mouse since Main Game is main scene
-            if mg_depth == self.scene_ptr.max :
+            if mg_depth == self.scene_ptr.max or self.scene_ptr.master == GS.UserInput:
                 pg.mouse.set_visible(False)
                 pg.mouse.get_rel()
             # Main game not primary scene so show and set mouse pos
@@ -334,6 +381,13 @@ class EventTypes:
                 self.app.player.reset()
             # Update previous max
             self.prev_max = self.scene_ptr.max
+
+    def user_input_action(self, action):
+        # Exec action depending on type of user input
+        if action == "save":
+            self.app.save_load.manage_sl(self.app.custom_events.active_sprite)
+        else:
+            pass # TBD
 
 # Custom exceptions --
 class SceneChanged(Exception):

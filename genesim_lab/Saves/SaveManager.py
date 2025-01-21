@@ -5,7 +5,11 @@
 
 # Import third party and Engine packages --------------|
 from pathlib import Path
+import pygame as pg
+import string
+import re
 import os
+
 
 # Save and Load Manager -------------------------------|
 class SaveManager:
@@ -20,10 +24,22 @@ class SaveManager:
         self.path_world = "world/whole.txt"
         self.path_player = "player.txt"
 
+    def manage_sl(self, file = ""):
+        # Strip Save File name to get file number
+        file = re.sub(r"\D+", "", file)
+        # Call Save or Load function
+        if self.app.scene.sprite_util["SaveLoad"] == "load":
+            # Load Whole file
+            self.load_whole_file(file)
+        else:
+            # PUT OVERWRITE  CHOICE????
+            # Save Whole file
+            self.save_whole_file(file)
+
     def save_whole_file(self, save_name = ""):
         # Write whole world chunks to txt.file
         if not save_name:
-            save_name = self.current_save
+            pass
         # Save World voxels
         with open(self.save_path + save_name + self.path_world, 'w') as f:
             for v_row in self.main_game.voxels:

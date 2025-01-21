@@ -10,9 +10,13 @@ from genesim_lab.Engine.scene.surfaces import *
 
 # Main -----------------------------------------|
 class Scene:
-
+    # This class is just a middle man
+    # Contains some data about scene and sprites
     def __init__(self, app):
         self.app = app
+        self.sprite_util = {
+            "SaveLoad" : "",
+        }
 
         # Initialize surfaces logic
         self.surfaces = Surfaces(self.app)

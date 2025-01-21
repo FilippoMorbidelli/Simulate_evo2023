@@ -94,7 +94,10 @@ class GLTextures2D(pg.sprite.Group):
             pass
         for sprite in self:
             self.render(sprite, self.app.screen)
-        self.gl_buffer.ctx.fbo.depth_mask = True
+        try:
+            self.gl_buffer.ctx.fbo.depth_mask = True  # TO DO - find better way
+        except Exception:
+            pass
 
     def update(self, app):
         for sprite in self:
@@ -169,12 +172,12 @@ class BackgroundSprite(pg.sprite.Sprite):
 
 
 class ButtonSprite(pg.sprite.Sprite):
-    def __init__(self, app, scene, button, ext, flag, anchor = (0, 0), name_add = ""):
+    def __init__(self, app, scene, button, ext, flag, anchor = (0, 0), name_add = "", threshold = 127):
         super().__init__()
         self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.{ext}').convert_alpha()
         self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.{ext}').convert_alpha()
         self.image    = self.sprite_F
-        self.mask     = pg.mask.from_surface(self.image)
+        self.mask = pg.mask.from_surface(self.image, threshold)
         wh = self.sprite_F.get_size()
         self.rect = pg.Rect(anchor[0], anchor[1], wh[0], wh[1])
 
@@ -189,24 +192,30 @@ class ButtonSprite(pg.sprite.Sprite):
 class StaticAltSprite(pg.sprite.Sprite):
     def __init__(self, app, scene, flag, alts, xy, ext = "svg"):
         super().__init__()
+        # Save app pointer
+        self.app = app
         # Generate rect and load associated textures
-        self.sprite = {}
+        self.sprite_dict = {}
         for a in alts:
-            self.sprite[a] = pg.image.load(f'genesim_lab/assets/{scene}/static_alt_{a}.{ext}').convert_alpha()
-        wh = self.sprite[a].get_size()
+            self.sprite_dict[a] = pg.image.load(f'genesim_lab/assets/{scene}/static_alt_{a}.{ext}').convert_alpha()
+        wh = self.sprite_dict[a].get_size()
+        # Sprite render data (set to default sprite)
         self.rect = pg.Rect(xy[0], xy[1], wh[0], wh[1])  # Generate sprite rect from main window
-        # Set default sprite
-        self.image = self.sprite[a]
-        # Set other parameters
+        self.image = self.sprite_dict[a]
+        # Set other data/info
         self.alt = a
         self.mask = pg.mask.from_surface(self.image)
-        self.name = f"static_alt_{alts[-1]}"
+        self.name = f"static_alt_{a}"
         self.flag = flag  # Flag to determine if sprite is dynamic or not
         self.forced_reconstruct = False  # Flag to determine if vertices for vbo must be reconstructed every frame
 
     def alternate(self, alt):
-        self.image = self.sprite[alt]
+        # Switch active sprite
+        self.image = self.sprite_dict[alt]
+        self.rect.size = self.sprite_dict[alt].get_size()
         self.alt = alt
+        # Update pointer in Scene
+        self.app.scene.sprite_util["SaveLoad"] = alt
 
 
 class UtilityStaticText(pg.sprite.Sprite):

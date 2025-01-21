@@ -22,6 +22,7 @@ class GS(IntEnum):  # GS stands for GameState
     SettingsMenu   = 4
     UtilityOverlay = 5
     Other          = 6
+    UserInput      = 7
 
 # All surfaces ---------------------------------|
 class Surfaces:
@@ -46,16 +47,18 @@ class Surfaces:
             GS.SettingsMenu   : {"Render" : False, "Depth" : None, "Update" : False},
             GS.PauseMenu      : {"Render" : False, "Depth" : None, "Update" : False},
             GS.UtilityOverlay : {"Render" : False, "Depth" : None, "Update" : False},
-            GS.Other          : {"Render" : False, "Depth" : None, "Update" : False}
+            GS.Other          : {"Render" : False, "Depth" : None, "Update" : False},
+            GS.UserInput      : {"Render" : False, "Depth" : None, "Update" : False}
         }
         self.handle = {
-            GS.MainMenu       : app.shader_prog_2D.main_menu,
-            GS.UtilityOverlay : app.shader_prog_2D.utility,
+            GS.MainMenu       : self.app.shader_prog_2D.main_menu,
+            GS.UtilityOverlay : self.app.shader_prog_2D.utility,
             GS.MainGame       : self.surf.main_game.handle,
-            GS.SaveLoadMenu   : app.shader_prog_2D.saves_menu,
-            GS.SettingsMenu   : app.shader_prog_2D.settings_menu,
-            GS.PauseMenu      : app.shader_prog_2D.pause_menu,
-            GS.Other          : app.shader_prog_2D.other
+            GS.SaveLoadMenu   : self.app.shader_prog_2D.saves_menu,
+            GS.SettingsMenu   : self.app.shader_prog_2D.settings_menu,
+            GS.PauseMenu      : self.app.shader_prog_2D.pause_menu,
+            GS.Other          : self.app.shader_prog_2D.other,
+            GS.UserInput      : self.app.shader_prog_2D.user_input
         }
         self.update = {
             GS.MainMenu       : self.app.shader_prog_2D.main_menu.update,
@@ -65,6 +68,7 @@ class Surfaces:
             GS.SettingsMenu   : self.app.shader_prog_2D.settings_menu.update,
             GS.PauseMenu      : self.app.shader_prog_2D.pause_menu.update,
             GS.Other          : self.app.shader_prog_2D.other.update,
+            GS.UserInput      : self.app.shader_prog_2D.user_input.update
         }
         self.render = {
             GS.MainMenu       : self.app.shader_prog_2D.main_menu.draw2d,
@@ -73,7 +77,8 @@ class Surfaces:
             GS.SaveLoadMenu   : self.app.shader_prog_2D.saves_menu.draw2d,
             GS.SettingsMenu   : self.app.shader_prog_2D.settings_menu.draw2d,
             GS.PauseMenu      : self.app.shader_prog_2D.pause_menu.draw2d,
-            GS.Other          : self.app.shader_prog_2D.other.draw2d
+            GS.Other          : self.app.shader_prog_2D.other.draw2d,
+            GS.UserInput      : self.app.shader_prog_2D.user_input.draw2d
         }
 
         # Compute current Scene state
@@ -90,6 +95,7 @@ class Surfaces:
         surf_group.settings_menu = SettingsMenu(self.app)
         surf_group.pause_menu    = PauseMenu(self.app)
         surf_group.other         = Other(self.app)
+        surf_group.user_input    = UserInput(self.app, "")
 
         return surf_group
 
@@ -156,6 +162,14 @@ class Surfaces:
 
     def update_overlay(self, overlay):
         self.state[overlay]["Depth"] = self.state[self.master]["Depth"] + 0.1
+
+    def set_userinput(self, scene):
+        # Init UserInput sprite class
+        self.surf.user_input = UserInput(self.app, scene)
+        # Change scene
+        self.set_only_primary(GS.UserInput)
+        # Set UserInput action
+        self.app.custom_events.ui_action = scene
 
 
 class Other:
@@ -271,11 +285,49 @@ class SaveLoadMenu:
                 app.shader_prog_2D.saves_menu.add(button_save_n)
                 # Close file
                 f.close()
+        # New Save File
+        for new in range(5 - int(num) - 1):
+            n = int(num) + new + 1
+            anchor = (self.save_anchor_basic[0] + n * self.save_anchor_n[0], self.save_anchor_basic[1] + n * self.save_anchor_n[1])
+            button_save_new = ButtonSprite(app, "menu/saves_menu", "save_new", "svg", True, anchor, str(n))
+            app.shader_prog_2D.saves_menu.add(button_save_new)
 
 class SettingsMenu:
 
     def __init__(self, app):
         pass
+
+
+class UserInput:
+
+    def __init__(self, app, scene):
+        self.app = app
+        # Init User Input related sprites, depending on scene
+        match scene:
+
+            case "save":
+                # Temp background TO BE REMOVED!!!!
+                temp_surf = pg.sprite.Sprite()
+                temp_surf.flag = False
+                temp_surf.name = "blank_screen"
+                temp_surf.forced_reconstruct = False
+                temp_surf.rect = (0, 0, 10, 10)
+                temp_surf.image = pg.Surface((10, 10), pg.SRCALPHA, 32)
+                app.shader_prog_2D.saves_menu.add(temp_surf)
+
+                # Sprites related to new save file
+                pg.draw.rect(app.screen, (0, 0, 0),
+                             ((app.screen.get_width() / 2) - 100,
+                              (app.screen.get_height() / 2) - 10,
+                              200, 20), 0)
+                pg.draw.rect(app.screen, (255, 255, 255),
+                             ((app.screen.get_width() / 2) - 102,
+                              (app.screen.get_height() / 2) - 12,
+                              204, 24), 1)
+
+            case _:
+                pass
+
 
 
 class MainGame:
@@ -318,5 +370,6 @@ def init_shaders_2d(app):
     programs.saves_menu    = GLTextures2D(app)
     programs.main_game     = GLTextures2D(app)
     programs.other         = GLTextures2D(app)
+    programs.user_input    = GLTextures2D(app)
 
     return programs

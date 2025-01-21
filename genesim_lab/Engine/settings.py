@@ -12,6 +12,9 @@ import dataclasses
 from dataclasses import dataclass
 from numba.experimental import jitclass
 from numba import float32, int32
+from pygame import freetype
+from pathlib import Path
+
 
 # Settings ------------------------------------------|
 def sim_settings():
@@ -57,6 +60,7 @@ def sim_settings():
 
 # Initializations required ----------|
 pg.font.init()  # Init pygame fonts to create font inside settings
+freetype.init() # Init pygame fonts to create font inside settings
 
 
 # All game settings -----------------|
@@ -172,10 +176,11 @@ class PlayerData:
 
 @dataclass(slots=True, order=True)
 class Util:
-    fps_limit: int = 1000  # Limit frame rate to value
-    text_font: pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
-    text_color: tuple = (255, 255, 255)  # Color of displayed text
-    save_path: str = "SaveFiles/"  # Path in Game directory containing the save files
+    fps_limit  : int = 1000  # Limit frame rate to value
+    text_font  : pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
+    text_color : tuple = (255, 255, 255)  # Color of displayed text
+    save_path  : str = "SaveFiles/"  # Path in Game directory containing the save files
+    ui_font    : freetype.Font = freetype.Font(Path(__file__).parent.parent / "Assets/Fonts/Stormfaze.otf", 24)
 
     def __iter__(self):
         for field in dataclasses.fields(self):
