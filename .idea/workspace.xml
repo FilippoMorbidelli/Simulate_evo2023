@@ -5,16 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/genesim_lab/Assets/Fonts/Stormfaze.otf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/saves_menu/button_save_new_F.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/saves_menu/button_save_new_T.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/scene.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/scene.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/sprite.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/sprite.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,14 +157,9 @@
           <option name="timeStamp" value="75" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/Engine/scene/events.py</url>
-          <line>175</line>
-          <option name="timeStamp" value="163" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/Engine/scene/events.py</url>
-          <line>102</line>
-          <option name="timeStamp" value="165" />
+          <url>file://$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py</url>
+          <line>331</line>
+          <option name="timeStamp" value="187" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -189,6 +179,7 @@
         <watch expression="chunk_ids.dtype" />
         <watch expression="temp_surf" />
         <watch expression="temp_surf" />
+        <watch expression="scene_to_blit" />
       </configuration>
     </watches-manager>
   </component>

@@ -180,7 +180,7 @@ class Util:
     text_font  : pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
     text_color : tuple = (255, 255, 255)  # Color of displayed text
     save_path  : str = "SaveFiles/"  # Path in Game directory containing the save files
-    ui_font    : freetype.Font = freetype.Font(Path(__file__).parent.parent / "Assets/Fonts/Stormfaze.otf", 24)
+    ui_font    : freetype.Font = freetype.Font(Path(__file__).parent.parent / "Assets/Fonts/Stormfaze.otf", 28)
 
     def __iter__(self):
         for field in dataclasses.fields(self):

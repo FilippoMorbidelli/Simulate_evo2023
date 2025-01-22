@@ -27,6 +27,10 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
         # Custom FPS event to update it every half second
         self.FPS_EVENT = pg.USEREVENT + 1
         pg.time.set_timer(self.FPS_EVENT, 500)
+        # Custom UI event to write or remove | char every half second
+        self.ui_char_time = 0
+        self.ui_char_event = 500
+        self.ui_show = False
 
 #---## Main Event handler functions ------------------------------------------------------------------------------------
     def find_active_sprite(self, scene):
@@ -34,7 +38,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
         try:
             for sprite in scene:
                 # If sprite is static skip
-                if sprite.flag:
+                if sprite.to_interact:
                     # Find if collision is true
                     mouse_pos = self.app.mouse[0] - sprite.rect.x, self.app.mouse[1] - sprite.rect.y
                     try:
@@ -98,14 +102,17 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                         continue
                     # Text Input
                     self.search_user_input(event=event)
-                # Blit what the player wrote on screen REMOVE TO AFTER RENDER
-                if self.ui_string:
-                    if self.app.time: # tbd
-                        string = self.ui_string + "|"
+                # Append | character to current string every 0.5 seconds
+                self.ui_char_time += self.app.delta_time
+                if self.ui_char_time >= self.ui_char_event:
+                    if self.ui_show:
+                        self.ui_string = self.ui_string[:-1]
+                        self.ui_show = False
+                        self.ui_char_time = 0
                     else:
-                        string = self.ui_string
-                    self.app.screen.blit(self.app.stg.util.ui_font.render(string, 1, (255, 255, 255))[0],
-                                ((self.app.screen.get_width() / 2), (self.app.screen.get_height() / 2)))
+                        self.ui_string += "|"
+                        self.ui_show = True
+                        self.ui_char_time = 0
 
             # [Any other scene, check all events]
             case (_, _):
@@ -176,8 +183,11 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
             if in_key == pg.K_BACKSPACE:
                 self.ui_string = self.ui_string[:-1]
             elif in_key == pg.K_RETURN:
-                self.scene_ptr.reset_status(GS.UserInput)
                 self.event_types.user_input_action(self.ui_action)
+                self.ui_string = ""
+                self.ui_action = ""
+            elif in_key == pg.K_ESCAPE:
+                self.event_types.user_input_action("")
                 self.ui_string = ""
                 self.ui_action = ""
             elif in_key == pg.K_MINUS:
@@ -384,10 +394,23 @@ class EventTypes:
 
     def user_input_action(self, action):
         # Exec action depending on type of user input
+        self.scene_ptr.reset_status(GS.UserInput)
         if action == "save":
             self.app.save_load.manage_sl(self.app.custom_events.active_sprite)
         else:
             pass # TBD
+        # Reset Sprite TO BE DONEEEEEEEEEEE
+        #if self.app.custom_events.active_sprite:
+        #    for sprite in self.scene_ptr.handle[self.app.custom_events.master_scene]:
+        #        if sprite.name == self.app.custom_events.active_sprite:
+        #            sprite.over = False
+        #            sprite.image = sprite.sprite_F
+        # Handle current active scenes after event management
+        self.scene_ptr.handle_current_scene()
+        self.app.custom_events.master_scene = self.scene_ptr.master
+        self.app.custom_events.active_sprite = None
+        # Manage mouse since scene changed
+        self.manage_mouse()
 
 # Custom exceptions --
 class SceneChanged(Exception):

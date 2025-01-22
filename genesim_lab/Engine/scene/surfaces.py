@@ -95,7 +95,7 @@ class Surfaces:
         surf_group.settings_menu = SettingsMenu(self.app)
         surf_group.pause_menu    = PauseMenu(self.app)
         surf_group.other         = Other(self.app)
-        surf_group.user_input    = UserInput(self.app, "")
+        surf_group.user_input    = UserInput(self.app, "", "")
 
         return surf_group
 
@@ -165,7 +165,7 @@ class Surfaces:
 
     def set_userinput(self, scene):
         # Init UserInput sprite class
-        self.surf.user_input = UserInput(self.app, scene)
+        self.surf.user_input = UserInput(self.app, scene, self.app.custom_events.active_sprite)
         # Change scene
         self.set_only_primary(GS.UserInput)
         # Set UserInput action
@@ -254,9 +254,10 @@ class SaveLoadMenu:
 
         # Temp background TO BE REMOVED!!!!
         temp_surf = pg.sprite.Sprite()
-        temp_surf.flag = False
+        temp_surf.to_interact = False
         temp_surf.name = "blank_screen"
-        temp_surf.forced_reconstruct = False
+        temp_surf.to_rebuild = False
+        temp_surf.to_render = True
         temp_surf.rect = app.stg.window.rect
         temp_surf.image = pg.Surface(app.stg.window.rect.size, pg.SRCALPHA, 32)
         temp_surf.image.fill((0, 0, 0))
@@ -292,6 +293,7 @@ class SaveLoadMenu:
             button_save_new = ButtonSprite(app, "menu/saves_menu", "save_new", "svg", True, anchor, str(n))
             app.shader_prog_2D.saves_menu.add(button_save_new)
 
+
 class SettingsMenu:
 
     def __init__(self, app):
@@ -300,7 +302,7 @@ class SettingsMenu:
 
 class UserInput:
 
-    def __init__(self, app, scene):
+    def __init__(self, app, scene, sprite):
         self.app = app
         # Init User Input related sprites, depending on scene
         match scene:
@@ -308,14 +310,15 @@ class UserInput:
             case "save":
                 # Temp background TO BE REMOVED!!!!
                 temp_surf = pg.sprite.Sprite()
-                temp_surf.flag = False
+                temp_surf.to_interact = False
                 temp_surf.name = "blank_screen"
-                temp_surf.forced_reconstruct = False
+                temp_surf.to_render = True
+                temp_surf.to_rebuild = False
                 temp_surf.rect = (0, 0, 10, 10)
                 temp_surf.image = pg.Surface((10, 10), pg.SRCALPHA, 32)
-                app.shader_prog_2D.saves_menu.add(temp_surf)
+                app.shader_prog_2D.user_input.add(temp_surf)
 
-                # Sprites related to new save file
+                # Sprites related to new save file TO DEL
                 pg.draw.rect(app.screen, (0, 0, 0),
                              ((app.screen.get_width() / 2) - 100,
                               (app.screen.get_height() / 2) - 10,
@@ -325,9 +328,20 @@ class UserInput:
                               (app.screen.get_height() / 2) - 12,
                               204, 24), 1)
 
+                # UI text
+                scene_to_blit = self.app.shader_prog_2D.saves_menu
+                sp_to_blit = [sp for sp in scene_to_blit.sprites() if sp.name == sprite][0]
+                self.ui_text = UITextSprite(app, sp_to_blit, [50, 50] , self.app.custom_events.ui_string,
+                                       self.app.stg.util.ui_font)
+                app.shader_prog_2D.user_input.add(self.ui_text)
+
             case _:
+                # Safe Code
                 pass
 
+    def resetUI(self):
+        #self.ui_text.reset()
+        self.app.shader_prog_2D.user_input.empty()
 
 
 class MainGame:
