@@ -323,7 +323,7 @@ class UITextSprite(pg.sprite.Sprite):
 
     def update(self, app):
         self.image = pg.Surface((500, 100), pg.SRCALPHA, 32)
-        self.app.stg.util.ui_font.render_to(self.image, (self.topleft[0], self.topleft[1]), self.string, (250,250,250))
+        self.app.stg.util.ui_font.render_to(self.image, (self.topleft[0], self.topleft[1]), self.string["ui_string"], (250,250,250))
         #self.screen.image.blit(self.font.render(self.string, self.color)[0], (0, 0))
 
 def blit_text_to_surf(app, sprite, text, anchor = (0, 0)):

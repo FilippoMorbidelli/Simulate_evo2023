@@ -318,22 +318,12 @@ class UserInput:
                 temp_surf.image = pg.Surface((10, 10), pg.SRCALPHA, 32)
                 app.shader_prog_2D.user_input.add(temp_surf)
 
-                # Sprites related to new save file TO DEL
-                pg.draw.rect(app.screen, (0, 0, 0),
-                             ((app.screen.get_width() / 2) - 100,
-                              (app.screen.get_height() / 2) - 10,
-                              200, 20), 0)
-                pg.draw.rect(app.screen, (255, 255, 255),
-                             ((app.screen.get_width() / 2) - 102,
-                              (app.screen.get_height() / 2) - 12,
-                              204, 24), 1)
-
                 # UI text
                 scene_to_blit = self.app.shader_prog_2D.saves_menu
                 sp_to_blit = [sp for sp in scene_to_blit.sprites() if sp.name == sprite][0]
-                self.ui_text = UITextSprite(app, sp_to_blit, [50, 50] , self.app.custom_events.ui_string,
+                ui_text = UITextSprite(app, sp_to_blit, [50, 50] , self.app.custom_events.ui_dict,
                                        self.app.stg.util.ui_font)
-                app.shader_prog_2D.user_input.add(self.ui_text)
+                app.shader_prog_2D.user_input.add(ui_text)
 
             case _:
                 # Safe Code

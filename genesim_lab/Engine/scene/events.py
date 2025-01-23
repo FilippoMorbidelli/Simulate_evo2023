@@ -21,16 +21,18 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
         self.event_types   = EventTypes(app)  # Init event types class
         self.catalog       = self.events_catalog()  # Compute event catalog for each action
         # Other
-        self.ui_string     = ""
-        self.ui_action     = ""
 
         # Custom FPS event to update it every half second
         self.FPS_EVENT = pg.USEREVENT + 1
         pg.time.set_timer(self.FPS_EVENT, 500)
         # Custom UI event to write or remove | char every half second
-        self.ui_char_time = 0
-        self.ui_char_event = 500
-        self.ui_show = False
+        self.ui_dict = {
+            "ui_string"     : "",
+            "ui_action"     : "",
+            "ui_char_time"  : 0,
+            "ui_char_event" : 750,
+            "ui_show"       : False
+        }
 
 #---## Main Event handler functions ------------------------------------------------------------------------------------
     def find_active_sprite(self, scene):
@@ -103,16 +105,16 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                     # Text Input
                     self.search_user_input(event=event)
                 # Append | character to current string every 0.5 seconds
-                self.ui_char_time += self.app.delta_time
-                if self.ui_char_time >= self.ui_char_event:
-                    if self.ui_show:
-                        self.ui_string = self.ui_string[:-1]
-                        self.ui_show = False
-                        self.ui_char_time = 0
+                self.ui_dict["ui_char_time"] += self.app.delta_time
+                if self.ui_dict["ui_char_time"] >= self.ui_dict["ui_char_event"]:
+                    if self.ui_dict["ui_show"]:
+                        self.ui_dict["ui_string"] = self.ui_dict["ui_string"][:-1]
+                        self.ui_dict["ui_show"] = False
+                        self.ui_dict["ui_char_time"] = 0
                     else:
-                        self.ui_string += "|"
-                        self.ui_show = True
-                        self.ui_char_time = 0
+                        self.ui_dict["ui_string"] += "|"
+                        self.ui_dict["ui_show"] = True
+                        self.ui_dict["ui_char_time"] = 0
 
             # [Any other scene, check all events]
             case (_, _):
@@ -181,19 +183,19 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
             in_key = event.key
             # Perform related action
             if in_key == pg.K_BACKSPACE:
-                self.ui_string = self.ui_string[:-1]
+                self.ui_dict["ui_string"] = self.ui_dict["ui_string"][:-1]
             elif in_key == pg.K_RETURN:
-                self.event_types.user_input_action(self.ui_action)
-                self.ui_string = ""
-                self.ui_action = ""
+                self.event_types.user_input_action(self.ui_dict["ui_action"])
+                self.ui_dict["ui_string"] = ""
+                self.ui_dict["ui_action"] = ""
             elif in_key == pg.K_ESCAPE:
                 self.event_types.user_input_action("")
-                self.ui_string = ""
-                self.ui_action = ""
+                self.ui_dict["ui_string"] = ""
+                self.ui_dict["ui_action"] = ""
             elif in_key == pg.K_MINUS:
-                self.ui_string += "_"
+                self.ui_dict["ui_string"] += "_"
             elif in_key <= 127:
-                self.ui_string+= chr(in_key)
+                self.ui_dict["ui_string"] += chr(in_key)
 
 #---## Event Catalog ---------------------------------------------------------------------------------------------------
     def events_catalog(self):
