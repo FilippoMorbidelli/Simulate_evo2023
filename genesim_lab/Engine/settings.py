@@ -111,8 +111,8 @@ class World:
     scale_i : glm.vec3 = glm.vec3(v_x_i, v_y_i, v_z_i)
 
     # World data
-    w_width: int = 4
-    w_height: int = 4
+    w_width: int = 2
+    w_height: int = 2
     w_depth: int = w_width
     w_area: int = w_width * w_depth
     w_vol: int = w_area * w_height

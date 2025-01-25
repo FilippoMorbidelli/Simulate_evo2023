@@ -303,7 +303,7 @@ class FpsSprite(pg.sprite.Sprite):
 
 
 class UITextSprite(pg.sprite.Sprite):
-    def __init__(self, app, blit_surf, xy, string_ptr, font, color = (255, 255, 255), dim = 22, name = ""):
+    def __init__(self, app, blit_rect, xy, string_ptr, font, color = (255, 255, 255), dim = 22, name = ""):
         super().__init__()
         # Save Text Info
         self.app     = app
@@ -312,22 +312,21 @@ class UITextSprite(pg.sprite.Sprite):
         self.color   = color
         self.dim     = dim
         self.topleft = xy
-        self.screen  = blit_surf
         self.name    = name
-        self.image = pg.Surface((500, 100), pg.SRCALPHA, 32)
-        self.rect = pg.Rect(self.screen.rect.left, self.screen.rect.top, 500, 100)
+        self.image = pg.Surface((500, 120), pg.SRCALPHA, 32)
+        self.rect = pg.Rect(blit_rect.left, blit_rect.top, 500, 120)
         # Sprite flags
         self.to_render = True
         self.to_interact = False
         self.to_rebuild = False
 
     def update(self, app):
-        self.image = pg.Surface((500, 100), pg.SRCALPHA, 32)
-        self.app.stg.util.ui_font.render_to(self.image, (self.topleft[0], self.topleft[1]), self.string["ui_string"], (250,250,250))
-        #self.screen.image.blit(self.font.render(self.string, self.color)[0], (0, 0))
+        _, rect = self.font.render(self.string["ui_string"], self.color)
+        self.image = pg.Surface((500, 120), pg.SRCALPHA, 32)
+        self.app.stg.util.ui_font.render_to(self.image, (self.topleft[0], self.topleft[1] - rect.height/2.2), self.string["ui_string"], (250,50,50))
 
 def blit_text_to_surf(app, sprite, text, anchor = (0, 0)):
-    text_surf = app.stg.util.text_font.render(text, True, app.stg.util.text_color)
+    text_surf = app.stg.util.ui_font.render(text, app.stg.util.text_color, size = 22)[0]
     # Blit text to sprite image
     sprite.image.blit(text_surf, anchor)
     sprite.sprite_F.blit(text_surf, anchor)

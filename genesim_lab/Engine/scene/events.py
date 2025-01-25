@@ -26,11 +26,13 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
         self.FPS_EVENT = pg.USEREVENT + 1
         pg.time.set_timer(self.FPS_EVENT, 500)
         # Custom UI event to write or remove | char every half second
+        self.UI_EVENT = pg.USEREVENT + 2
+        pg.time.set_timer(self.UI_EVENT, 750)
+        pg.event.set_blocked(self.UI_EVENT)
         self.ui_dict = {
+            "ui_sprite"     : "",
             "ui_string"     : "",
             "ui_action"     : "",
-            "ui_char_time"  : 0,
-            "ui_char_event" : 750,
             "ui_show"       : False
         }
 
@@ -54,7 +56,8 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                         sprite.over = check_over
                         if sprite.over:
                             # Switch sprite active
-                            sprite.image = sprite.sprite_T
+                            #sprite.image = pg.transform.scale_by(sprite.sprite_T, 2)
+                            #sprite.rect.size = sprite.image.get_size()
                             self.active_sprite = sprite.name
                             break  # Break current search since over sprite has been found
                         else:
@@ -104,17 +107,6 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                         continue
                     # Text Input
                     self.search_user_input(event=event)
-                # Append | character to current string every 0.5 seconds
-                self.ui_dict["ui_char_time"] += self.app.delta_time
-                if self.ui_dict["ui_char_time"] >= self.ui_dict["ui_char_event"]:
-                    if self.ui_dict["ui_show"]:
-                        self.ui_dict["ui_string"] = self.ui_dict["ui_string"][:-1]
-                        self.ui_dict["ui_show"] = False
-                        self.ui_dict["ui_char_time"] = 0
-                    else:
-                        self.ui_dict["ui_string"] += "|"
-                        self.ui_dict["ui_show"] = True
-                        self.ui_dict["ui_char_time"] = 0
 
             # [Any other scene, check all events]
             case (_, _):
@@ -181,21 +173,39 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
         if event.type == pg.KEYDOWN:
             # Retrieve key
             in_key = event.key
-            # Perform related action
+            # Delete last char of string
             if in_key == pg.K_BACKSPACE:
+                self.ui_dict["ui_string"] = self.ui_dict["ui_string"].rstrip("|")
                 self.ui_dict["ui_string"] = self.ui_dict["ui_string"][:-1]
+            # Add underscore
+            elif in_key == pg.K_MINUS:
+                self.ui_dict["ui_string"] = self.ui_dict["ui_string"].rstrip("|")
+                self.ui_dict["ui_string"] += "_"
+            # Confirm string and execute action
             elif in_key == pg.K_RETURN:
+                self.ui_dict["ui_string"] = self.ui_dict["ui_string"].rstrip("|")
                 self.event_types.user_input_action(self.ui_dict["ui_action"])
                 self.ui_dict["ui_string"] = ""
                 self.ui_dict["ui_action"] = ""
+            # End string insertion, no action
             elif in_key == pg.K_ESCAPE:
                 self.event_types.user_input_action("")
                 self.ui_dict["ui_string"] = ""
                 self.ui_dict["ui_action"] = ""
-            elif in_key == pg.K_MINUS:
-                self.ui_dict["ui_string"] += "_"
+            # Add alphanumeric char
             elif in_key <= 127:
+                self.ui_dict["ui_string"] = self.ui_dict["ui_string"].rstrip("|")
                 self.ui_dict["ui_string"] += chr(in_key)
+        # Remove / Add | char from current string
+        if event.type == self.UI_EVENT:
+            if self.ui_dict["ui_show"]:
+                # Strip | char from end of string
+                self.ui_dict["ui_string"] = self.ui_dict["ui_string"].rstrip("|")
+                self.ui_dict["ui_show"] = False
+            else:
+                # Add | char to end of string
+                self.ui_dict["ui_string"] += "|"
+                self.ui_dict["ui_show"] = True
 
 #---## Event Catalog ---------------------------------------------------------------------------------------------------
     def events_catalog(self):
@@ -398,7 +408,7 @@ class EventTypes:
         # Exec action depending on type of user input
         self.scene_ptr.reset_status(GS.UserInput)
         if action == "save":
-            self.app.save_load.manage_sl(self.app.custom_events.active_sprite)
+            self.app.save_load.manage_sl(self.app.custom_events.ui_dict["ui_sprite"], self.app.custom_events.ui_dict["ui_string"])
         else:
             pass # TBD
         # Reset Sprite TO BE DONEEEEEEEEEEE
@@ -413,6 +423,8 @@ class EventTypes:
         self.app.custom_events.active_sprite = None
         # Manage mouse since scene changed
         self.manage_mouse()
+        # Disable UI event queueing
+        pg.event.set_blocked(self.app.custom_events.UI_EVENT)
 
 # Custom exceptions --
 class SceneChanged(Exception):
