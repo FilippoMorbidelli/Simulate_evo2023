@@ -17,7 +17,7 @@ from genesim_lab.Engine.world_gen.sparsevoxeloctree import *
 # World generator ------------------------------|
 class World:
 
-    def __init__(self, app):
+    def __init__(self, app, voxels = None):
         self.app = app
         self.info = app.stg.world
         self.chunks: list = [None for _ in range(self.info.w_vol)]
@@ -25,7 +25,7 @@ class World:
         self.svo_pointer = np.empty([self.info.w_width, self.info.w_height, self.info.w_depth])
         self.frustum_check = self.app.player.frustum.is_on_frustum
 
-        self.build_chunks()
+        self.build_chunks(voxels)
         self.build_chunk_mesh()
 
         # Build world sparse voxel octree
@@ -38,7 +38,7 @@ class World:
         # World objects
         self.celestial = Celestial(self)
 
-    def build_chunks(self):
+    def build_chunks(self, load_voxels):
         for x in range(self.info.w_width):
             for y in range(self.info.w_height):
                 for z in range(self.info.w_depth):
@@ -49,7 +49,10 @@ class World:
                     self.chunks[chunk_index] = chunk
 
                     # Put the chunk voxels in a separate array
-                    self.voxels[chunk_index] = chunk.build_voxels()
+                    if load_voxels is np.ndarray:
+                        self.voxels[chunk_index] = load_voxels[chunk_index]
+                    else:
+                        self.voxels[chunk_index] = chunk.build_voxels()
 
                     # Get pointer to voxels
                     chunk.voxels = self.voxels[chunk_index]

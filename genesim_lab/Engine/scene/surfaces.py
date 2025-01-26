@@ -249,7 +249,7 @@ class SaveLoadMenu:
         self.save_info = "SaveInfo.txt"
         self.save_anchor_basic = [350, 200]
         self.save_anchor_n = [0, 160]
-        self.max_saves = 5
+        self.free_saves = [0, 1, 2, 3, 4]
         # Init each sprite for the SaveLoad menu scene
         max_n = -1
         # Background
@@ -268,7 +268,7 @@ class SaveLoadMenu:
         static_alt_title = StaticAltSprite(app, "menu/saves_menu", False, ["load", "save"], [75, 30])
         app.shader_prog_2D.saves_menu.add(static_alt_title)
         # Save File blank container
-        for n in range(self.max_saves):
+        for n in range(5):
             anchor = (self.save_anchor_basic[0] +  n * self.save_anchor_n[0], self.save_anchor_basic[1] +  n * self.save_anchor_n[1])
             container_save_n = BackgroundSprite(app, "menu/saves_menu", "save_container", "svg", False, anchor, str(n))
             app.shader_prog_2D.saves_menu.add(container_save_n)
@@ -276,10 +276,10 @@ class SaveLoadMenu:
         for save in os.listdir(self.save_path):
             with open(self.save_path / save / self.save_info, "r") as f:
                 # Extract save info
-                info = f.read().split(",")
+                info = f.read().split(" ,")
                 name, date, num = info
                 num = int(num)
-                max_n = num if num > max_n else max_n
+                self.free_saves.remove(num)
                 # Create Save interactable
                 anchor = (self.save_anchor_basic[0] +  num * self.save_anchor_n[0], self.save_anchor_basic[1] +  num * self.save_anchor_n[1])
                 button_save_n = ButtonSprite(app, "menu/saves_menu", "save_label", "svg", True, anchor, str(num))
@@ -289,10 +289,9 @@ class SaveLoadMenu:
                 # Add to Class
                 app.shader_prog_2D.saves_menu.add(button_save_n)
                 # Save name to SaveManager
-                app.save_load.existing_saves.append(name)
+                app.save_load.existing_saves[num] = name
         # New Save File
-        for new in range(5 - max_n - 1):
-            n = max_n + new + 1
+        for n in self.free_saves:
             anchor = (self.save_anchor_basic[0] + n * self.save_anchor_n[0], self.save_anchor_basic[1] + n * self.save_anchor_n[1])
             button_save_new = ButtonSprite(app, "menu/saves_menu", "save_new", "svg", True, anchor, str(n))
             app.shader_prog_2D.saves_menu.add(button_save_new)
@@ -346,9 +345,9 @@ class MainGame:
         overlay_crosshair = OverlaySprite(app, "main_game", "crosshair", "svg", True)
         app.shader_prog_2D.main_game.add(overlay_crosshair)
 
-    def init_world(self):
+    def init_world(self, vox = None):
         # Initialize 3D graphic elements
-        self.world = World(self.app)
+        self.world = World(self.app, vox)
 
     def handle(self):
         self.app.shader_prog_3D()

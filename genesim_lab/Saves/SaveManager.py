@@ -7,6 +7,7 @@
 from pathlib import Path
 from datetime import datetime
 from genesim_lab.Engine.scene.surfaces import SaveLoadMenu
+from genesim_lab.Engine.scene.events import GS
 import re
 import os
 import numpy as np
@@ -26,7 +27,7 @@ class SaveManager:
         self.path_info = "SaveInfo.txt"
 
         # Current save files data
-        self.existing_saves = []
+        self.existing_saves = [None for _ in range(5)]
 
     def manage_sl(self, file_num, file_name = ""):
         # Strip Save File name to get file number
@@ -48,18 +49,21 @@ class SaveManager:
             self.app.scene.surfaces.surf.saves_menu = SaveLoadMenu(self.app)
 
     def save_whole_file(self, num, name = ""):
+        # Get real date
         date = datetime.today().strftime('%Y-%m-%d %H:%M')
-        # Write whole world chunks to txt.file
+
         # Save World voxels
         path_to_create = self.save_path / name / self.path_world
         path_to_create.parent.mkdir(exist_ok=True, parents=True)
         with open(self.save_path / name / self.path_world, 'w+') as f:
             np.save(self.save_path / name / self.path_world, self.app.scene.surfaces.surf.main_game.world.voxels)
+
         # Save player state
         with open(self.save_path / name / self.path_player, 'w+') as f:
-            f.write(str(self.app.player.position) + " ")
-            f.write(str(self.app.player.yaw) + " ")
-            f.write(str(self.app.player.pitch) + " ")
+            f.write(str(self.app.player.position.to_list()) + " ;")
+            f.write(str(self.app.player.yaw) + " ;")
+            f.write(str(self.app.player.pitch) + " ;")
+
         # Save Info
         with open(self.save_path / name / self.path_info, 'w+') as f:
             f.write(name + " ," + str(date) + " ," + num)
@@ -68,10 +72,13 @@ class SaveManager:
         # Read whole file data and set data to voxel container
         voxels = np.load(self.save_path / name / self.path_world)
         # Read player info (position)
-        with open(self.save_path / name / self.path_player, 'w+') as f:
-            player = f.read().split(",")
-            pos, yaw, pitch = player
+        with open(self.save_path / name / self.path_player, 'r+') as f:
+            player = f.read().split(" ;")[:-1]
         # Init game
+        self.app.scene.surfaces.set_primary(GS.MainGame)
+        self.app.custom_events.event_types.update_scene_logic()
+        self.app.scene.surfaces.surf.main_game.init_world(voxels)
+        self.app.player.move(*player)
 
 
     def SaveRegion(self, data, region):

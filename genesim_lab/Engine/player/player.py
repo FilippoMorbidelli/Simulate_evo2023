@@ -7,6 +7,7 @@
 # Import packages ------------------------------|
 from genesim_lab.Engine.player.camera import *
 from genesim_lab.Engine.settings import *
+from ast import literal_eval
 
 
 # All surfaces ---------------------------------|
@@ -53,5 +54,8 @@ class Player(Camera):
         if key_state[pg.K_LCTRL]:
             self.move_down(vel)
 
-    def reset(self, position=stg.player.pos, yaw=-90, pitch=0):
+    def reset(self):
         self.reset_camera(position=stg.player.pos, yaw=-90, pitch=0)
+
+    def move(self, pos, yaw, pitch):
+        self.reset_camera(position=glm.vec3(literal_eval(pos)), yaw=float(yaw), pitch=float(pitch))

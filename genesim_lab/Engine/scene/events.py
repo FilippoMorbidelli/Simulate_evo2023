@@ -56,6 +56,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                         sprite.over = check_over
                         if sprite.over:
                             # Switch sprite active
+                            sprite.image = sprite.sprite_T
                             #sprite.image = pg.transform.scale_by(sprite.sprite_T, 2)
                             #sprite.rect.size = sprite.image.get_size()
                             self.active_sprite = sprite.name
@@ -338,6 +339,14 @@ class EventTypes:
         self.scene_ptr = app.scene.surfaces  # Current state and data of each scene
         self.prev_max  = None  # Depth of master scene (no overlays)
 
+    def update_scene_logic(self):
+        # Handle current active scenes after event management
+        self.scene_ptr.handle_current_scene()
+        self.app.custom_events.master_scene = self.scene_ptr.master
+        self.app.custom_events.active_sprite = None
+        # Manage mouse since scene changed
+        self.manage_mouse()
+
     def change_scene(self, event, input_action, input_type, input_keys, actions):
         # Check if the input action is the same as requested
         if event.type == input_action:
@@ -351,12 +360,8 @@ class EventTypes:
                 # Compute actions
                 for act in actions:
                     act()
-                # Handle current active scenes after event management
-                self.scene_ptr.handle_current_scene()
-                self.app.custom_events.master_scene = self.scene_ptr.master
-                self.app.custom_events.active_sprite = None
-                # Manage mouse since scene changed
-                self.manage_mouse()
+                # Update scene logics
+                self.update_scene_logic()
                 # Confirm event found
                 return True
         # Event not compliant
