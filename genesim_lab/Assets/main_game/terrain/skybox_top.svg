@@ -8,7 +8,7 @@
    version="1.1"
    id="svg1"
    inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
-   sodipodi:docname="skybox_top.svg"
+   sodipodi:docname="skybox_left.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,9 +24,9 @@
      inkscape:deskcolor="#505050"
      inkscape:document-units="px"
      showgrid="true"
-     inkscape:zoom="0.5"
-     inkscape:cx="813"
-     inkscape:cy="575"
+     inkscape:zoom="0.72426347"
+     inkscape:cx="396.95499"
+     inkscape:cy="561.25984"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
@@ -40,11 +40,11 @@
        originy="0"
        spacingx="1"
        spacingy="1"
-       empcolor="#000000"
+       empcolor="#0099e5"
        empopacity="0.30196078"
-       color="#000000"
+       color="#0099e5"
        opacity="0.14901961"
-       empspacing="200"
+       empspacing="100"
        dotted="false"
        gridanglex="30"
        gridanglez="30"
@@ -63,293 +63,5 @@
        height="1000"
        x="0"
        y="0" />
-    <path
-       id="rect2"
-       style="fill:#dfde84"
-       d="M 39 38 L 39 39 L 38 39 L 38 40 L 39 40 L 39 41 L 40 41 L 40 40 L 41 40 L 41 39 L 40 39 L 40 38 L 39 38 z " />
-    <path
-       id="rect2-2"
-       style="fill:#dfde84"
-       d="m 113,57 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-4"
-       style="fill:#dfde84"
-       d="m 100,157 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-9"
-       style="fill:#dfde84"
-       d="m 229,105 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-1"
-       style="fill:#dfde84"
-       d="m 335,215 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-18"
-       style="fill:#dfde84"
-       d="m 483,147 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-3"
-       style="fill:#dfde84"
-       d="m 511,322 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-180"
-       style="fill:#dfde84"
-       d="m 280,385 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-92"
-       style="fill:#dfde84"
-       d="m 189,351 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-41"
-       style="fill:#dfde84"
-       d="m 161,304 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-8"
-       style="fill:#dfde84"
-       d="m 97,575 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-5"
-       style="fill:#dfde84"
-       d="m 200,658 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-29"
-       style="fill:#dfde84"
-       d="m 527,604 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-7"
-       style="fill:#dfde84"
-       d="m 431,462 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-35"
-       style="fill:#dfde84"
-       d="m 373,342 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-294"
-       style="fill:#dfde84"
-       d="m 455,269 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-71"
-       style="fill:#dfde84"
-       d="m 677,204 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-6"
-       style="fill:#dfde84"
-       d="m 719,113 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-57"
-       style="fill:#dfde84"
-       d="m 905,93 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-43"
-       style="fill:#dfde84"
-       d="m 970,339 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-65"
-       style="fill:#dfde84"
-       d="m 803,410 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-46"
-       style="fill:#dfde84"
-       d="m 721,329 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-79"
-       style="fill:#dfde84"
-       d="m 823,283 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-45"
-       style="fill:#dfde84"
-       d="m 619,397 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-68"
-       style="fill:#dfde84"
-       d="m 677,551 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-0"
-       style="fill:#dfde84"
-       d="m 924,679 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-290"
-       style="fill:#dfde84"
-       d="m 927,742 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-51"
-       style="fill:#dfde84"
-       d="m 687,889 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-83"
-       style="fill:#dfde84"
-       d="m 551,795 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-36"
-       style="fill:#dfde84"
-       d="m 653,690 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-33"
-       style="fill:#dfde84"
-       d="m 318,682 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-352"
-       style="fill:#dfde84"
-       d="m 350,597 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-74"
-       style="fill:#dfde84"
-       d="m 258,525 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-80"
-       style="fill:#dfde84"
-       d="m 216,635 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-95"
-       style="fill:#dfde84"
-       d="m 106,769 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-64"
-       style="fill:#dfde84"
-       d="m 210,897 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-794"
-       style="fill:#dfde84"
-       d="m 374,831 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-928"
-       style="fill:#dfde84"
-       d="m 427,741 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-73"
-       style="fill:#dfde84"
-       d="m 463,636 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-89"
-       style="fill:#dfde84"
-       d="m 517,544 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-17"
-       style="fill:#dfde84"
-       d="m 565,455 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-955"
-       style="fill:#dfde84"
-       d="m 616,286 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-571"
-       style="fill:#dfde84"
-       d="m 589,119 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-56"
-       style="fill:#dfde84"
-       d="m 862,83 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-59"
-       style="fill:#dfde84"
-       d="m 941,238 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-07"
-       style="fill:#dfde84"
-       d="m 907,406 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-91"
-       style="fill:#dfde84"
-       d="m 885,503 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-27"
-       style="fill:#dfde84"
-       d="m 907,615 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-21"
-       style="fill:#dfde84"
-       d="m 777,506 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-98"
-       style="fill:#dfde84"
-       d="m 702,457 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-60"
-       style="fill:#dfde84"
-       d="m 741,622 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-25"
-       style="fill:#dfde84"
-       d="m 840,815 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-50"
-       style="fill:#dfde84"
-       d="m 900,901 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-62"
-       style="fill:#dfde84"
-       d="m 776,881 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-93"
-       style="fill:#dfde84"
-       d="m 708,785 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-34"
-       style="fill:#dfde84"
-       d="m 811,683 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-922"
-       style="fill:#dfde84"
-       d="m 545,701 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-94"
-       style="fill:#dfde84"
-       d="m 462,837 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-11"
-       style="fill:#dfde84"
-       d="m 492,915 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-58"
-       style="fill:#dfde84"
-       d="m 281,781 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-01"
-       style="fill:#dfde84"
-       d="m 166,724 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-30"
-       style="fill:#dfde84"
-       d="m 69,547 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-304"
-       style="fill:#dfde84"
-       d="m 100,399 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-577"
-       style="fill:#dfde84"
-       d="m 265,464 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-37"
-       style="fill:#dfde84"
-       d="m 339,460 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-63"
-       style="fill:#dfde84"
-       d="m 212,216 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-81"
-       style="fill:#dfde84"
-       d="m 342,93 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-08"
-       style="fill:#dfde84"
-       d="m 524,55 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-77"
-       style="fill:#dfde84"
-       d="m 560,226 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-948"
-       style="fill:#dfde84"
-       d="m 790,75 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-40"
-       style="fill:#dfde84"
-       d="m 893,201 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
-    <path
-       id="rect2-931"
-       style="fill:#dfde84"
-       d="m 796,198 v 1 h -1 v 1 h 1 v 1 h 1 v -1 h 1 v -1 h -1 v -1 z" />
   </g>
 </svg>

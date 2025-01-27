@@ -58,4 +58,4 @@ class Player(Camera):
         self.reset_camera(position=stg.player.pos, yaw=-90, pitch=0)
 
     def move(self, pos, yaw, pitch):
-        self.reset_camera(position=glm.vec3(literal_eval(pos)), yaw=float(yaw), pitch=float(pitch))
+        self.move_camera(position=glm.vec3(literal_eval(pos)), yaw=float(yaw), pitch=float(pitch))

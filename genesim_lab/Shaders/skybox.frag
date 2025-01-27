@@ -13,6 +13,7 @@ vec3 SunRadCol = vec3 (255, 255, 255) / 255;
 vec3 MoonRadCol = vec3 (255, 255, 118) / 255;
 vec3 NightCol = vec3 (0, 0, 30) / 255;
 vec3 TwilightCol = vec3 (255, 153, 153) / 255;
+vec3 StarsCol = vec3(255, 255, 0) / 255;
 
 
 void main() {
@@ -44,6 +45,8 @@ void main() {
     vec3 NightFragDiff = fragColor.rgb - NightCol;
 
     // Fragment modification
+    // Sun body
+    //
     // Day and Night cycle
     fragColor.rgb = fragColor.rgb * (1 - SunWeight) + SunRadCol * SunWeight * SunVisibility - NightFragDiff * NightWeight;
     // Twilight

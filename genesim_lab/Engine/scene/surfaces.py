@@ -8,6 +8,7 @@
 from genesim_lab.Engine.world_gen.world import World
 from genesim_lab.Engine.scene.sprite import *
 from enum import IntEnum
+import numpy as np
 import copy
 from pathlib import Path
 import os
@@ -61,7 +62,7 @@ class Surfaces:
             GS.UserInput      : self.app.shader_prog_2D.user_input
         }
         self.update = {
-            GS.MainMenu       : self.app.shader_prog_2D.main_menu.update,
+            GS.MainMenu       : self.surf.main_menu.update,
             GS.UtilityOverlay : self.app.shader_prog_2D.utility.update,
             GS.MainGame       : self.surf.main_game.update,
             GS.SaveLoadMenu   : self.app.shader_prog_2D.saves_menu.update,
@@ -71,7 +72,7 @@ class Surfaces:
             GS.UserInput      : self.app.shader_prog_2D.user_input.update
         }
         self.render = {
-            GS.MainMenu       : self.app.shader_prog_2D.main_menu.draw2d,
+            GS.MainMenu       : self.surf.main_menu.render,
             GS.UtilityOverlay : self.app.shader_prog_2D.utility.draw2d,
             GS.MainGame       : self.surf.main_game.render,
             GS.SaveLoadMenu   : self.app.shader_prog_2D.saves_menu.draw2d,
@@ -185,9 +186,19 @@ class Other:
 class MainMenu:
 
     def __init__(self, app):
+        self.app = app
         # Init each sprite for the main menu scene
         # Load first backgrounds and then foremost sprites, defining the z order
 
+        #self.save_path = Path(__file__).parent.parent.parent / "Assets/menu/main_menu/background_world"
+        # Background real world scene
+        #vox = np.load(self.save_path / "World/whole.npy")
+        # Read player info (position)
+        #with open(self.save_path / "Player.txt", 'r+') as f:
+        #    player = f.read().split(" ;")[:-1]
+        # Init game
+        #self.app.player.move(*player)
+        #self.world = World(app, vox)
         # Background menu button
         background_menu = BackgroundSprite(app, "menu/main_menu", "menu",  "svg", False)
         app.shader_prog_2D.main_menu.add(background_menu)
@@ -207,6 +218,15 @@ class MainMenu:
         # Quit button
         button_quit = ButtonSprite(app, "menu/main_menu", "quit", "svg", True)
         app.shader_prog_2D.main_menu.add(button_quit)
+
+    def update(self, app):
+        #self.world.update()
+        #self.app.shader_prog_3D.update()
+        self.app.shader_prog_2D.main_menu.update(app)
+
+    def render(self):
+        #self.world.render()
+        self.app.shader_prog_2D.main_menu.draw2d()
 
 
 class UtilityMenu:

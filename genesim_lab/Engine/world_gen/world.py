@@ -49,8 +49,9 @@ class World:
                     self.chunks[chunk_index] = chunk
 
                     # Put the chunk voxels in a separate array
-                    if load_voxels is np.ndarray:
-                        self.voxels[chunk_index] = load_voxels[chunk_index]
+                    if isinstance(load_voxels, np.ndarray):
+                        self.voxels[chunk_index] = load_voxels[chunk_index, :]
+                        chunk.is_empty = False
                     else:
                         self.voxels[chunk_index] = chunk.build_voxels()
 

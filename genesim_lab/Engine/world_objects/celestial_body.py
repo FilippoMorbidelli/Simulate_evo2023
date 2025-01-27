@@ -50,15 +50,15 @@ class Celestial(WorldClock):
         self.skybox.build_mesh()
 
         # Build sky objects mesh
-        for body in self.bodies:
-            body.build_mesh()
+        #for body in self.bodies:
+        #    body.build_mesh()
 
     def render(self):
         # Render bodies
-        for body in self.bodies:
-            if body.is_active:  # and self.is_on_frustum(body):
-                body.set_uniform()
-                body.mesh.render()
+        #for body in self.bodies:
+        #    if body.is_active:  # and self.is_on_frustum(body):
+        #        body.set_uniform()
+        #        body.mesh.render()
 
         # Render skybox
         self.skybox.mesh.render()

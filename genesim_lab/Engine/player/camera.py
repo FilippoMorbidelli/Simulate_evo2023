@@ -72,10 +72,19 @@ class Camera:
         self.yaw = glm.radians(yaw)
         self.pitch = glm.radians(pitch)
 
+        self.up = glm.vec3(0, 1, 0)
+        self.right = glm.vec3(1, 0, 0)
+        self.forward = glm.vec3(0, 0, -1)
+
+        self.m_proj = glm.perspective(stg.camera.v_fov, stg.camera.aspect_ratio, stg.camera.near, stg.camera.far)
+        self.m_view = glm.mat4()
+
+    def move_camera(self, position, yaw, pitch):
+        self.position = position
+        self.yaw = yaw
+        self.pitch = pitch
+
         self.update_vectors()
-        #self.up = glm.vec3(0, 1, 0)
-        #self.right = glm.vec3(1, 0, 0)
-        #self.forward = glm.vec3(0, 0, -1)
 
         self.m_proj = glm.perspective(stg.camera.v_fov, stg.camera.aspect_ratio, stg.camera.near, stg.camera.far)
         self.m_view = glm.mat4()
