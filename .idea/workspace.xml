@@ -5,23 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/Player.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/SaveInfo.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/World/whole.npy" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/saves_menu/prova.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/components.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/nbea/Player.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/SaveInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/nbea/SaveInfo.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/pesto/Player.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/SaveInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/pesto/SaveInfo.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/save0/SaveInfo.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/save1/SaveInfo.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/player/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/player.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/player/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/camera.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,6 +79,7 @@
   <component name="RunManager">
     <configuration name="GENESIM_LAB_njit_debug" type="PythonConfigurationType" factoryName="Python">
       <module name="Simulate_evo2023" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -116,7 +104,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-7a29c1521ef0-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.11799.298" />
+        <option value="bundled-python-sdk-c69650fc56ca-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.15619.17" />
       </set>
     </attachedChunks>
   </component>
@@ -167,11 +155,6 @@
           <url>file://$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py</url>
           <line>443</line>
           <option name="timeStamp" value="75" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/Engine/scene/events.py</url>
-          <line>343</line>
-          <option name="timeStamp" value="102" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

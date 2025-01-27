@@ -185,5 +185,7 @@ def fractal_noise(settings):
     for _ in range(octaves):
         noise += amplitude * generate_perlin_noise_2d(shape, (frequency * res[0], frequency * res[1]))
         frequency *= 2
+
+
         amplitude *= persistence
     return noise

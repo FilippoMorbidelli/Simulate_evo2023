@@ -337,7 +337,7 @@ class EventTypes:
     def __init__(self, app):
         self.app       = app
         self.scene_ptr = app.scene.surfaces  # Current state and data of each scene
-        self.prev_max  = None  # Depth of master scene (no overlays)
+        self.prev_master  = None  # Depth of master scene (no overlays)
 
     def update_scene_logic(self):
         # Handle current active scenes after event management
@@ -391,23 +391,23 @@ class EventTypes:
         return False
 
     def manage_mouse(self):
-        # Retrieve Main Game depth
-        mg_depth = self.scene_ptr.state[GS.MainGame]["Depth"]
         # Manage mouse depending on Main Game state
-        if self.prev_max != self.scene_ptr.max:
+        if self.prev_master != self.scene_ptr.master:
+
             # Hide mouse since Main Game is main scene
-            if mg_depth == self.scene_ptr.max or self.scene_ptr.master == GS.UserInput:
+            if self.scene_ptr.master == GS.MainGame or self.scene_ptr.master == GS.UserInput:
                 pg.mouse.set_visible(False)
-                pg.mouse.get_rel()
             # Main game not primary scene so show and set mouse pos
-            elif mg_depth != self.scene_ptr.max:
+            elif not pg.mouse.get_visible():
                 pg.mouse.set_pos(self.app.screen.get_rect().center)
                 pg.mouse.set_visible(True)
-            # Exit from Main Game, reset player
-            elif mg_depth is None:
-                self.app.player.reset()
+
             # Update previous max
-            self.prev_max = self.scene_ptr.max
+            self.prev_master = self.scene_ptr.master
+
+        # Exit from Main Game, reset player
+        if self.scene_ptr.state[GS.MainGame]["Depth"] is None:
+            self.app.player.reset()
 
     def user_input_action(self, action):
         # Exec action depending on type of user input
