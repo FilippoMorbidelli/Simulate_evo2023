@@ -11,6 +11,9 @@ from genesim_lab.Engine.scene.events import GS
 import re
 import os
 import numpy as np
+from numba import uint8
+from numba import uint64
+from numba import njit
 
 
 # Save and Load Manager -------------------------------|
@@ -22,7 +25,7 @@ class SaveManager:
 
         self.current_save = ""
         self.save_path = Path(__file__).parent.parent.parent / app.stg.util.save_path
-        self.path_world = "World/whole.npy"
+        self.path_world = "World/whole.npz"
         self.path_player = "Player.txt"
         self.path_info = "SaveInfo.txt"
 
@@ -55,8 +58,10 @@ class SaveManager:
         # Save World voxels
         path_to_create = self.save_path / name / self.path_world
         path_to_create.parent.mkdir(exist_ok=True, parents=True)
+
         with open(self.save_path / name / self.path_world, 'w+') as f:
-            np.save(self.save_path / name / self.path_world, self.app.scene.surfaces.surf.main_game.world.voxels)
+            voxels = save_encoder(self.app.scene.surfaces.surf.main_game.world.voxels)
+            np.savez_compressed(self.save_path / name / self.path_world, voxels)
 
         # Save player state
         with open(self.save_path / name / self.path_player, 'w+') as f:
@@ -70,7 +75,7 @@ class SaveManager:
 
     def load_whole_file(self, name):
         # Read whole file data and set data to voxel container
-        voxels = np.load(self.save_path / name / self.path_world)
+        voxels = load_decoder(np.load(self.save_path / name / self.path_world)['arr_0'], self.info.w_vol, self.info.c_vol)
         # Read player info (position)
         with open(self.save_path / name / self.path_player, 'r+') as f:
             player = f.read().split(" ;")[:-1]
@@ -87,5 +92,91 @@ class SaveManager:
     def LoadRegion(self, region):
         pass
 
-    def RunLengthEncoding(self, chunk):
-        pass
+@njit
+def run_length_encoding(voxels):
+    # Define max encoded array
+    length = voxels.shape[0]
+    rle_voxels = np.empty(2 * length, dtype = 'uint8')
+    # Define variables
+    count = 1
+    rle_pos = 0
+    # Main loop
+    for i in range(length - 1):
+        if voxels[i] == voxels[i + 1] and count < 254:
+            count += 1
+        else:
+            rle_voxels[rle_pos] = uint8(count)
+            rle_voxels[rle_pos + 1] = voxels[i]
+            rle_pos += 2
+            count = 1
+    # Insert last run length
+    rle_voxels[rle_pos] = uint8(count)
+    rle_voxels[rle_pos + 1] = voxels[i+1]
+    rle_pos += 2
+    # Truncate array
+    rle_voxels = rle_voxels[ : rle_pos]
+    # Compression
+    # None
+    return rle_voxels
+
+def run_length_decoding(rle_voxels):
+    # Reshape
+    pairs = rle_voxels.reshape(-1, 2)
+    # Extract counts and values
+    counts = pairs[:, 0]
+    values = pairs[:, 1]
+    # Use np.repeat to repeat each value according to its count
+    voxels = np.repeat(values, counts)
+
+    return voxels
+
+@njit
+def save_encoder(chunks):
+    rle_chunks = np.empty(1, dtype='uint8')
+    # Iterate over each chunk and apply rle encoding, then append
+    for voxels in chunks:
+        rle_chunks = np.append(rle_chunks, run_length_encoding(voxels))
+        rle_chunks = np.append(rle_chunks, uint8(255))
+
+    return rle_chunks[1:-1]
+
+def load_decoder(chunks, w, c):
+    # Split array into single chunks
+    separator = np.array(255, dtype=np.uint8)
+    separator_size = 1
+    mask = np.all(np.lib.stride_tricks.sliding_window_view(chunks, separator_size) == separator, axis=1)
+    separator_indices = np.where(mask)[0]
+    sequences = []
+    start = 0
+    for idx in separator_indices:
+        # Extract the sequence before the separator
+        sequences.append(chunks[start : idx])
+        # Update the start index to skip the separator
+        start = idx + separator_size
+    # Append the last sequence after the final separator
+    sequences.append(chunks[start : ])
+    # Decode each chunk
+    decoded_chunks = np.empty([w, c], dtype='uint8')
+    for idx, seq in enumerate(sequences):
+        decoded_chunks[idx] = run_length_decoding(seq)
+
+    return decoded_chunks
+
+@njit
+def pack_data(c1, v1, c2, v2, c3):
+    # c1: 6bit, v1: 6bit, c2: 6bit, v2: 6bit, c3: 6bit, void --> 2bit
+    a, b, c, d, e = c1, v1, c2, v2, c3
+
+    b_bit, c_bit, d_bit, e_bit = 6, 6, 6, 6
+    de_bit = d_bit + e_bit
+    cde_bit = c_bit + de_bit
+    bcde_bit = b_bit + cde_bit
+
+    packed_data = (
+            a << bcde_bit |
+            b << cde_bit |
+            c << de_bit |
+            d << e_bit | e
+    )
+
+    return packed_data
