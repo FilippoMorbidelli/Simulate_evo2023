@@ -5,17 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/Player.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/SaveInfo.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/World/whole.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/nbea/World/whole.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/pesto/World/whole.npz" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/nbea/Player.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/SaveInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/nbea/SaveInfo.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/World/whole.npy" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/nbea/World/whole.npy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/pesto/Player.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/SaveInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/pesto/SaveInfo.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

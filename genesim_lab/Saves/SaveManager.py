@@ -119,6 +119,7 @@ def run_length_encoding(voxels):
     # None
     return rle_voxels
 
+@njit
 def run_length_decoding(rle_voxels):
     # Reshape
     pairs = rle_voxels.reshape(-1, 2)
@@ -140,11 +141,18 @@ def save_encoder(chunks):
 
     return rle_chunks[1:-1]
 
+@njit
 def load_decoder(chunks, w, c):
     # Split array into single chunks
-    separator = np.array(255, dtype=np.uint8)
+    separator = np.array(255, dtype='uint8')
     separator_size = 1
-    mask = np.all(np.lib.stride_tricks.sliding_window_view(chunks, separator_size) == separator, axis=1)
+    # Create a sliding window view to find the separator
+    window_view = np.lib.stride_tricks.sliding_window_view(chunks, separator_size)
+    # Manually apply np.all along axis=1 since njit cannot handle axis arg of np.all
+    mask = np.empty(len(window_view), dtype=np.bool_)
+    for i in range(len(window_view)):
+        mask[i] = np.all(window_view[i] == separator)
+    #mask = np.all(np.lib.stride_tricks.sliding_window_view(chunks, separator_size) == separator, axis = 1) Used without Njit
     separator_indices = np.where(mask)[0]
     sequences = []
     start = 0
@@ -156,7 +164,7 @@ def load_decoder(chunks, w, c):
     # Append the last sequence after the final separator
     sequences.append(chunks[start : ])
     # Decode each chunk
-    decoded_chunks = np.empty([w, c], dtype='uint8')
+    decoded_chunks = np.empty((w, c), dtype='uint8')
     for idx, seq in enumerate(sequences):
         decoded_chunks[idx] = run_length_decoding(seq)
 
