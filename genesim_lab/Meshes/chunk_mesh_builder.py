@@ -100,23 +100,34 @@ def to_uint8_ao(ao):
 
 @njit
 def get_chunk_index(world_voxel_pos, stg):
+    # Unpack voxel position in world coordinates
     wx, wy, wz = world_voxel_pos
-    cx = wx // c_size + w_width/2
-    cy = wy // (c_size * v_y) + 0
-    cz = wz // c_size + w_depth/2
-    if not (0 <= cx < w_width and 0 <= cy < w_height and 0 <= cz < w_depth):
-        return - 1
+    wx = wx / v_x + w_width/2 * c_size
+    wy = wy / v_y +         0 * c_size
+    wz = wz / v_z + w_depth/2 * c_size
+    # Compute region index
+    rx = wx // (r_size * c_size)
+    ry = wy // (r_size * c_size)
+    rz = wz // (r_size * c_size)
+    # Compute chunk index
+    cx = wx % (r_size * c_size) // c_size
+    cy = wy % (r_size * c_size) // c_size
+    cz = wz % (r_size * c_size) // c_size
+    if not (0 <= rx < width_rn and 0 <= ry < height_rn and 0 <= rz < depth_rn):
+        return - 1, -1
 
+    r_index = rx + width_rn * rz + depth_rn * width_rn * ry
     index = cx + w_width * cz + w_area * cy
-    return int(index)
+    return int(r_index), int(index)
 
 
 @njit
 def is_void(local_voxel_pos, world_voxel_pos, world_voxels, stg):
-    chunk_index = get_chunk_index(world_voxel_pos, stg)
-    if chunk_index == -1:
+    region_index, chunk_index = get_chunk_index(world_voxel_pos, stg)
+    # Out of max world region
+    if region_index == -1:
         return False
-    chunk_voxels = world_voxels[r][chunk_index]
+    chunk_voxels = world_voxels[region_index][chunk_index]
 
     x, y, z = local_voxel_pos
     voxel_index = x % c_size + z % c_size * c_size + y % c_size * c_area

@@ -128,6 +128,10 @@ class World:
     r_depth  : int = r_size
     r_height : int = r_size
     r_vol    : int = r_size ** 3
+    width_rn : int = int(np.ceil(w_width / r_size))
+    height_rn: int = int(np.ceil(w_height / r_size))
+    depth_rn : int = int(np.ceil(w_depth / r_size))
+    r_number : int = width_rn * height_rn * depth_rn
 
     # Octree creation data
     vso_depth    : int = int(np.log2(r_size) - 1)  # log2(r_size)
@@ -214,7 +218,8 @@ class GameSettings:
 stg = GameSettings()
 
 (c_size, c_half, c_area, c_vol, c_sphere_radius, c_threshold, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
- w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, r_size, r_width, r_depth, r_height, r_vol, vso_depth, vso_p_sides, vso_p_position) = stg.world
+ w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, r_size, r_width, r_depth, r_height, r_vol, width_rn, height_rn, depth_rn, r_number,
+ vso_depth, vso_p_sides, vso_p_position) = stg.world
 
 powers = 1 << np.array(range(c_size), dtype="int64")
 

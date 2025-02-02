@@ -26,17 +26,17 @@ class World:
         self.info = app.stg.world
 
         # Compute regions number to divide world in
-        r_n, r_data = self.compute_regions(*w_dims)
-        self.chunks : list = [[None for _ in range(self.info.r_vol)] for _ in range(r_n)]
-        self.voxels : list = [np.empty([self.info.r_vol, self.info.c_vol], dtype='uint8') for _ in range(r_n)]
+        r_data = self.compute_regions(*w_dims)
+        self.chunks : list = [[None for _ in range(self.info.r_vol)] for _ in range(self.info.r_number)]
+        self.voxels : list = [np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8') for _ in range(self.info.r_number)]
         self.mesh_stg = self.get_mesh_stg()
         self.frustum_check = self.app.player.frustum.is_on_frustum
 
-        self.build_chunks(r_n, r_data, voxels)
+        self.build_chunks(r_data, voxels)
         self.build_chunk_mesh()
 
         # Build world sparse voxel octree
-        self.svo : list = [build_svo(self.app, self.info, self.chunks[r], r_data[r, :]) for r in range(r_n)]
+        self.svo : list = [build_svo(self.app, self.info, self.chunks[r], r_data[r, :]) for r in range(self.info.r_number)]
 
         # Player interactivity
         self.voxel_handler = VoxelHandler(self)
@@ -47,37 +47,31 @@ class World:
 
     def compute_regions(self, width, height, depth):
         r_size = self.info.r_size
-        # Compute regions needed for each dim
-        w_n = int(np.ceil(width / r_size))
-        d_n = int(np.ceil(depth / r_size))
-        h_n = int(np.ceil(height / r_size))
-        # Compute total number of regions
-        r_n = int(w_n * d_n * h_n)
         # Compute regions data
-        r_data = np.empty([r_n, 6], dtype='uint32')
-        for w in range(w_n):
+        r_data = np.empty([self.info.r_number, 6], dtype='uint32')
+        for w in range(self.info.width_rn):
             # Chunks present along width
-            w_c = width % r_size if w == w_n - 1 else r_size
-            for h in range(h_n):
+            w_c = width % r_size if w == self.info.width_rn - 1 else r_size
+            for h in range(self.info.height_rn):
                 # Chunk present along height
-                h_c = height % r_size if h == h_n - 1 else r_size
-                for d in range(d_n):
+                h_c = height % r_size if h == self.info.height_rn - 1 else r_size
+                for d in range(self.info.depth_rn):
                     # Chunks present along depth
-                    d_c = depth % r_size if d == d_n - 1 else r_size
+                    d_c = depth % r_size if d == self.info.depth_rn - 1 else r_size
                     # Compute region index
-                    r_id = d + h * d_n + w * d_n * h_n
+                    r_id = w + self.info.width_rn * d + self.info.width_rn * self.info.depth_rn * h
                     r_data[r_id, :] = [w, h, d, w_c, h_c, d_c]
 
-        return r_n, r_data
+        return r_data
 
-    def build_chunks(self, r_num, r_data, load_voxels):
-        for r in range(r_num):
+    def build_chunks(self, r_data, load_voxels):
+        for r in range(self.info.r_number):
             # Compute region chunk distribution
             w, h, d, width, depth, height = r_data[r, :]
             for x in range(width):
                 for y in range(height):
                     for z in range(depth):
-                        chunk = Chunk(self, index=(x, y, z), r_index=(w, h ,d))
+                        chunk = Chunk(self, index=(x, y, z), r_index=(w, h, d))
 
                         chunk_index = x + self.info.w_width * z + self.info.w_area * y
                         self.chunks[r][chunk_index] = chunk
@@ -95,7 +89,8 @@ class World:
     def build_chunk_mesh(self):
         for r in self.chunks:
             for chunk in r:
-                chunk.build_mesh()
+                if chunk is not None:
+                    chunk.build_mesh()
 
     def update(self):
         # Update Sky objects
@@ -106,8 +101,9 @@ class World:
         self.voxel_marker.update()  # Update voxel marker obtained from ray casting algorithm
 
     def render(self):
-        # Render Chunks
-        self.svo_frustum_render(self.svo)
+        # Render Chunks of each region
+        for svo in self.svo:
+            self.svo_frustum_render(svo)
 
         # Render Sky objects
         self.celestial.render()
