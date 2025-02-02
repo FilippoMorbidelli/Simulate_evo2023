@@ -108,25 +108,31 @@ class World:
     v_x_i   : float = 1 / v_x
     v_y_i   : float = 1 / v_y
     v_z_i   : float = 1 / v_z
-    scale_i : glm.vec3 = glm.vec3(v_x_i, v_y_i, v_z_i)
+    scale_i : glm.vec3 = 1 / scale
 
     # World data
-    w_width: int = 2
-    w_height: int = 2
-    w_depth: int = w_width
-    w_area: int = w_width * w_depth
-    w_vol: int = w_area * w_height
+    w_width  : int = 2
+    w_height : int = 2
+    w_depth  : int = w_width
+    w_area   : int = w_width * w_depth
+    w_vol    : int = w_area * w_height
 
     # World center data
-    center_xz: float = w_width * c_half
-    center_y: float = w_height * c_half
-    offset: glm.vec3 = glm.vec3(w_width/2, 0, w_depth/2)
+    center_xz : float = w_width * c_half
+    center_y  : float = w_height * c_half
+    offset    : glm.vec3 = glm.vec3(w_width/2, 0, w_depth/2)
+
+    # Region data
+    r_size   : int = 32  # Number of chunks per dimension per region
+    r_width  : int = r_size
+    r_depth  : int = r_size
+    r_height : int = r_size
+    r_vol    : int = r_size ** 3
 
     # Octree creation data
-    vso_depth: int = int(np.log2(max(w_width, w_height)) - 1)
-    vso_parent_sides: glm.vec3 = [w_width, w_width, w_width] * c_scale
-    vso_parent_center: glm.vec3 = [w_width * c_half, w_width * c_half,  w_width * c_half] * scale - offset * c_scale
-    vso_parent_position: glm.vec3 = -offset * c_scale
+    vso_depth    : int = int(np.log2(r_size) - 1)  # log2(r_size)
+    vso_p_sides  : glm.vec3 = r_size * c_scale
+    vso_p_pos    : glm.vec3 = - offset * c_scale
 
     def __iter__(self):
         for field in dataclasses.fields(self):
@@ -208,9 +214,9 @@ class GameSettings:
 stg = GameSettings()
 
 (c_size, c_half, c_area, c_vol, c_sphere_radius, c_threshold, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
- w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, vso_depth, vso_p_sides, vso_p_center, vso_p_position) = stg.world
+ w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, r_size, r_width, r_depth, r_height, r_vol, vso_depth, vso_p_sides, vso_p_position) = stg.world
 
-powers = 1 << np.array(range(c_size), dtype="int64") # np.arange(c_size, dtype = "int64")
+powers = 1 << np.array(range(c_size), dtype="int64")
 
 # World Settings for Njit ------|
 spec = [

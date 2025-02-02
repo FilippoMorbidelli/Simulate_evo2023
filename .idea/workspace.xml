@@ -5,8 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/World/whole.npz" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/as/Player.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/SaveInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/as/SaveInfo.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/whole.npz" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/as/World/whole.npz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/nbea/Player.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/SaveInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/nbea/SaveInfo.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/World/whole.npz" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/nbea/World/whole.npz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/prova/Player.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/SaveInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/prova/SaveInfo.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/World/whole.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/chunk.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/chunk.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/sparsevoxeloctree.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/sparsevoxeloctree.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,19 +151,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py</url>
-          <line>435</line>
-          <option name="timeStamp" value="55" />
+          <url>file://$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh.py</url>
+          <line>32</line>
+          <option name="timeStamp" value="82" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py</url>
-          <line>437</line>
-          <option name="timeStamp" value="59" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py</url>
-          <line>443</line>
-          <option name="timeStamp" value="75" />
+          <url>file://$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh.py</url>
+          <line>41</line>
+          <option name="timeStamp" value="86" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

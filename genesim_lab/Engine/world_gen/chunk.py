@@ -13,12 +13,16 @@ from genesim_lab.Meshes.chunk_mesh import ChunkMesh
 # World generator ------------------------------|
 class Chunk:
 
-    def __init__(self, world, index):
+    def __init__(self, world, index, r_index):
+        rx, ry, rz = r_index
+
         self.app = world.app
         self.world = world
-        self.index = index
-        self.pos = (self.index - offset) * c_scale
         self.info = world.info
+        self.mesh_stg = world.mesh_stg
+        self.index = index
+        self.r_index = r_index
+        self.pos = (glm.vec3(self.index) + glm.vec3(rx, ry, rz) * self.info.r_size - self.info.offset) * self.info.c_scale
         self.m_model = self.get_model_matrix()
 
         # Build chunk
@@ -26,7 +30,7 @@ class Chunk:
         self.mesh: ChunkMesh = None
         self.is_empty = True
 
-        self.center = glm.vec3(self.pos) + 0.5 * c_scale
+        self.center = glm.vec3(self.pos) + 0.5 * self.info.c_scale
         self.is_on_frustum = self.app.player.frustum.is_on_frustum
 
     def get_model_matrix(self):

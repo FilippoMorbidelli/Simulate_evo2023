@@ -31,10 +31,12 @@ class ChunkMesh(BaseMesh):
 
     def get_vertex_data(self):
         mesh, greedy_mesh = build_chunk_mesh(
-            chunk_voxels=self.chunk.voxels,
-            format_size=self.format_size,
-            chunk_pos=self.chunk.index,
-            world_voxels=self.chunk.world.voxels,
+            chunk_voxels = self.chunk.voxels,
+            format_size  = self.format_size,
+            chunk_pos    = self.chunk.index,
+            world_voxels = self.chunk.world.voxels,
+            region_pos   = self.chunk.r_index,
+            stg          = self.chunk.mesh_stg,
         )
 
         return mesh, greedy_mesh

@@ -5,31 +5,38 @@
 # Notes: Contains the Engine, Engine start and world_objects generation
 
 # Import packages ------------------------------|
+import math
 import numpy as np
 import numpy.random as rnd
+from numba import float64, int32
+from numba.experimental import jitclass
 from genesim_lab.Engine.world_gen.chunk import Chunk
 from genesim_lab.Engine.player.voxel_handler import VoxelHandler
 from genesim_lab.Engine.world_objects.voxel_marker import VoxelMarker
 from genesim_lab.Engine.world_objects.celestial_body import Celestial
-from genesim_lab.Engine.world_gen.sparsevoxeloctree import *
+from genesim_lab.Engine.world_gen.sparsevoxeloctree import build_svo
 
 
 # World generator ------------------------------|
 class World:
+    # World structure is divided into multiple regions of stg.world.r_size chunks on each dim
 
-    def __init__(self, app, voxels = None):
+    def __init__(self, app, w_dims, voxels = None):
         self.app = app
         self.info = app.stg.world
-        self.chunks: list = [None for _ in range(self.info.w_vol)]
-        self.voxels = np.empty([self.info.w_vol, self.info.c_vol], dtype='uint8')
-        self.svo_pointer = np.empty([self.info.w_width, self.info.w_height, self.info.w_depth])
+
+        # Compute regions number to divide world in
+        r_n, r_data = self.compute_regions(*w_dims)
+        self.chunks : list = [[None for _ in range(self.info.r_vol)] for _ in range(r_n)]
+        self.voxels : list = [np.empty([self.info.r_vol, self.info.c_vol], dtype='uint8') for _ in range(r_n)]
+        self.mesh_stg = self.get_mesh_stg()
         self.frustum_check = self.app.player.frustum.is_on_frustum
 
-        self.build_chunks(voxels)
+        self.build_chunks(r_n, r_data, voxels)
         self.build_chunk_mesh()
 
         # Build world sparse voxel octree
-        self.svo = build_svo(app, self.chunks, self.svo_pointer)
+        self.svo : list = [build_svo(self.app, self.info, self.chunks[r], r_data[r, :]) for r in range(r_n)]
 
         # Player interactivity
         self.voxel_handler = VoxelHandler(self)
@@ -38,32 +45,57 @@ class World:
         # World objects
         self.celestial = Celestial(self)
 
-    def build_chunks(self, load_voxels):
-        for x in range(self.info.w_width):
-            for y in range(self.info.w_height):
-                for z in range(self.info.w_depth):
-                    chunk = Chunk(self, index=(x, y, z))
+    def compute_regions(self, width, height, depth):
+        r_size = self.info.r_size
+        # Compute regions needed for each dim
+        w_n = int(np.ceil(width / r_size))
+        d_n = int(np.ceil(depth / r_size))
+        h_n = int(np.ceil(height / r_size))
+        # Compute total number of regions
+        r_n = int(w_n * d_n * h_n)
+        # Compute regions data
+        r_data = np.empty([r_n, 6], dtype='uint32')
+        for w in range(w_n):
+            # Chunks present along width
+            w_c = width % r_size if w == w_n - 1 else r_size
+            for h in range(h_n):
+                # Chunk present along height
+                h_c = height % r_size if h == h_n - 1 else r_size
+                for d in range(d_n):
+                    # Chunks present along depth
+                    d_c = depth % r_size if d == d_n - 1 else r_size
+                    # Compute region index
+                    r_id = d + h * d_n + w * d_n * h_n
+                    r_data[r_id, :] = [w, h, d, w_c, h_c, d_c]
 
-                    chunk_index = x + self.info.w_width * z + self.info.w_area * y
-                    #chunk.id = chunk_index
-                    self.chunks[chunk_index] = chunk
+        return r_n, r_data
 
-                    # Put the chunk voxels in a separate array
-                    if isinstance(load_voxels, np.ndarray):
-                        self.voxels[chunk_index] = load_voxels[chunk_index, :]
-                        chunk.is_empty = False
-                    else:
-                        self.voxels[chunk_index] = chunk.build_voxels()
+    def build_chunks(self, r_num, r_data, load_voxels):
+        for r in range(r_num):
+            # Compute region chunk distribution
+            w, h, d, width, depth, height = r_data[r, :]
+            for x in range(width):
+                for y in range(height):
+                    for z in range(depth):
+                        chunk = Chunk(self, index=(x, y, z), r_index=(w, h ,d))
 
-                    # Get pointer to voxels
-                    chunk.voxels = self.voxels[chunk_index]
+                        chunk_index = x + self.info.w_width * z + self.info.w_area * y
+                        self.chunks[r][chunk_index] = chunk
 
-                    # Get pointer to chunk index for octree
-                    self.svo_pointer[x, y, z] = chunk_index
+                        # Put the chunk voxels in a separate array
+                        if isinstance(load_voxels, np.ndarray):
+                            self.voxels[r][chunk_index] = load_voxels[chunk_index, :]
+                            chunk.is_empty = False
+                        else:
+                            self.voxels[r][chunk_index] = chunk.build_voxels()
+
+                        # Get pointer to voxels
+                        chunk.voxels = self.voxels[r][chunk_index]
 
     def build_chunk_mesh(self):
-        for chunk in self.chunks:
-            chunk.build_mesh()
+        for r in self.chunks:
+            for chunk in r:
+                chunk.build_mesh()
 
     def update(self):
         # Update Sky objects
@@ -99,6 +131,40 @@ class World:
                 for child_coord, child_node in node.children.items():
                     self.svo_frustum_render(child_node)
 
+    def get_mesh_stg(self):
+
+        stg = ChunkMeshSettings(self.info.c_size, self.info.c_area, self.info.c_vol, self.info.offset[0], self.info.offset[1],
+                                self.info.offset[2], self.info.v_x, self.info.v_y, self.info.v_z, self.info.r_size)
+
+        return stg
+
+
+spec = [
+    ("c_size", float64),
+    ("c_area", float64),
+    ("c_vol", float64),
+    ("off_x", float64),
+    ("off_y", float64),
+    ("off_z", float64),
+    ("v_x", float64),
+    ("v_y", float64),
+    ("v_z", float64),
+    ("r_size", int32),
+]
+
+@jitclass(spec)
+class ChunkMeshSettings:
+    def __init__(self, c_size, c_area, c_vol, off_x, off_y, off_z, v_x, v_y, v_z, r_size):
+        self.c_size = c_size
+        self.c_area = c_area
+        self.c_vol = c_vol
+        self.off_x = off_x
+        self.off_y = off_y
+        self.off_z = off_z
+        self.v_x = v_x
+        self.v_y = v_y
+        self.v_z = v_z
+        self.r_size = r_size
 
 class SimGrid:
     def __init__(self, settings):

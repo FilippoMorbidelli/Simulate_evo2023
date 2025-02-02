@@ -367,7 +367,7 @@ class MainGame:
 
     def init_world(self, vox = None):
         # Initialize 3D graphic elements
-        self.world = World(self.app, vox)
+        self.world = World(self.app, [self.app.stg.world.w_width, self.app.stg.world.w_height, self.app.stg.world.w_depth], vox)
 
     def handle(self):
         self.app.shader_prog_3D()
