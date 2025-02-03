@@ -17,6 +17,7 @@ class VoxelHandler:
     def __init__(self, world):
         self.app = world.app
         self.chunks = world.chunks
+        self.mesh_stg = world.mesh_stg
 
         # Ray casting result
         self.chunk = None
@@ -45,9 +46,10 @@ class VoxelHandler:
                     chunk.is_empty = False
 
     def rebuild_adj_chunk(self, adj_voxel_pos):
-        index = get_chunk_index(adj_voxel_pos)
-        if index != -1:
-            self.chunks[int(index)].mesh.rebuild()
+        r_index, index = get_chunk_index(adj_voxel_pos, self.mesh_stg)
+        # If chunk exists rebuild it
+        if r_index != -1 and self.chunks[int(r_index)][int(index)] is not None:
+            self.chunks[int(r_index)][int(index)].mesh.rebuild()
 
     def rebuild_adjacent_chunks(self):
         lx, ly, lz = self.voxel_local_pos
@@ -145,16 +147,21 @@ class VoxelHandler:
         return False
 
     def get_voxel_id(self, voxel_world_pos):
-        cx, cy, cz = chunk_pos = glm.ivec3(np.floor(voxel_world_pos / c_scale + offset))
+        world_pos_off = glm.ivec3(voxel_world_pos / scale + offset * c_size)
+        rx, ry, rz = region_pos = glm.ivec3(world_pos_off // rc_size)
+        cx, cy, cz = glm.ivec3((world_pos_off - region_pos * rc_size) // c_size)
 
-        if 0 <= cx < w_width and 0 <= cy < w_height and 0 <= cz < w_depth:
-            chunk_index = cx + w_width * cz + w_area * cy
-            chunk = self.chunks[chunk_index]
+        if 0 <= rx < width_rn and 0 <= ry < height_rn and 0 <= rz < depth_rn:
+            region_index = rx + width_rn * rz + depth_rn * width_rn * ry
+            chunk_index = cx + r_size * cz + r_area * cy
+            chunk = self.chunks[region_index][chunk_index]
 
-            lx, ly, lz = voxel_local_pos = voxel_world_pos - (glm.vec3(chunk_pos) - offset) * c_scale
+            if chunk is None:
+                return 0, 0, 0, 0
 
-            voxel_index = lx + c_size * lz + c_area * ly * scale_i.y
-            voxel_index = int(voxel_index)
+            lx, ly, lz = voxel_local_pos = (world_pos_off - region_pos * rc_size) % c_size
+
+            voxel_index = int(lx + c_size * lz + c_area * ly)
             voxel_id = chunk.voxels[voxel_index]
 
             return voxel_id, voxel_index, voxel_local_pos, chunk

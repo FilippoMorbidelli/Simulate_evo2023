@@ -12,10 +12,10 @@ import glm
 def build_svo(app, info, data, region_data):
     # Instantiate variables
     init_depth = 0
-    p_pos      = region_data[ : 3] * info.r_size * info.scale + info.vso_p_pos
+    p_pos      = region_data[ : 3] * info.r_size * info.c_scale + info.vso_p_pos
     p_center   = p_pos + info.vso_p_sides / 2
     # Build octree
-    parent     = build_node(app, data, init_depth, p_pos, info.vso_p_sides, p_center, [0, 0, 0], info.vso_depth)
+    parent     = build_node(app, data, init_depth, p_pos, info.vso_p_sides, p_center, np.array([0, 0, 0], dtype="int32"), info.vso_depth)
     # Find void nodes recursively from most deep to least
     find_void_nodes(parent, level=init_depth)
 
@@ -27,10 +27,10 @@ def build_node(app, data, depth, position, sides, center, local_id, tot_depth):
     if depth == tot_depth:
 
         chunk_dict = {}
-        new_base = local_id * (2 ** (depth - 1)) if depth != 0 else local_id
+        new_base = local_id * 2
 
         # Check if Node contains existing chunks
-        check_chunk = new_base[0] + new_base[2] * app.stg.world.r_size + new_base[1] * app.stg.world.r_size ** 2
+        check_chunk = new_base[0] + new_base[2] * app.stg.world.r_size + new_base[1] * app.stg.world.r_area
 
         if data[check_chunk] is None:
             # Return empty Node
@@ -41,8 +41,8 @@ def build_node(app, data, depth, position, sides, center, local_id, tot_depth):
             for j in range(2):
                 for k in range(2):
 
-                    x, y, z = new_base + [i, j, k]
-                    chunk_id = x + z * app.stg.world.r_size + y * app.stg.world.r_size ** 2
+                    x, y, z = new_base + np.array([i, j, k], dtype="int32")
+                    chunk_id = x + z * app.stg.world.r_size + y * app.stg.world.r_area
                     chunk_dict[chunk_id] = data[chunk_id].center
 
         # Is Node visible?
@@ -54,7 +54,7 @@ def build_node(app, data, depth, position, sides, center, local_id, tot_depth):
     sides = sides * 0.5
 
     # Perform logic to create Child Nodes
-    new_base = local_id * (2 ** (depth - 1)) if depth != 0 else local_id
+    new_base = local_id * 2 if depth != 0 else local_id
 
     for i in range(2):
         for j in range(2):
@@ -62,7 +62,7 @@ def build_node(app, data, depth, position, sides, center, local_id, tot_depth):
 
                 child_pos = position + [i, j, k] * sides
                 child_center = child_pos + sides * 0.5
-                new_id = new_base + [i, j, k]
+                new_id = new_base + np.array([i, j, k], dtype="int32")
 
                 child_node = build_node(app, data, depth + 1, child_pos, sides, child_center, new_id, tot_depth)
                 node.children[i + 2 * k + 4 * j] = child_node
@@ -89,7 +89,7 @@ class Node:
         self.depth = depth
         self.position = position
         self.sides = sides
-        self.center = center
+        self.center = glm.vec3(center)
         self.local_id = l_id
 
         self.visibility = visibility

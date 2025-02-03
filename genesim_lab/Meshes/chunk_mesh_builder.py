@@ -106,18 +106,18 @@ def get_chunk_index(world_voxel_pos, stg):
     wy = wy / v_y +         0 * c_size
     wz = wz / v_z + w_depth/2 * c_size
     # Compute region index
-    rx = wx // (r_size * c_size)
-    ry = wy // (r_size * c_size)
-    rz = wz // (r_size * c_size)
+    rx = wx // rc_size
+    ry = wy // rc_size
+    rz = wz // rc_size
     # Compute chunk index
-    cx = wx % (r_size * c_size) // c_size
-    cy = wy % (r_size * c_size) // c_size
-    cz = wz % (r_size * c_size) // c_size
+    cx = wx % rc_size // c_size
+    cy = wy % rc_size // c_size
+    cz = wz % rc_size // c_size
     if not (0 <= rx < width_rn and 0 <= ry < height_rn and 0 <= rz < depth_rn):
         return - 1, -1
 
     r_index = rx + width_rn * rz + depth_rn * width_rn * ry
-    index = cx + w_width * cz + w_area * cy
+    index = cx + r_size * cz + r_area * cy
     return int(r_index), int(index)
 
 
@@ -126,14 +126,14 @@ def is_void(local_voxel_pos, world_voxel_pos, world_voxels, stg):
     region_index, chunk_index = get_chunk_index(world_voxel_pos, stg)
     # Out of max world region
     if region_index == -1:
-        return False
+        return True # Put False to not show voxels at world borders TBD (Find a way to block mesh when adjacent chunk doesn't exist but regions yes)
     chunk_voxels = world_voxels[region_index][chunk_index]
 
     x, y, z = local_voxel_pos
     voxel_index = x % c_size + z % c_size * c_size + y % c_size * c_area
 
     if chunk_voxels[voxel_index]:
-        return False
+        return False # Not void so don't create a mesh
     return True
 
 

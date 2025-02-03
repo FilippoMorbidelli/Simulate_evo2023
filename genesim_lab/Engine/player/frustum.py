@@ -9,7 +9,6 @@ from genesim_lab.Engine.settings import *
 from numba.experimental import jitclass
 
 # All surfaces ---------------------------------|
-#@jitclass(spec)
 class Frustum:
 
     def __init__(self, camera):

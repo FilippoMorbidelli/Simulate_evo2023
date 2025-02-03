@@ -365,9 +365,9 @@ class MainGame:
         overlay_crosshair = OverlaySprite(app, "main_game", "crosshair", "svg", True)
         app.shader_prog_2D.main_game.add(overlay_crosshair)
 
-    def init_world(self, vox = None):
+    def init_world(self, vox = None, regions = None, world_dims = None):
         # Initialize 3D graphic elements
-        self.world = World(self.app, [self.app.stg.world.w_width, self.app.stg.world.w_height, self.app.stg.world.w_depth], vox)
+        self.world = World(self.app, world_dims, regions, vox)
 
     def handle(self):
         self.app.shader_prog_3D()

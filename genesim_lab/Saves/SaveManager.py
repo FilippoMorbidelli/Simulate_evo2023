@@ -23,11 +23,14 @@ class SaveManager:
         self.app = app
         self.info = app.stg.world
 
-        self.current_save = ""
-        self.save_path = Path(__file__).parent.parent.parent / app.stg.util.save_path
-        self.path_world = "World/whole.npz"
-        self.path_player = "Player.txt"
-        self.path_info = "SaveInfo.txt"
+        self.current_save   = ""
+        self.save_path      = Path(__file__).parent.parent.parent / app.stg.util.save_path
+        self.path_world     = "World/"
+        self.path_world_ext = ".npz"
+
+        self.path_regions   = "Regions.npz"
+        self.path_player    = "Player.txt"
+        self.path_info      = "SaveInfo.txt"
 
         # Current save files data
         self.existing_saves = [None for _ in range(5)]
@@ -55,13 +58,22 @@ class SaveManager:
         # Get real date
         date = datetime.today().strftime('%Y-%m-%d %H:%M')
 
-        # Save World voxels
+        # Create save directory with input name
         path_to_create = self.save_path / name / self.path_world
         path_to_create.parent.mkdir(exist_ok=True, parents=True)
 
-        with open(self.save_path / name / self.path_world, 'w+') as f:
-            voxels = save_encoder(self.app.scene.surfaces.surf.main_game.world.voxels)
-            np.savez_compressed(self.save_path / name / self.path_world, voxels)
+        # Save World voxels
+        for rid, r_voxels in enumerate(self.app.scene.surfaces.surf.main_game.world.voxels):
+            r_name = self.app.scene.surfaces.surf.main_game.world.r_data[rid, : 3]
+            r_name = "r_" + str(r_name[0]) + "_" + str(r_name[1]) + "_" + str(r_name[2])
+            path = self.path_world + r_name + self.path_world_ext
+            with open(self.save_path / name / path, 'w+') as f:
+                voxels = save_encoder(r_voxels)
+                np.savez_compressed(self.save_path / name / path, voxels)
+
+        # Save Regions data
+        with open(self.save_path / name / self.path_regions, 'w+') as f:
+            np.savez_compressed(self.save_path / name / self.path_regions, self.app.scene.surfaces.surf.main_game.world.r_data)
 
         # Save player state
         with open(self.save_path / name / self.path_player, 'w+') as f:
@@ -74,15 +86,25 @@ class SaveManager:
             f.write(name + " ," + str(date) + " ," + num)
 
     def load_whole_file(self, name):
+        # Retrieve directory
+        save_dir = Path(self.save_path / name / self.path_world).glob('**/*.npz')
+
         # Read whole file data and set data to voxel container
-        voxels = load_decoder(np.load(self.save_path / name / self.path_world)['arr_0'], self.info.w_vol, self.info.c_vol)
+        voxels = []
+        for file in save_dir:
+            voxels.append(load_decoder(np.load(str(file))['arr_0'], self.info.w_vol, self.info.c_vol))
+
+        # Save Regions data
+        regions = np.load(self.save_path / name / self.path_regions)['arr_0']
+
         # Read player info (position)
         with open(self.save_path / name / self.path_player, 'r+') as f:
             player = f.read().split(" ;")[:-1]
+
         # Init game
         self.app.scene.surfaces.set_primary(GS.MainGame)
         self.app.custom_events.event_types.update_scene_logic()
-        self.app.scene.surfaces.surf.main_game.init_world(voxels)
+        self.app.scene.surfaces.surf.main_game.init_world(voxels, regions)
         self.app.player.move(*player)
 
 

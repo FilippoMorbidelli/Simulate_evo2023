@@ -6,7 +6,8 @@
 
 # Import packages ------------------------------|
 import random
-from genesim_lab.Engine.settings import *
+import glm
+import numpy as np
 from genesim_lab.Meshes.chunk_mesh import ChunkMesh
 
 
@@ -14,14 +15,12 @@ from genesim_lab.Meshes.chunk_mesh import ChunkMesh
 class Chunk:
 
     def __init__(self, world, index, r_index):
-        rx, ry, rz = r_index
-
         self.app = world.app
         self.world = world
         self.info = world.info
         self.mesh_stg = world.mesh_stg
         self.index = index
-        self.r_index = r_index
+        self.r_index = rx, ry, rz = np.array(r_index)
         self.pos = (glm.vec3(self.index) + glm.vec3(rx, ry, rz) * self.info.r_size - self.info.offset) * self.info.c_scale
         self.m_model = self.get_model_matrix()
 
@@ -48,7 +47,7 @@ class Chunk:
         if not self.is_empty:
             self.set_uniform()
 
-            if glm.distance(self.app.player.frustum.cam.position, self.center) > self.app.stg.world.c_threshold:
+            if glm.distance(self.app.player.frustum.cam.position, self.center) > self.info.c_threshold:
                 self.mesh.render_greedy()
             else:
                 self.mesh.render()
@@ -59,18 +58,18 @@ class Chunk:
         rng = random.randrange(1, 100)
 
         # Fill chunk
-        cx, cy, cz = glm.ivec3(self.index) * c_size
+        cx, cy, cz = (glm.ivec3(self.index) + glm.ivec3(self.r_index) * self.info.r_size) * self.info.c_size
 
-        for x in range(c_size):
-            for z in range(c_size):
+        for x in range(self.info.c_size):
+            for z in range(self.info.c_size):
                 wx = x + cx
                 wz = z + cz
                 world_height = int(glm.simplex(glm.vec2(wx, wz) * 0.01) * 32 + 32)
-                local_height = min(world_height - cy, c_size)
+                local_height = min(world_height - cy, self.info.c_size)
 
                 for y in range(local_height):
                     wy = y + cy
-                    voxels[x + c_size * z + self.info.c_area * y] = 1
+                    voxels[x + self.info.c_size * z + self.info.c_area * y] = 1
 
         if np.any(voxels):
             self.is_empty = False

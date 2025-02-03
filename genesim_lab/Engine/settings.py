@@ -111,8 +111,8 @@ class World:
     scale_i : glm.vec3 = 1 / scale
 
     # World data
-    w_width  : int = 2
-    w_height : int = 2
+    w_width  : int = 4
+    w_height : int = 4
     w_depth  : int = w_width
     w_area   : int = w_width * w_depth
     w_vol    : int = w_area * w_height
@@ -123,11 +123,10 @@ class World:
     offset    : glm.vec3 = glm.vec3(w_width/2, 0, w_depth/2)
 
     # Region data
-    r_size   : int = 32  # Number of chunks per dimension per region
-    r_width  : int = r_size
-    r_depth  : int = r_size
-    r_height : int = r_size
+    r_size   : int = 2  # Number of chunks per dimension per region
+    r_area   : int = r_size ** 2
     r_vol    : int = r_size ** 3
+    rc_size  : int = r_size * c_size
     width_rn : int = int(np.ceil(w_width / r_size))
     height_rn: int = int(np.ceil(w_height / r_size))
     depth_rn : int = int(np.ceil(w_depth / r_size))
@@ -218,7 +217,7 @@ class GameSettings:
 stg = GameSettings()
 
 (c_size, c_half, c_area, c_vol, c_sphere_radius, c_threshold, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
- w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, r_size, r_width, r_depth, r_height, r_vol, width_rn, height_rn, depth_rn, r_number,
+ w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, r_size, r_area , r_vol, rc_size, width_rn, height_rn, depth_rn, r_number,
  vso_depth, vso_p_sides, vso_p_position) = stg.world
 
 powers = 1 << np.array(range(c_size), dtype="int64")

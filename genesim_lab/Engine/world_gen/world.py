@@ -21,22 +21,26 @@ from genesim_lab.Engine.world_gen.sparsevoxeloctree import build_svo
 class World:
     # World structure is divided into multiple regions of stg.world.r_size chunks on each dim
 
-    def __init__(self, app, w_dims, voxels = None):
+    def __init__(self, app, w_dims = None, regions = None, voxels = None):
         self.app = app
         self.info = app.stg.world
 
         # Compute regions number to divide world in
-        r_data = self.compute_regions(*w_dims)
+        if regions is None:
+            self.r_data = self.compute_regions(*w_dims)
+        else:
+            self.r_data = regions
+        # Prepare chunks and voxels variables
         self.chunks : list = [[None for _ in range(self.info.r_vol)] for _ in range(self.info.r_number)]
         self.voxels : list = [np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8') for _ in range(self.info.r_number)]
         self.mesh_stg = self.get_mesh_stg()
         self.frustum_check = self.app.player.frustum.is_on_frustum
 
-        self.build_chunks(r_data, voxels)
+        self.build_chunks(self.r_data, voxels)
         self.build_chunk_mesh()
 
         # Build world sparse voxel octree
-        self.svo : list = [build_svo(self.app, self.info, self.chunks[r], r_data[r, :]) for r in range(self.info.r_number)]
+        self.svo : list = [build_svo(self.app, self.info, self.chunks[r], self.r_data[r, :]) for r in range(self.info.r_number)]
 
         # Player interactivity
         self.voxel_handler = VoxelHandler(self)
@@ -51,13 +55,13 @@ class World:
         r_data = np.empty([self.info.r_number, 6], dtype='uint32')
         for w in range(self.info.width_rn):
             # Chunks present along width
-            w_c = width % r_size if w == self.info.width_rn - 1 else r_size
+            w_c = width - (r_size * w) if w == self.info.width_rn - 1 else r_size
             for h in range(self.info.height_rn):
                 # Chunk present along height
-                h_c = height % r_size if h == self.info.height_rn - 1 else r_size
+                h_c = height - (r_size * h) if h == self.info.height_rn - 1 else r_size
                 for d in range(self.info.depth_rn):
                     # Chunks present along depth
-                    d_c = depth % r_size if d == self.info.depth_rn - 1 else r_size
+                    d_c = depth - (r_size * d) if d == self.info.depth_rn - 1 else r_size
                     # Compute region index
                     r_id = w + self.info.width_rn * d + self.info.width_rn * self.info.depth_rn * h
                     r_data[r_id, :] = [w, h, d, w_c, h_c, d_c]
@@ -73,12 +77,12 @@ class World:
                     for z in range(depth):
                         chunk = Chunk(self, index=(x, y, z), r_index=(w, h, d))
 
-                        chunk_index = x + self.info.w_width * z + self.info.w_area * y
+                        chunk_index = x + self.info.r_size * z + self.info.r_area * y
                         self.chunks[r][chunk_index] = chunk
 
                         # Put the chunk voxels in a separate array
                         if isinstance(load_voxels, np.ndarray):
-                            self.voxels[r][chunk_index] = load_voxels[chunk_index, :]
+                            self.voxels[r][chunk_index] = load_voxels[r][chunk_index, :]
                             chunk.is_empty = False
                         else:
                             self.voxels[r][chunk_index] = chunk.build_voxels()
@@ -102,8 +106,8 @@ class World:
 
     def render(self):
         # Render Chunks of each region
-        for svo in self.svo:
-            self.svo_frustum_render(svo)
+        for id, svo in enumerate(self.svo):
+            self.svo_frustum_render(svo, id)
 
         # Render Sky objects
         self.celestial.render()
@@ -111,7 +115,7 @@ class World:
         # Render Player functions
         self.voxel_marker.render()
 
-    def svo_frustum_render(self, node):
+    def svo_frustum_render(self, node, region):
         # Check if node is visible and inside player frustum
         if node.visibility and self.frustum_check(node.center, sphere_radius=node.sides.x * 0.5 * math.sqrt(3)):
 
@@ -119,13 +123,13 @@ class World:
             if node.data:
 
                 for ck_id, _ in node.data.items():
-                    self.chunks[ck_id].render()
+                    self.chunks[region][ck_id].render()
 
             # If node doesn't contain item check if it has children and is visible from player frustum
             elif node.children:
 
                 for child_coord, child_node in node.children.items():
-                    self.svo_frustum_render(child_node)
+                    self.svo_frustum_render(child_node, region)
 
     def get_mesh_stg(self):
 

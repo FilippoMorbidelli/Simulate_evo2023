@@ -236,7 +236,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                         "change_scene",  # Event handle to use for this custom event
                         [pg.MOUSEBUTTONDOWN, "button", 1],
                         [lambda : self.scene_ptr.set_primary(GS.MainGame),
-                         lambda : self.scene_ptr.surf.main_game.init_world()],
+                         lambda : self.scene_ptr.surf.main_game.init_world(world_dims = [self.app.stg.world.w_width, self.app.stg.world.w_height, self.app.stg.world.w_depth])],
                     ],
                     "button_continue" : [
                         "change_scene",  # Event handle to use for this custom event
