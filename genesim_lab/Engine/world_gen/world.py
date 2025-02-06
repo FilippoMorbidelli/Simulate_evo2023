@@ -8,8 +8,9 @@
 import math
 import numpy as np
 import numpy.random as rnd
-from numba import float64, int32
+from numba import float64, int32, types
 from numba.experimental import jitclass
+from numba.typed import Dict
 from genesim_lab.Engine.world_gen.chunk import Chunk
 from genesim_lab.Engine.player.voxel_handler import VoxelHandler
 from genesim_lab.Engine.world_objects.voxel_marker import VoxelMarker
@@ -30,9 +31,12 @@ class World:
             self.r_data = self.compute_regions(*w_dims)
         else:
             self.r_data = regions
+        # Prepare voxel dict to be also used by Numba NJit
+        self.voxels = Dict.empty(key_type = types.int64, value_type = types.uint8[:, :])
+        for r_id in range(self.info.r_number):
+            self.voxels[r_id] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
         # Prepare chunks and voxels variables
-        self.chunks : list = [[None for _ in range(self.info.r_vol)] for _ in range(self.info.r_number)]
-        self.voxels : list = [np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8') for _ in range(self.info.r_number)]
+        self.chunks : dict = {r_id : [None for _ in range(self.info.r_vol)] for r_id in range(self.info.r_number)}
         self.mesh_stg = self.get_mesh_stg()
         self.frustum_check = self.app.player.frustum.is_on_frustum
 
@@ -40,7 +44,7 @@ class World:
         self.build_chunk_mesh()
 
         # Build world sparse voxel octree
-        self.svo : list = [build_svo(self.app, self.info, self.chunks[r], self.r_data[r, :]) for r in range(self.info.r_number)]
+        self.svo : dict = {r : build_svo(self.app, self.info, self.chunks[r], self.r_data[r, :]) for r in range(self.info.r_number)}
 
         # Player interactivity
         self.voxel_handler = VoxelHandler(self)
@@ -81,7 +85,7 @@ class World:
                         self.chunks[r][chunk_index] = chunk
 
                         # Put the chunk voxels in a separate array
-                        if isinstance(load_voxels, np.ndarray):
+                        if not load_voxels is None:
                             self.voxels[r][chunk_index] = load_voxels[r][chunk_index, :]
                             chunk.is_empty = False
                         else:
@@ -91,7 +95,7 @@ class World:
                         chunk.voxels = self.voxels[r][chunk_index]
 
     def build_chunk_mesh(self):
-        for r in self.chunks:
+        for r in self.chunks.values():
             for chunk in r:
                 if chunk is not None:
                     chunk.build_mesh()
@@ -106,8 +110,8 @@ class World:
 
     def render(self):
         # Render Chunks of each region
-        for id, svo in enumerate(self.svo):
-            self.svo_frustum_render(svo, id)
+        for rid, svo in self.svo.items():
+            self.svo_frustum_render(svo, rid)
 
         # Render Sky objects
         self.celestial.render()

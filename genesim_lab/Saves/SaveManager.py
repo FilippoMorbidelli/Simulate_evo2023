@@ -8,11 +8,12 @@ from pathlib import Path
 from datetime import datetime
 from genesim_lab.Engine.scene.surfaces import SaveLoadMenu
 from genesim_lab.Engine.scene.events import GS
+from genesim_lab.Engine.settings import World
 import re
-import os
+import ntpath
 import numpy as np
-from numba import uint8
-from numba import uint64
+from numba import uint8, types
+from numba.typed import Dict
 from numba import njit
 
 
@@ -31,6 +32,7 @@ class SaveManager:
         self.path_regions   = "Regions.npz"
         self.path_player    = "Player.txt"
         self.path_info      = "SaveInfo.txt"
+        self.path_w_stg     = "WorldSettings.pkl"
 
         # Current save files data
         self.existing_saves = [None for _ in range(5)]
@@ -61,9 +63,14 @@ class SaveManager:
         # Create save directory with input name
         path_to_create = self.save_path / name / self.path_world
         path_to_create.parent.mkdir(exist_ok=True, parents=True)
+        path_to_create.mkdir(exist_ok=True, parents=True)
+
+        # Save World settings
+        with open(self.save_path / name / self.path_w_stg, 'w+') as f:
+            self.info.save_to_pickle(self.save_path / name / self.path_w_stg)
 
         # Save World voxels
-        for rid, r_voxels in enumerate(self.app.scene.surfaces.surf.main_game.world.voxels):
+        for rid, r_voxels in self.app.scene.surfaces.surf.main_game.world.voxels.items():
             r_name = self.app.scene.surfaces.surf.main_game.world.r_data[rid, : 3]
             r_name = "r_" + str(r_name[0]) + "_" + str(r_name[1]) + "_" + str(r_name[2])
             path = self.path_world + r_name + self.path_world_ext
@@ -89,16 +96,21 @@ class SaveManager:
         # Retrieve directory
         save_dir = Path(self.save_path / name / self.path_world).glob('**/*.npz')
 
+        # Load World settings
+        self.info = World.load_from_pickle(self.save_path / name / self.path_w_stg)
+
         # Read whole file data and set data to voxel container
-        voxels = []
+        voxels = Dict.empty(key_type = types.int64, value_type = types.uint8[:, :])
         for file in save_dir:
-            voxels.append(load_decoder(np.load(str(file))['arr_0'], self.info.w_vol, self.info.c_vol))
+            name_string = ntpath.basename(file)
+            r_index = self.get_index_from_name(name_string)
+            voxels[r_index] = load_decoder(np.load(str(file))['arr_0'], self.info.r_vol, self.info.c_vol)
 
         # Save Regions data
         regions = np.load(self.save_path / name / self.path_regions)['arr_0']
 
         # Read player info (position)
-        with open(self.save_path / name / self.path_player, 'r+') as f:
+        with open(self.save_path / name / self.path_player, 'r') as f:
             player = f.read().split(" ;")[:-1]
 
         # Init game
@@ -113,6 +125,13 @@ class SaveManager:
 
     def LoadRegion(self, region):
         pass
+
+    def get_index_from_name(self, region_string):
+        # Extract indexes from name and compute index to corresponding region
+        x, y, z = re.findall(r'\d+', region_string)
+        index = int(x) + self.info.width_rn * int(z) + self.info.width_rn * self.info.depth_rn * int(y)
+
+        return index
 
 @njit
 def run_length_encoding(voxels):

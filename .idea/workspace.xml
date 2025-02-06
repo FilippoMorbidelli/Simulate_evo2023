@@ -5,38 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_0_0_0.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_0_0_1.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_0_1_0.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_0_1_1.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_1_0_0.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_1_0_1.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_1_1_0.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_1_1_1.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/Regions.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/World/r_0_0_0.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/World/r_0_0_1.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/World/r_0_1_0.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/World/r_0_1_1.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/World/r_1_0_0.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/World/r_1_0_1.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/World/r_1_1_0.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/World/r_1_1_1.npz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaveFiles/prova/WorldSettings.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/as/Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/as/Player.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/as/SaveInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/as/SaveInfo.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaveFiles/prova/Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/prova/Player.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/Regions.npz" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/prova/Regions.npz" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaveFiles/prova/SaveInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/prova/SaveInfo.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/World/whole.npz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/player/frustum.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/frustum.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/World/r_0_0_0.npz" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/prova/World/r_0_0_0.npz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/World/r_0_0_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/World/r_0_1_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/World/r_0_1_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/World/r_1_0_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/World/r_1_0_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/World/r_1_1_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/World/r_1_1_1.npz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/player/voxel_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/voxel_handler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/chunk.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/chunk.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/sparsevoxeloctree.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/sparsevoxeloctree.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -166,19 +150,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/Engine/world_gen/sparsevoxeloctree.py</url>
-          <line>17</line>
-          <option name="timeStamp" value="114" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/genesim_lab/Engine/player/frustum.py</url>
-          <line>26</line>
-          <option name="timeStamp" value="118" />
+          <url>file://$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py</url>
+          <line>176</line>
+          <option name="timeStamp" value="125" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py</url>
-          <line>89</line>
-          <option name="timeStamp" value="123" />
+          <line>96</line>
+          <option name="timeStamp" value="131" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

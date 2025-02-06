@@ -9,6 +9,8 @@ import glm
 import math
 import pygame as pg
 import dataclasses
+import pickle
+
 from dataclasses import dataclass
 from numba.experimental import jitclass
 from numba import float32, int32
@@ -92,7 +94,7 @@ class Interaction:
 @dataclass(slots=True, order=True)
 class World:
     # Chunk data
-    c_size          : float = 48  # Chunk size == number of cubes along a dimension [N x N x N]
+    c_size          : float = 32  # Chunk size == number of cubes along a dimension [N x N x N]
     c_half          : float = c_size // 2
     c_area          : float = c_size ** 2
     c_vol           : float = c_size ** 3
@@ -111,8 +113,8 @@ class World:
     scale_i : glm.vec3 = 1 / scale
 
     # World data
-    w_width  : int = 4
-    w_height : int = 4
+    w_width  : int = 2
+    w_height : int = 2
     w_depth  : int = w_width
     w_area   : int = w_width * w_depth
     w_vol    : int = w_area * w_height
@@ -140,6 +142,15 @@ class World:
     def __iter__(self):
         for field in dataclasses.fields(self):
             yield getattr(self, field.name)
+
+    def save_to_pickle(self, filename):
+        with open(filename, 'wb') as file:
+            pickle.dump(self, file)  # Save the entire object
+
+    @classmethod
+    def load_from_pickle(cls, filename):
+        with open(filename, 'rb') as file:
+            return pickle.load(file)  # Load the entire object
 
 
 @dataclass(slots=True, order=True)

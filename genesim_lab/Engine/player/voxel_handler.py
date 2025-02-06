@@ -48,8 +48,8 @@ class VoxelHandler:
     def rebuild_adj_chunk(self, adj_voxel_pos):
         r_index, index = get_chunk_index(adj_voxel_pos, self.mesh_stg)
         # If chunk exists rebuild it
-        if r_index != -1 and self.chunks[int(r_index)][int(index)] is not None:
-            self.chunks[int(r_index)][int(index)].mesh.rebuild()
+        if r_index != -1 and self.chunks[r_index][index] is not None:
+            self.chunks[r_index][index].mesh.rebuild()
 
     def rebuild_adjacent_chunks(self):
         lx, ly, lz = self.voxel_local_pos
