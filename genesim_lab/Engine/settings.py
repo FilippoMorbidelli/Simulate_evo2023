@@ -94,7 +94,7 @@ class Interaction:
 @dataclass(slots=True, order=True)
 class World:
     # Chunk data
-    c_size          : float = 32  # Chunk size == number of cubes along a dimension [N x N x N]
+    c_size          : float = 48  # Chunk size == number of cubes along a dimension [N x N x N]
     c_half          : float = c_size // 2
     c_area          : float = c_size ** 2
     c_vol           : float = c_size ** 3
@@ -113,8 +113,8 @@ class World:
     scale_i : glm.vec3 = 1 / scale
 
     # World data
-    w_width  : int = 2
-    w_height : int = 2
+    w_width  : int = 32
+    w_height : int = 16
     w_depth  : int = w_width
     w_area   : int = w_width * w_depth
     w_vol    : int = w_area * w_height
@@ -125,7 +125,7 @@ class World:
     offset    : glm.vec3 = glm.vec3(w_width/2, 0, w_depth/2)
 
     # Region data
-    r_size   : int = 2  # Number of chunks per dimension per region
+    r_size   : int = 16  # Number of chunks per dimension per region
     r_area   : int = r_size ** 2
     r_vol    : int = r_size ** 3
     rc_size  : int = r_size * c_size

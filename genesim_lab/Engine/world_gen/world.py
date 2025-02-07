@@ -144,12 +144,12 @@ class World:
 
 
 spec = [
-    ("c_size", float64),
-    ("c_area", float64),
-    ("c_vol", float64),
-    ("off_x", float64),
-    ("off_y", float64),
-    ("off_z", float64),
+    ("c_size", int32),
+    ("c_area", int32),
+    ("c_vol", int32),
+    ("off_x", int32),
+    ("off_y", int32),
+    ("off_z", int32),
     ("v_x", float64),
     ("v_y", float64),
     ("v_z", float64),

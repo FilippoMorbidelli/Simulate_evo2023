@@ -29,22 +29,22 @@ def get_ao(local_pos, world_pos, world_voxels, plane, stg):
         h = is_void((x + 1, y, z - 1), (wx + 1, wy, wz - 1), world_voxels, stg=stg)
     elif plane == 'X':  # Valid for Top and Bottom faces (Y axis)
         a = is_void((x, y, z - 1), (wx, wy, wz - 1), world_voxels, stg=stg)
-        b = is_void((x, y - 1, z - 1), (wx, wy - stg.v_y, wz - 1), world_voxels, stg=stg)
-        c = is_void((x, y - 1, z), (wx, wy - stg.v_y, wz), world_voxels, stg=stg)
-        d = is_void((x, y - 1, z + 1), (wx, wy - stg.v_y, wz + 1), world_voxels, stg=stg)
+        b = is_void((x, y - 1, z - 1), (wx, wy - v_y, wz - 1), world_voxels, stg=stg)
+        c = is_void((x, y - 1, z), (wx, wy - v_y, wz), world_voxels, stg=stg)
+        d = is_void((x, y - 1, z + 1), (wx, wy - v_y, wz + 1), world_voxels, stg=stg)
         e = is_void((x, y, z + 1), (wx, wy, wz + 1), world_voxels, stg=stg)
-        f = is_void((x, y + 1, z + 1), (wx, wy + stg.v_y, wz + 1), world_voxels, stg=stg)
-        g = is_void((x, y + 1, z), (wx, wy + stg.v_y, wz), world_voxels, stg=stg)
-        h = is_void((x, y + 1, z - 1), (wx, wy + stg.v_y, wz - 1), world_voxels, stg=stg)
+        f = is_void((x, y + 1, z + 1), (wx, wy + v_y, wz + 1), world_voxels, stg=stg)
+        g = is_void((x, y + 1, z), (wx, wy + v_y, wz), world_voxels, stg=stg)
+        h = is_void((x, y + 1, z - 1), (wx, wy + v_y, wz - 1), world_voxels, stg=stg)
     else:
         a = is_void((x - 1, y, z), (wx - 1, wy, wz), world_voxels, stg=stg)
-        b = is_void((x - 1, y - 1, z), (wx - 1, wy - stg.v_y, wz), world_voxels, stg=stg)
-        c = is_void((x, y - 1, z), (wx, wy - stg.v_y, wz), world_voxels, stg=stg)
-        d = is_void((x + 1, y - 1, z), (wx + 1, wy - stg.v_y, wz), world_voxels, stg=stg)
+        b = is_void((x - 1, y - 1, z), (wx - 1, wy - v_y, wz), world_voxels, stg=stg)
+        c = is_void((x, y - 1, z), (wx, wy - v_y, wz), world_voxels, stg=stg)
+        d = is_void((x + 1, y - 1, z), (wx + 1, wy - v_y, wz), world_voxels, stg=stg)
         e = is_void((x + 1, y, z), (wx + 1, wy, wz), world_voxels, stg=stg)
-        f = is_void((x + 1, y + 1, z), (wx + 1, wy + stg.v_y, wz), world_voxels, stg=stg)
-        g = is_void((x, y + 1, z), (wx, wy + stg.v_y, wz), world_voxels, stg=stg)
-        h = is_void((x - 1, y + 1, z), (wx - 1, wy + stg.v_y, wz), world_voxels, stg=stg)
+        f = is_void((x + 1, y + 1, z), (wx + 1, wy + v_y, wz), world_voxels, stg=stg)
+        g = is_void((x, y + 1, z), (wx, wy + v_y, wz), world_voxels, stg=stg)
+        h = is_void((x - 1, y + 1, z), (wx - 1, wy + v_y, wz), world_voxels, stg=stg)
 
     ao = (a + b + c), (g + h + a), (e + f + g), (c + d + e)
     return to_uint8_ao(ao)
@@ -110,9 +110,9 @@ def get_chunk_index(world_voxel_pos, stg):
     ry = wy // rc_size
     rz = wz // rc_size
     # Compute chunk index
-    cx = wx % rc_size // c_size
-    cy = wy % rc_size // c_size
-    cz = wz % rc_size // c_size
+    cx = (wx - rx * rc_size) // c_size
+    cy = (wy - ry * rc_size) // c_size
+    cz = (wz - rz * rc_size) // c_size
     if not (0 <= rx < width_rn and 0 <= ry < height_rn and 0 <= rz < depth_rn):
         return - 1, -1
 
@@ -247,38 +247,38 @@ def greedy_mesh_builder(v_mask, face, voxel, level, gvd, indexGreedy):
 @njit
 def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_pos, stg):
     # Array containing additional properties [Voxel_ID, Face_ID] - type: uint8 to reduce memory size
-    vertex_data = np.empty(c_vol * 18 * format_size, dtype='uint32')
+    vertex_data = np.empty(stg.c_vol * 18 * format_size, dtype='uint32')
     # Array containing voxel type per face, after culling (used by greedy meshing algo)
-    greedy_raw_data = np.zeros((c_vol, 6), dtype = 'uint8')
-    greedy_vertex_data = np.empty(c_vol * 18 * format_size, dtype='uint32')
+    greedy_raw_data = np.zeros((stg.c_vol, 6), dtype = 'uint8')
+    greedy_vertex_data = np.empty(stg.c_vol * 18 * format_size, dtype='uint32')
     # Init index to extract actual size of matrix
     index = 0
     indexGreedy = 0
 
     # Iterate over each dimension, compute the vertex of the only visible faces
-    for x_ind in range(c_size):
+    for x_ind in range(stg.c_size):
         x_plus = x_ind + 1  # x plus coordinate
-        for y_ind in range(c_size):
+        for y_ind in range(stg.c_size):
             y_plus = y_ind + 1   # y plus coordinate
-            for z_ind in range(c_size):
+            for z_ind in range(stg.c_size):
                 z_plus = z_ind + 1   # z plus coordinate
 
                 # Retrieve Voxel_ID for the given quad to plot and verify that it is not Null
-                voxel_id = chunk_voxels[x_ind + c_size * z_ind + c_area * y_ind]
+                voxel_id = chunk_voxels[x_ind + stg.c_size * z_ind + stg.c_area * y_ind]
                 if not voxel_id:
                     continue
 
                 # Voxels world position
                 cx, cy, cz = chunk_pos
                 rx, ry, rz = region_pos
-                wx = (x_ind + (rx * r_size + cx - w_width/2) * c_size) * v_x
-                wy = (y_ind + (ry * r_size + cy -         0) * c_size) * v_y
-                wz = (z_ind + (rz * r_size + cz - w_depth/2) * c_size) * v_z
+                wx = (x_ind + (rx * stg.r_size + cx - stg.off_x) * stg.c_size) * stg.v_x
+                wy = (y_ind + (ry * stg.r_size + cy - stg.off_y) * stg.c_size) * stg.v_y
+                wz = (z_ind + (rz * stg.r_size + cz - stg.off_z) * stg.c_size) * stg.v_z
 
                 # top face
-                if is_void((x_ind, y_ind + 1, z_ind), (wx, wy + 1 * stg.v_y, wz), world_voxels, stg):
+                if is_void((x_ind, y_ind + 1, z_ind), (wx, wy + stg.v_y, wz), world_voxels, stg):
                     # Get ao values
-                    ao = get_ao((x_ind, y_ind + 1, z_ind), (wx, wy + 1 * stg.v_y, wz), world_voxels, plane='Y', stg=stg)
+                    ao = get_ao((x_ind, y_ind + 1, z_ind), (wx, wy + stg.v_y, wz), world_voxels, plane='Y', stg=stg)
                     flip_id = ao[1] + ao[3] > ao[0] + ao[2]
 
                     # format: [x, y, z, ao_id] - [voxel_id, face_id]
@@ -294,7 +294,7 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
 
                     # save data for greedy meshing
                     if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
-                        greedy_raw_data[x_ind + c_size * z_ind + c_area * y_ind, 0] = voxel_id
+                        greedy_raw_data[x_ind + stg.c_size * z_ind + stg.c_area * y_ind, 0] = voxel_id
                     else:
                         # voxel is meshed as is, no need for flip id check
                         v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 0)
@@ -304,9 +304,9 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
                         indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 # bottom face
-                if is_void((x_ind, y_ind - 1, z_ind), (wx, wy - 1 * stg.v_y, wz), world_voxels, stg=stg):
+                if is_void((x_ind, y_ind - 1, z_ind), (wx, wy - stg.v_y, wz), world_voxels, stg=stg):
                     # Get ao values
-                    ao = get_ao((x_ind, y_ind - 1, z_ind), (wx, wy - 1 * stg.v_y, wz), world_voxels, plane='Y', stg=stg)
+                    ao = get_ao((x_ind, y_ind - 1, z_ind), (wx, wy - stg.v_y, wz), world_voxels, plane='Y', stg=stg)
                     flip_id = ao[1] + ao[3] > ao[0] + ao[2]
 
                     # format: [x, y, z] - [voxel_id, face_id]
@@ -322,7 +322,7 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
 
                     # save data for greedy meshing
                     if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
-                        greedy_raw_data[x_ind + c_size * z_ind + c_area * y_ind, 1] = voxel_id
+                        greedy_raw_data[x_ind + stg.c_size * z_ind + stg.c_area * y_ind, 1] = voxel_id
                     else:
                         # voxel is meshed as is, no need for flip id check
                         v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 1)
@@ -332,9 +332,9 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
                         indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 # right face
-                if is_void((x_ind + 1, y_ind, z_ind), (wx + 1, wy, wz), world_voxels, stg=stg):
+                if is_void((x_ind + 1, y_ind, z_ind), (wx + stg.v_x, wy, wz), world_voxels, stg=stg):
                     # Get ao values
-                    ao = get_ao((x_ind + 1, y_ind, z_ind), (wx + 1, wy, wz), world_voxels, plane='X', stg=stg)
+                    ao = get_ao((x_ind + 1, y_ind, z_ind), (wx + stg.v_x, wy, wz), world_voxels, plane='X', stg=stg)
                     flip_id = ao[1] + ao[3] > ao[0] + ao[2]
 
                     # format: [x, y, z] - [voxel_id, face_id]
@@ -350,7 +350,7 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
 
                     # save data for greedy meshing
                     if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
-                        greedy_raw_data[z_ind + c_size * y_ind + c_area * x_ind, 2] = voxel_id
+                        greedy_raw_data[z_ind + stg.c_size * y_ind + stg.c_area * x_ind, 2] = voxel_id
                     else:
                         # voxel is meshed as is, no need for flip id check
                         v0 = greedy_pack_data(x_plus, y_plus, z_ind, voxel_id, 2)
@@ -360,9 +360,9 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
                         indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 # left face
-                if is_void((x_ind - 1, y_ind, z_ind), (wx - 1, wy, wz), world_voxels, stg=stg):
+                if is_void((x_ind - 1, y_ind, z_ind), (wx - stg.v_x, wy, wz), world_voxels, stg=stg):
                     # Get ao values
-                    ao = get_ao((x_ind - 1, y_ind, z_ind), (wx - 1, wy, wz), world_voxels, plane='X', stg=stg)
+                    ao = get_ao((x_ind - 1, y_ind, z_ind), (wx - stg.v_x, wy, wz), world_voxels, plane='X', stg=stg)
                     flip_id = ao[1] + ao[3] > ao[0] + ao[2]
 
                     # format: [x, y, z] - [voxel_id, face_id]
@@ -378,7 +378,7 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
 
                     # save data for greedy meshing
                     if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
-                        greedy_raw_data[z_ind + c_size * y_ind + c_area * x_ind, 3] = voxel_id
+                        greedy_raw_data[z_ind + stg.c_size * y_ind + stg.c_area * x_ind, 3] = voxel_id
                     else:
                         # voxel is meshed as is, no need for flip id check
                         v0 = greedy_pack_data(x_ind, y_ind, z_ind, voxel_id, 3)
@@ -388,9 +388,9 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
                         indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 # back face
-                if is_void((x_ind, y_ind, z_ind - 1), (wx, wy, wz - 1), world_voxels, stg=stg):
+                if is_void((x_ind, y_ind, z_ind - 1), (wx, wy, wz - stg.v_z), world_voxels, stg=stg):
                     # Get ao values
-                    ao = get_ao((x_ind, y_ind, z_ind - 1), (wx, wy, wz - 1), world_voxels, plane='Z', stg=stg)
+                    ao = get_ao((x_ind, y_ind, z_ind - 1), (wx, wy, wz - stg.v_z), world_voxels, plane='Z', stg=stg)
                     flip_id = ao[1] + ao[3] > ao[0] + ao[2]
 
                     # format: [x, y, z] - [voxel_id, face_id]
@@ -406,7 +406,7 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
 
                     # save data for greedy meshing
                     if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
-                        greedy_raw_data[x_ind + c_size * y_ind + c_area * z_ind, 4] = voxel_id
+                        greedy_raw_data[x_ind + stg.c_size * y_ind + stg.c_area * z_ind, 4] = voxel_id
                     else:
                         # voxel is meshed as is, no need for flip id check
                         v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 4)
@@ -416,9 +416,9 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
                         indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 # front face
-                if is_void((x_ind, y_ind, z_ind + 1), (wx, wy, wz + 1), world_voxels, stg=stg):
+                if is_void((x_ind, y_ind, z_ind + 1), (wx, wy, wz + stg.v_z), world_voxels, stg=stg):
                     # Get ao values
-                    ao = get_ao((x_ind, y_ind, z_ind + 1), (wx, wy, wz + 1), world_voxels, plane='Z', stg=stg)
+                    ao = get_ao((x_ind, y_ind, z_ind + 1), (wx, wy, wz + stg.v_z), world_voxels, plane='Z', stg=stg)
                     flip_id = ao[1] + ao[3] > ao[0] + ao[2]
 
                     # format: [x, y, z] - [voxel_id, face_id]
@@ -434,7 +434,7 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
 
                     # save data for greedy meshing
                     if voxel_id < 2: # To Be Defined (value of id that can be greedy meshed)
-                        greedy_raw_data[x_ind + c_size * y_ind + c_area * z_ind, 5] = voxel_id
+                        greedy_raw_data[x_ind + stg.c_size * y_ind + stg.c_area * z_ind, 5] = voxel_id
                     else:
                         # voxel is meshed as is, no need for flip id check
                         v0 = greedy_pack_data(x_ind, y_plus, z_ind, voxel_id, 5)
@@ -444,14 +444,14 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
                         indexGreedy = add_data(greedy_vertex_data, indexGreedy, v0, v3, v2, v0, v2, v1)
 
     # Build fast greedy mesh
-    new_mask = np.zeros(c_size, dtype = "uint64")
+    new_mask = np.zeros(stg.c_size, dtype = "uint64")
     for v_type in range(1, 2): # Iterate over each meshable voxel type
         for face in range(6):
-            for cut in range(c_size):
-                raw_mask = greedy_raw_data[cut * c_area : (cut + 1) * c_area, face] == v_type
+            for cut in range(stg.c_size):
+                raw_mask = greedy_raw_data[cut * stg.c_area : (cut + 1) * stg.c_area, face] == v_type
                 if raw_mask.any():
-                    for it_m in range(c_size):
-                        new_mask[it_m] = np.sum(powers * raw_mask[it_m * c_size : (it_m + 1) * c_size])
+                    for it_m in range(stg.c_size):
+                        new_mask[it_m] = np.sum(powers * raw_mask[it_m * stg.c_size : (it_m + 1) * stg.c_size])
                     indexGreedy = greedy_mesh_builder(new_mask, face, v_type, cut, greedy_vertex_data, indexGreedy)
 
     # Truncate Vertex Data array
