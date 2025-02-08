@@ -13,9 +13,9 @@ from ast import literal_eval
 # All surfaces ---------------------------------|
 class Player(Camera):
 
-    def __init__(self, app, position=stg.player.pos, yaw=-135, pitch=0):
-        self.app = app
-        super().__init__(position, yaw, pitch)
+    def __init__(self, app, position=glm.vec3(0, 0, 0), yaw=-135, pitch=0):
+        self.p_info = app.stg.player
+        super().__init__(app, position, yaw, pitch)
 
     def update(self):
         self.keyboard_control()
@@ -34,13 +34,13 @@ class Player(Camera):
     def mouse_control(self):
         mouse_dx, mouse_dy = pg.mouse.get_rel()
         if mouse_dx:
-            self.rotate_yaw(delta_x=mouse_dx * stg.player.mouse_sensitivity)
+            self.rotate_yaw(delta_x=mouse_dx * self.p_info.mouse_sensitivity)
         if mouse_dy:
-            self.rotate_pitch(delta_y=mouse_dy * stg.player.mouse_sensitivity)
+            self.rotate_pitch(delta_y=mouse_dy * self.p_info.mouse_sensitivity)
 
     def keyboard_control(self):
         key_state = pg.key.get_pressed()
-        vel = stg.player.speed * self.app.delta_time
+        vel = self.p_info.speed * self.app.delta_time
         if key_state[pg.K_w]:
             self.move_forward(vel)
         if key_state[pg.K_s]:
@@ -55,7 +55,7 @@ class Player(Camera):
             self.move_down(vel)
 
     def reset(self):
-        self.reset_camera(position=stg.player.pos, yaw=-90, pitch=0)
+        self.reset_camera(position=self.p_info.pos, yaw=-90, pitch=0)
 
     def move(self, pos, yaw, pitch):
         self.move_camera(position=glm.vec3(literal_eval(pos)), yaw=float(yaw), pitch=float(pitch))

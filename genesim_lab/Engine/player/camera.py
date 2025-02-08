@@ -12,7 +12,10 @@ from genesim_lab.Engine.player.frustum import Frustum
 # All surfaces ---------------------------------|
 class Camera:
 
-    def __init__(self, position, yaw, pitch):
+    def __init__(self, app, position, yaw, pitch):
+        self.app = app
+        self.c_info = app.stg.camera
+
         self.position = glm.vec3(position)
         self.yaw = glm.radians(yaw)
         self.pitch = glm.radians(pitch)
@@ -21,10 +24,10 @@ class Camera:
         self.right = glm.vec3(1, 0, 0)
         self.forward = glm.vec3(0, 0, -1)
 
-        self.m_proj = glm.perspective(stg.camera.v_fov, stg.camera.aspect_ratio, stg.camera.near, stg.camera.far)
+        self.m_proj = glm.perspective(self.c_info.v_fov, self.c_info.aspect_ratio, self.c_info.near, self.c_info.far)
         self.m_view = glm.mat4()
 
-        self.frustum = Frustum(self)
+        self.frustum = Frustum(self, self.c_info, app.stg.world)
 
     def update(self):
         self.update_vectors()
@@ -44,7 +47,7 @@ class Camera:
 
     def rotate_pitch(self, delta_y):
         self.pitch -= delta_y
-        self.pitch = glm.clamp(self.pitch, - stg.camera.pitch_max, stg.camera.pitch_max)
+        self.pitch = glm.clamp(self.pitch, - self.c_info.pitch_max, self.c_info.pitch_max)
 
     def rotate_yaw(self, delta_x):
         self.yaw += delta_x
@@ -76,7 +79,7 @@ class Camera:
         self.right = glm.vec3(1, 0, 0)
         self.forward = glm.vec3(0, 0, -1)
 
-        self.m_proj = glm.perspective(stg.camera.v_fov, stg.camera.aspect_ratio, stg.camera.near, stg.camera.far)
+        self.m_proj = glm.perspective(self.c_info.v_fov, self.c_info.aspect_ratio, self.c_info.near, self.c_info.far)
         self.m_view = glm.mat4()
 
     def move_camera(self, position, yaw, pitch):
@@ -86,5 +89,5 @@ class Camera:
 
         self.update_vectors()
 
-        self.m_proj = glm.perspective(stg.camera.v_fov, stg.camera.aspect_ratio, stg.camera.near, stg.camera.far)
+        self.m_proj = glm.perspective(self.c_info.v_fov, self.c_info.aspect_ratio, self.c_info.near, self.c_info.far)
         self.m_view = glm.mat4()

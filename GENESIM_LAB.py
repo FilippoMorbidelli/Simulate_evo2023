@@ -10,7 +10,7 @@ from genesim_lab.Engine.scene.surfaces import *
 from genesim_lab.Engine.world_gen.shader_program import ShaderProgram
 from genesim_lab.Engine.scene.events import *
 from genesim_lab.Engine.player.player import Player
-from genesim_lab.Engine.settings import *
+from genesim_lab.Engine.settings import GameSettings
 from genesim_lab.Engine.world_gen.textures import Textures
 from genesim_lab.Saves.SaveManager import SaveManager
 
@@ -35,7 +35,7 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  # 
 
         # Initialize Engine settings
-        self.stg = stg
+        self.stg = GameSettings()
 
         # Set Engine window size (default: full screen)
         if self.stg.window.full_screen:
@@ -68,7 +68,7 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         self.is_running = True
 
         # Init player control (during main Engine as master only)
-        self.player = Player(self)
+        self.player = Player(self, position=self.stg.player.pos)
 
         # Init Save/Load Manager
         self.save_load = SaveManager(self)

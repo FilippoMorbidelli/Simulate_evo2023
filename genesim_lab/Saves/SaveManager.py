@@ -71,8 +71,7 @@ class SaveManager:
 
         # Save World voxels
         for rid, r_voxels in self.app.scene.surfaces.surf.main_game.world.voxels.items():
-            r_name = self.app.scene.surfaces.surf.main_game.world.r_data[rid, : 3]
-            r_name = "r_" + str(r_name[0]) + "_" + str(r_name[1]) + "_" + str(r_name[2])
+            r_name = self.get_name_from_index(rid)
             path = self.path_world + r_name + self.path_world_ext
             with open(self.save_path / name / path, 'w+') as f:
                 voxels = save_encoder(r_voxels)
@@ -132,6 +131,13 @@ class SaveManager:
         index = int(x) + self.info.width_rn * int(z) + self.info.width_rn * self.info.depth_rn * int(y)
 
         return index
+
+    def get_name_from_index(self, region_index):
+        # Get region coordinates from region index by inspecting a chunk
+        r_name = self.app.scene.surfaces.surf.main_game.world.chunks[region_index][0].r_index
+        r_name = "r_" + str(r_name[0]) + "_" + str(r_name[1]) + "_" + str(r_name[2])
+
+        return r_name
 
 @njit
 def run_length_encoding(voxels):

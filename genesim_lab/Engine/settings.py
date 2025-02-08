@@ -13,7 +13,7 @@ import pickle
 
 from dataclasses import dataclass
 from numba.experimental import jitclass
-from numba import float32, int32
+from numba import float64, int32
 from pygame import freetype
 from pathlib import Path
 
@@ -113,8 +113,8 @@ class World:
     scale_i : glm.vec3 = 1 / scale
 
     # World data
-    w_width  : int = 32
-    w_height : int = 16
+    w_width  : int = 2
+    w_height : int = 2
     w_depth  : int = w_width
     w_area   : int = w_width * w_depth
     w_vol    : int = w_area * w_height
@@ -225,63 +225,51 @@ class GameSettings:
             yield getattr(self, field.name)
 
 
-stg = GameSettings()
+#stg = GameSettings()
 
-(c_size, c_half, c_area, c_vol, c_sphere_radius, c_threshold, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
- w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, r_size, r_area , r_vol, rc_size, width_rn, height_rn, depth_rn, r_number,
- vso_depth, vso_p_sides, vso_p_position) = stg.world
+#(c_size, c_half, c_area, c_vol, c_sphere_radius, c_threshold, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
+# w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, r_size, r_area , r_vol, rc_size, width_rn, height_rn, depth_rn, r_number,
+# vso_depth, vso_p_sides, vso_p_position) = stg.world
 
-powers = 1 << np.array(range(c_size), dtype="int64")
+powers = 1 << np.array(range(48), dtype="int64")
 
 # World Settings for Njit ------|
 spec = [
-    ('c_size', float32),
-    ('c_half', float32),
-    ('c_area', float32),
-    ('c_vol', float32),
-    ('c_sphere_radius', float32),
-
-    ('v_x', float32),
-    ('v_y', float32),
-    ('v_z', float32),
-
-    ('w_width', int32),
-    ('w_height', int32),
-    ('w_depth', int32),
-    ('w_area', int32),
-    ('w_vol', int32),
-
-    ('center_xz', float32),
-    ('center_y', float32)
+    ("c_size"   , int32),
+    ("c_area"   , int32),
+    ("c_vol"    , int32),
+    ("off_x"    , int32),
+    ("off_y"    , int32),
+    ("off_z"    , int32),
+    ("v_x"      , float64),
+    ("v_y"      , float64),
+    ("v_z"      , float64),
+    ("r_size"   , int32),
+    ("r_area"   , int32),
+    ("rc_size"  , int32),
+    ("width_rn" , int32),
+    ("height_rn", int32),
+    ("depth_rn" , int32),
 ]
 
 @jitclass(spec)
-class WorldStgNjit(object):
-    def __init__(self):
-        # Chunk data
-        self.c_size = 48
-        self.c_half = self.c_size // 2
-        self.c_area = self.c_size ** 2
-        self.c_vol = self.c_size ** 3
-        self.c_sphere_radius = self.c_half * math.sqrt(3)
-
-        # Voxel data (stretching factor along each dimension)
-        self.v_x = 1.0
-        self.v_y = 0.5
-        self.v_z = 1.0
-
-        # World data
-        self.w_width = 2
-        self.w_height = 2
-        self.w_depth = self.w_width
-        self.w_area = self.w_width * self.w_depth
-        self.w_vol = self.w_area * self.w_height
-
-        # World center data
-        self.center_xz = self.w_width * self.c_half
-        self.center_y = self.w_height * self.c_half
-
-Ws = WorldStgNjit()
+class ChunkMeshSettings:
+    def __init__(self, c_size, c_area, c_vol, off_x, off_y, off_z, v_x, v_y, v_z, r_size, r_area, rc_size, width_rn, height_rn, depth_rn):
+        self.c_size    = c_size
+        self.c_area    = c_area
+        self.c_vol     = c_vol
+        self.off_x     = off_x
+        self.off_y     = off_y
+        self.off_z     = off_z
+        self.v_x       = v_x
+        self.v_y       = v_y
+        self.v_z       = v_z
+        self.r_size    = r_size
+        self.r_area    = r_area
+        self.rc_size   = rc_size
+        self.width_rn  = width_rn
+        self.height_rn = height_rn
+        self.depth_rn  = depth_rn
 
 # Settings functions ----------|
 

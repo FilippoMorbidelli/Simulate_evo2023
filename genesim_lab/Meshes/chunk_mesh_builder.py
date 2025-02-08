@@ -28,23 +28,23 @@ def get_ao(local_pos, world_pos, world_voxels, plane, stg):
         g = is_void((x + 1, y, z    ), (wx + 1, wy, wz    ), world_voxels, stg=stg)
         h = is_void((x + 1, y, z - 1), (wx + 1, wy, wz - 1), world_voxels, stg=stg)
     elif plane == 'X':  # Valid for Top and Bottom faces (Y axis)
-        a = is_void((x, y, z - 1), (wx, wy, wz - 1), world_voxels, stg=stg)
-        b = is_void((x, y - 1, z - 1), (wx, wy - v_y, wz - 1), world_voxels, stg=stg)
-        c = is_void((x, y - 1, z), (wx, wy - v_y, wz), world_voxels, stg=stg)
-        d = is_void((x, y - 1, z + 1), (wx, wy - v_y, wz + 1), world_voxels, stg=stg)
-        e = is_void((x, y, z + 1), (wx, wy, wz + 1), world_voxels, stg=stg)
-        f = is_void((x, y + 1, z + 1), (wx, wy + v_y, wz + 1), world_voxels, stg=stg)
-        g = is_void((x, y + 1, z), (wx, wy + v_y, wz), world_voxels, stg=stg)
-        h = is_void((x, y + 1, z - 1), (wx, wy + v_y, wz - 1), world_voxels, stg=stg)
+        a = is_void((x, y    , z - 1), (wx, wy          , wz - 1), world_voxels, stg=stg)
+        b = is_void((x, y - 1, z - 1), (wx, wy - stg.v_y, wz - 1), world_voxels, stg=stg)
+        c = is_void((x, y - 1, z    ), (wx, wy - stg.v_y, wz    ), world_voxels, stg=stg)
+        d = is_void((x, y - 1, z + 1), (wx, wy - stg.v_y, wz + 1), world_voxels, stg=stg)
+        e = is_void((x, y    , z + 1), (wx, wy          , wz + 1), world_voxels, stg=stg)
+        f = is_void((x, y + 1, z + 1), (wx, wy + stg.v_y, wz + 1), world_voxels, stg=stg)
+        g = is_void((x, y + 1, z    ), (wx, wy + stg.v_y, wz    ), world_voxels, stg=stg)
+        h = is_void((x, y + 1, z - 1), (wx, wy + stg.v_y, wz - 1), world_voxels, stg=stg)
     else:
-        a = is_void((x - 1, y, z), (wx - 1, wy, wz), world_voxels, stg=stg)
-        b = is_void((x - 1, y - 1, z), (wx - 1, wy - v_y, wz), world_voxels, stg=stg)
-        c = is_void((x, y - 1, z), (wx, wy - v_y, wz), world_voxels, stg=stg)
-        d = is_void((x + 1, y - 1, z), (wx + 1, wy - v_y, wz), world_voxels, stg=stg)
-        e = is_void((x + 1, y, z), (wx + 1, wy, wz), world_voxels, stg=stg)
-        f = is_void((x + 1, y + 1, z), (wx + 1, wy + v_y, wz), world_voxels, stg=stg)
-        g = is_void((x, y + 1, z), (wx, wy + v_y, wz), world_voxels, stg=stg)
-        h = is_void((x - 1, y + 1, z), (wx - 1, wy + v_y, wz), world_voxels, stg=stg)
+        a = is_void((x - 1, y    , z), (wx - 1, wy          , wz), world_voxels, stg=stg)
+        b = is_void((x - 1, y - 1, z), (wx - 1, wy - stg.v_y, wz), world_voxels, stg=stg)
+        c = is_void((x    , y - 1, z), (wx    , wy - stg.v_y, wz), world_voxels, stg=stg)
+        d = is_void((x + 1, y - 1, z), (wx + 1, wy - stg.v_y, wz), world_voxels, stg=stg)
+        e = is_void((x + 1, y    , z), (wx + 1, wy          , wz), world_voxels, stg=stg)
+        f = is_void((x + 1, y + 1, z), (wx + 1, wy + stg.v_y, wz), world_voxels, stg=stg)
+        g = is_void((x    , y + 1, z), (wx    , wy + stg.v_y, wz), world_voxels, stg=stg)
+        h = is_void((x - 1, y + 1, z), (wx - 1, wy + stg.v_y, wz), world_voxels, stg=stg)
 
     ao = (a + b + c), (g + h + a), (e + f + g), (c + d + e)
     return to_uint8_ao(ao)
@@ -102,22 +102,22 @@ def to_uint8_ao(ao):
 def get_chunk_index(world_voxel_pos, stg):
     # Unpack voxel position in world coordinates
     wx, wy, wz = world_voxel_pos
-    wx = wx / v_x + w_width/2 * c_size
-    wy = wy / v_y +         0 * c_size
-    wz = wz / v_z + w_depth/2 * c_size
+    wx = wx / stg.v_x + stg.off_x * stg.c_size
+    wy = wy / stg.v_y + stg.off_y * stg.c_size
+    wz = wz / stg.v_z + stg.off_z * stg.c_size
     # Compute region index
-    rx = wx // rc_size
-    ry = wy // rc_size
-    rz = wz // rc_size
+    rx = wx // stg.rc_size
+    ry = wy // stg.rc_size
+    rz = wz // stg.rc_size
     # Compute chunk index
-    cx = (wx - rx * rc_size) // c_size
-    cy = (wy - ry * rc_size) // c_size
-    cz = (wz - rz * rc_size) // c_size
-    if not (0 <= rx < width_rn and 0 <= ry < height_rn and 0 <= rz < depth_rn):
+    cx = (wx - rx * stg.rc_size) // stg.c_size
+    cy = (wy - ry * stg.rc_size) // stg.c_size
+    cz = (wz - rz * stg.rc_size) // stg.c_size
+    if not (0 <= rx < stg.width_rn and 0 <= ry < stg.height_rn and 0 <= rz < stg.depth_rn):
         return - 1, -1
 
-    r_index = rx + width_rn * rz + depth_rn * width_rn * ry
-    index = cx + r_size * cz + r_area * cy
+    r_index = rx + stg.width_rn * rz + stg.depth_rn * stg.width_rn * ry
+    index = cx + stg.r_size * cz + stg.r_area * cy
     return int(r_index), int(index)
 
 
@@ -130,7 +130,7 @@ def is_void(local_voxel_pos, world_voxel_pos, world_voxels, stg):
     chunk_voxels = world_voxels[region_index][chunk_index]
 
     x, y, z = local_voxel_pos
-    voxel_index = x % c_size + z % c_size * c_size + y % c_size * c_area
+    voxel_index = x % stg.c_size + z % stg.c_size * stg.c_size + y % stg.c_size * stg.c_area
 
     if chunk_voxels[voxel_index]:
         return False # Not void so don't create a mesh
@@ -160,8 +160,8 @@ def bit_length(v):
 
 
 @njit
-def greedy_mesh_builder(v_mask, face, voxel, level, gvd, indexGreedy):
-    row_length = c_size
+def greedy_mesh_builder(v_mask, face, voxel, level, gvd, indexGreedy, stg):
+    row_length = stg.c_size
 
     for row in range(row_length):
         h = 0
@@ -198,10 +198,10 @@ def greedy_mesh_builder(v_mask, face, voxel, level, gvd, indexGreedy):
             # Compute the two triangles and append them
             match face:
                 case 0:  # Top
-                    v0 = greedy_pack_data(h, level + 1, row, voxel, face)
-                    v1 = greedy_pack_data(h + trailing_ones, level + 1, row, voxel, face)
+                    v0 = greedy_pack_data(h                , level + 1, row    , voxel, face)
+                    v1 = greedy_pack_data(h + trailing_ones, level + 1, row    , voxel, face)
                     v2 = greedy_pack_data(h + trailing_ones, level + 1, row + w, voxel, face)
-                    v3 = greedy_pack_data(h, level + 1, row + w, voxel, face)
+                    v3 = greedy_pack_data(h                , level + 1, row + w, voxel, face)
                     indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 case 1:  # Bottom
@@ -452,7 +452,7 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
                 if raw_mask.any():
                     for it_m in range(stg.c_size):
                         new_mask[it_m] = np.sum(powers * raw_mask[it_m * stg.c_size : (it_m + 1) * stg.c_size])
-                    indexGreedy = greedy_mesh_builder(new_mask, face, v_type, cut, greedy_vertex_data, indexGreedy)
+                    indexGreedy = greedy_mesh_builder(new_mask, face, v_type, cut, greedy_vertex_data, indexGreedy, stg)
 
     # Truncate Vertex Data array
     if not index:

@@ -11,18 +11,25 @@ from numba.experimental import jitclass
 # All surfaces ---------------------------------|
 class Frustum:
 
-    def __init__(self, camera):
-        self.cam = camera
-        self.near = stg.camera.near
-        self.far = stg.camera.far
+    def __init__(self, camera, c_info, w_info):
+        self.c_info = c_info
+        self.w_info = w_info
 
-        self.factor_y = 1.0 / math.cos(half_y := stg.camera.v_fov * 0.5)
+        self.cam = camera
+        self.near = self.c_info.near
+        self.far = self.c_info.far
+
+        self.factor_y = 1.0 / math.cos(half_y := self.c_info.v_fov * 0.5)
         self.tan_y = math.tan(half_y)
 
-        self.factor_x = 1.0 / math.cos(half_x := stg.camera.h_fov * 0.5)
+        self.factor_x = 1.0 / math.cos(half_x := self.c_info.h_fov * 0.5)
         self.tan_x = math.tan(half_x)
 
-    def is_on_frustum(self, center, sphere_radius=c_sphere_radius):  #chunk
+    def is_on_frustum(self, center, sphere_radius=None):  #chunk
+        # Set sphere radius
+        if sphere_radius is None:
+            sphere_radius = self.w_info.c_sphere_radius
+
         # Vector to sphere center
         sphere_vec = center - self.cam.position
 

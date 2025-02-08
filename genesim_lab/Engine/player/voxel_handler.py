@@ -18,6 +18,7 @@ class VoxelHandler:
         self.app = world.app
         self.chunks = world.chunks
         self.mesh_stg = world.mesh_stg
+        self.w_info = world.app.stg.world
 
         # Ray casting result
         self.chunk = None
@@ -57,17 +58,17 @@ class VoxelHandler:
 
         if lx == 0:
             self.rebuild_adj_chunk((wx - 1, wy, wz))
-        elif lx == c_size - 1:
+        elif lx == self.w_info.c_size - 1:
             self.rebuild_adj_chunk((wx + 1, wy, wz))
 
         if ly == 0:
             self.rebuild_adj_chunk((wx, wy - 1, wz))
-        elif ly == c_size - 1:
+        elif ly == self.w_info.c_size - 1:
             self.rebuild_adj_chunk((wx, wy + 1, wz))
 
         if lz == 0:
             self.rebuild_adj_chunk((wx, wy, wz - 1))
-        elif lz == c_size - 1:
+        elif lz == self.w_info.c_size - 1:
             self.rebuild_adj_chunk((wx, wy, wz + 1))
 
     def remove_voxel(self):
@@ -94,7 +95,7 @@ class VoxelHandler:
         # end point
         x2, y2, z2 = self.app.player.position + self.app.player.forward * self.app.stg.interaction.max_ray_dist
 
-        current_voxel_pos = glm.vec3(floor(x1), v_y * floor(v_y_i * y1), floor(z1))
+        current_voxel_pos = glm.vec3(floor(x1), self.w_info.v_y * floor(self.w_info.v_y_i * y1), floor(z1))
         self.voxel_id = 0
         self.voxel_normal = glm.vec3(0)
         step_dir = -1
@@ -103,7 +104,7 @@ class VoxelHandler:
         delta_x = min(dx / (x2 - x1), 10000000.0) if dx != 0 else 10000000.0
         max_x = delta_x * (1.0 - glm.fract(x1)) if dx > 0 else delta_x * glm.fract(x1)
 
-        dy = glm.sign(y2 - y1) * scale.y
+        dy = glm.sign(y2 - y1) * self.w_info.scale.y
         delta_y = min(dy / (y2 - y1), 10000000.0) if dy != 0 else 10000000.0
         max_y = delta_y * (1.0 - glm.fract(y1)) if dy > 0 else delta_y * glm.fract(y1)
 
@@ -147,21 +148,21 @@ class VoxelHandler:
         return False
 
     def get_voxel_id(self, voxel_world_pos):
-        world_pos_off = glm.ivec3(voxel_world_pos / scale + offset * c_size)
-        rx, ry, rz = region_pos = glm.ivec3(world_pos_off // rc_size)
-        cx, cy, cz = glm.ivec3((world_pos_off - region_pos * rc_size) // c_size)
+        world_pos_off = glm.ivec3(voxel_world_pos / self.w_info.scale + self.w_info.offset * self.w_info.c_size)
+        rx, ry, rz = region_pos = glm.ivec3(world_pos_off // self.w_info.rc_size)
+        cx, cy, cz = glm.ivec3((world_pos_off - region_pos * self.w_info.rc_size) // self.w_info.c_size)
 
-        if 0 <= rx < width_rn and 0 <= ry < height_rn and 0 <= rz < depth_rn:
-            region_index = rx + width_rn * rz + depth_rn * width_rn * ry
-            chunk_index = cx + r_size * cz + r_area * cy
+        if 0 <= rx < self.w_info.width_rn and 0 <= ry < self.w_info.height_rn and 0 <= rz < self.w_info.depth_rn:
+            region_index = rx + self.w_info.width_rn * rz + self.w_info.depth_rn * self.w_info.width_rn * ry
+            chunk_index = cx + self.w_info.r_size * cz + self.w_info.r_area * cy
             chunk = self.chunks[region_index][chunk_index]
 
             if chunk is None:
                 return 0, 0, 0, 0
 
-            lx, ly, lz = voxel_local_pos = (world_pos_off - region_pos * rc_size) % c_size
+            lx, ly, lz = voxel_local_pos = (world_pos_off - region_pos * self.w_info.rc_size) % self.w_info.c_size
 
-            voxel_index = int(lx + c_size * lz + c_area * ly)
+            voxel_index = int(lx + self.w_info.c_size * lz + self.w_info.c_area * ly)
             voxel_id = chunk.voxels[voxel_index]
 
             return voxel_id, voxel_index, voxel_local_pos, chunk

@@ -16,6 +16,7 @@ from genesim_lab.Engine.player.voxel_handler import VoxelHandler
 from genesim_lab.Engine.world_objects.voxel_marker import VoxelMarker
 from genesim_lab.Engine.world_objects.celestial_body import Celestial
 from genesim_lab.Engine.world_gen.sparsevoxeloctree import build_svo
+from genesim_lab.Engine.settings import ChunkMeshSettings
 
 
 # World generator ------------------------------|
@@ -137,38 +138,14 @@ class World:
 
     def get_mesh_stg(self):
 
-        stg = ChunkMeshSettings(self.info.c_size, self.info.c_area, self.info.c_vol, self.info.offset[0], self.info.offset[1],
-                                self.info.offset[2], self.info.v_x, self.info.v_y, self.info.v_z, self.info.r_size)
+        stg = ChunkMeshSettings(self.info.c_size, self.info.c_area, self.info.c_vol,
+                                self.info.offset[0], self.info.offset[1], self.info.offset[2],
+                                self.info.v_x, self.info.v_y, self.info.v_z,
+                                self.info.r_size, self.info.r_area, self.info.rc_size,
+                                self.info.width_rn, self.info.height_rn, self.info.depth_rn)
 
         return stg
 
-
-spec = [
-    ("c_size", int32),
-    ("c_area", int32),
-    ("c_vol", int32),
-    ("off_x", int32),
-    ("off_y", int32),
-    ("off_z", int32),
-    ("v_x", float64),
-    ("v_y", float64),
-    ("v_z", float64),
-    ("r_size", int32),
-]
-
-@jitclass(spec)
-class ChunkMeshSettings:
-    def __init__(self, c_size, c_area, c_vol, off_x, off_y, off_z, v_x, v_y, v_z, r_size):
-        self.c_size = c_size
-        self.c_area = c_area
-        self.c_vol = c_vol
-        self.off_x = off_x
-        self.off_y = off_y
-        self.off_z = off_z
-        self.v_x = v_x
-        self.v_y = v_y
-        self.v_z = v_z
-        self.r_size = r_size
 
 class SimGrid:
     def __init__(self, settings):
