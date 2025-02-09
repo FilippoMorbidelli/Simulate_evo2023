@@ -19,46 +19,6 @@ from pathlib import Path
 
 
 # Settings ------------------------------------------|
-def sim_settings():
-    """ """
-
-    # Values are reported in SI units if they have a dimension [m, s, kg, ...]
-    settings = {
-        'tick'    : 1,  # [s] tick conversion to seconds
-        'x_min'   : -128,  # [m]
-        'y_min'   : -128,  # [m]
-        'x_max'   : 128,  # [m]
-        'y_max'   : 128,  # [m]
-        'terrain' : {
-            'shape'           : (256, 256),
-            'resolution'      : (1, 1),
-            'octaves'         : 6,
-            'persistence'     : 0.5,
-            'grass_ID'        : 1,
-            'grass_RGB'       : [],
-            'water_threshold' : 0.2,
-            'water_ID'        : 0,
-            'water_RGB'       : [],
-            'vegetation_ID'   : 2,
-            'vegetation_RGB'  : [],
-        },
-        'resources': {
-            'init_food_veg': 50,
-            'init_food_grass': 10,
-            'init_pond': 25,
-            'food_max': 150,
-            'pond_max': 75,
-            'food_radius': 0.05,
-            'pond_radius': 0.2,
-            'food_sp_ticks': 2,
-            'pond_sp_ticks': 10,
-        },
-        'creatures': {
-            'spawn_creatures': 50,
-        },
-    }
-
-    return settings
 
 # Initializations required ----------|
 pg.font.init()  # Init pygame fonts to create font inside settings
@@ -67,7 +27,7 @@ freetype.init() # Init pygame fonts to create font inside settings
 
 # All game settings -----------------|
 @dataclass(slots=True, order=True)
-class WorldObj:
+class WorldObj:  # Contains settings about any world object
     # Skybox
     Skybox: tuple = ("Skybox", 0, 0 * 5 * 32, 0, 1000, glm.vec3(0, 0, 0))
 
@@ -86,13 +46,13 @@ class WorldObj:
 
 
 @dataclass(slots=True, order=True)
-class Interaction:
+class Interaction:  # Contains settings about player interaction inside world
     # Ray casting
     max_ray_dist: int = 6
 
 
 @dataclass(slots=True, order=True)
-class World:
+class World:  # Contains settings about world generation, chunks, regions, ecc
     # Chunk data
     c_size          : float = 48  # Chunk size == number of cubes along a dimension [N x N x N]
     c_half          : float = c_size // 2
@@ -113,7 +73,7 @@ class World:
     scale_i : glm.vec3 = 1 / scale
 
     # World data
-    w_width  : int = 2
+    w_width  : int = 8
     w_height : int = 2
     w_depth  : int = w_width
     w_area   : int = w_width * w_depth
@@ -125,7 +85,7 @@ class World:
     offset    : glm.vec3 = glm.vec3(w_width/2, 0, w_depth/2)
 
     # Region data
-    r_size   : int = 16  # Number of chunks per dimension per region
+    r_size   : int = 2  # Number of chunks per dimension per region
     r_area   : int = r_size ** 2
     r_vol    : int = r_size ** 3
     rc_size  : int = r_size * c_size
@@ -154,7 +114,12 @@ class World:
 
 
 @dataclass(slots=True, order=True)
-class Window:
+class Simulation:  # Contains settings about simulation parameters
+    pass
+
+
+@dataclass(slots=True, order=True)
+class Window:  # Contains settings about app window
     h : int            = 900  # Height of window
     w : int            = 1600  # Width of window
     full_screen : bool = True  # Automatically opens Engine in full screen
@@ -168,7 +133,7 @@ class Window:
 
 
 @dataclass(slots=True, order=True)
-class CameraData:
+class CameraData:  # Contains settings about player camera parameters
     aspect_ratio: float = 1920/1080  # Implement correct value not hard coded
     fov_deg: float = 50  # Field of view degrees
     v_fov: float = glm.radians(fov_deg)  # Vertical FOV
@@ -183,7 +148,7 @@ class CameraData:
 
 
 @dataclass(slots=True, order=True)
-class PlayerData:
+class PlayerData:  # Contains settings about player data
     speed: float = 0.1  # Limit player speed to move around
     rot_speed: float = 0.003  # Limit player speed to rotate
     pos: float = glm.vec3(0, 0, 0)  # Player initial position
@@ -195,7 +160,7 @@ class PlayerData:
 
 
 @dataclass(slots=True, order=True)
-class Util:
+class Util:  # Contains settings about util parameters and functions
     fps_limit  : int = 1000  # Limit frame rate to value
     text_font  : pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
     text_color : tuple = (255, 255, 255)  # Color of displayed text
@@ -208,8 +173,9 @@ class Util:
 
 
 @dataclass(slots=True, order=True)
-class GameSettings:
+class GameSettings:  # Main wrapped settings class
     world       = World()
+    sim         = Simulation()
     world_obj   = WorldObj()
     interaction = Interaction()
     window      = Window()
@@ -224,16 +190,10 @@ class GameSettings:
         for field in dataclasses.fields(self):
             yield getattr(self, field.name)
 
-
-#stg = GameSettings()
-
-#(c_size, c_half, c_area, c_vol, c_sphere_radius, c_threshold, v_x, v_y, v_z, scale, c_scale, v_x_i, v_y_i, v_z_i, scale_i,
-# w_width, w_height, w_depth, w_area, w_vol, center_xz, center_y, offset, r_size, r_area , r_vol, rc_size, width_rn, height_rn, depth_rn, r_number,
-# vso_depth, vso_p_sides, vso_p_position) = stg.world
-
+# Mesh builder util functions
 powers = 1 << np.array(range(48), dtype="int64")
 
-# World Settings for Njit ------|
+# World Settings for njit ------|
 spec = [
     ("c_size"   , int32),
     ("c_area"   , int32),

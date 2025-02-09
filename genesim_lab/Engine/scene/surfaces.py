@@ -24,6 +24,7 @@ class GS(IntEnum):  # GS stands for GameState
     UtilityOverlay = 5
     Other          = 6
     UserInput      = 7
+    CreateMenu     = 8
 
 # All surfaces ---------------------------------|
 class Surfaces:
@@ -49,7 +50,8 @@ class Surfaces:
             GS.PauseMenu      : {"Render" : False, "Depth" : None, "Update" : False},
             GS.UtilityOverlay : {"Render" : False, "Depth" : None, "Update" : False},
             GS.Other          : {"Render" : False, "Depth" : None, "Update" : False},
-            GS.UserInput      : {"Render" : False, "Depth" : None, "Update" : False}
+            GS.UserInput      : {"Render" : False, "Depth" : None, "Update" : False},
+            GS.CreateMenu     : {"Render" : False, "Depth" : None, "Update" : False}
         }
         self.handle = {
             GS.MainMenu       : self.app.shader_prog_2D.main_menu,
@@ -59,7 +61,8 @@ class Surfaces:
             GS.SettingsMenu   : self.app.shader_prog_2D.settings_menu,
             GS.PauseMenu      : self.app.shader_prog_2D.pause_menu,
             GS.Other          : self.app.shader_prog_2D.other,
-            GS.UserInput      : self.app.shader_prog_2D.user_input
+            GS.UserInput      : self.app.shader_prog_2D.user_input,
+            GS.CreateMenu     : self.app.shader_prog_2D.create_menu
         }
         self.update = {
             GS.MainMenu       : self.surf.main_menu.update,
@@ -69,7 +72,8 @@ class Surfaces:
             GS.SettingsMenu   : self.app.shader_prog_2D.settings_menu.update,
             GS.PauseMenu      : self.app.shader_prog_2D.pause_menu.update,
             GS.Other          : self.app.shader_prog_2D.other.update,
-            GS.UserInput      : self.app.shader_prog_2D.user_input.update
+            GS.UserInput      : self.app.shader_prog_2D.user_input.update,
+            GS.CreateMenu     : self.app.shader_prog_2D.create_menu.update
         }
         self.render = {
             GS.MainMenu       : self.surf.main_menu.render,
@@ -79,7 +83,8 @@ class Surfaces:
             GS.SettingsMenu   : self.app.shader_prog_2D.settings_menu.draw2d,
             GS.PauseMenu      : self.app.shader_prog_2D.pause_menu.draw2d,
             GS.Other          : self.app.shader_prog_2D.other.draw2d,
-            GS.UserInput      : self.app.shader_prog_2D.user_input.draw2d
+            GS.UserInput      : self.app.shader_prog_2D.user_input.draw2d,
+            GS.CreateMenu     : self.app.shader_prog_2D.create_menu.draw2d
         }
 
         # Compute current Scene state
@@ -97,6 +102,7 @@ class Surfaces:
         surf_group.pause_menu    = PauseMenu(self.app)
         surf_group.other         = Other(self.app)
         surf_group.user_input    = UserInput(self.app, "", "")
+        surf_group.create_menu   = CreateMenu(self.app)
 
         return surf_group
 
@@ -317,10 +323,16 @@ class SaveLoadMenu:
             app.shader_prog_2D.saves_menu.add(button_save_new)
 
 
-class SettingsMenu:
+class CreateMenu:
 
     def __init__(self, app):
-        pass
+        # Load Background
+
+        # Load settings
+
+        # Load Confirm action
+        button_confirm = ButtonSprite(app, "menu/create_menu", "confirm", "svg", True, (1450, 800))
+        app.shader_prog_2D.create_menu.add(button_confirm)
 
 
 class UserInput:
@@ -365,9 +377,9 @@ class MainGame:
         overlay_crosshair = OverlaySprite(app, "main_game", "crosshair", "svg", True)
         app.shader_prog_2D.main_game.add(overlay_crosshair)
 
-    def init_world(self, vox = None, regions = None, world_dims = None):
+    def init_world(self, vox = None):
         # Initialize 3D graphic elements
-        self.world = World(self.app, world_dims, regions, vox)
+        self.world = World(self.app, vox)
 
     def handle(self):
         self.app.shader_prog_3D()
@@ -383,6 +395,12 @@ class MainGame:
         self.app.shader_prog_2D.main_game.draw2d()
 
 
+class SettingsMenu:
+
+    def __init__(self, app):
+        pass
+
+
 def init_shaders_2d(app):
     # Creates Shaders programs organized in subgroups relative to the different scenes
     programs = type("Contains all subgroup related to same shader program", (), {})()
@@ -394,5 +412,6 @@ def init_shaders_2d(app):
     programs.main_game     = GLTextures2D(app)
     programs.other         = GLTextures2D(app)
     programs.user_input    = GLTextures2D(app)
+    programs.create_menu   = GLTextures2D(app)
 
     return programs

@@ -127,13 +127,17 @@ def is_void(local_voxel_pos, world_voxel_pos, world_voxels, stg):
     # Out of max world region
     if region_index == -1:
         return True # Put False to not show voxels at world borders TBD (Find a way to block mesh when adjacent chunk doesn't exist but regions yes)
-    chunk_voxels = world_voxels[region_index][chunk_index]
+    chunk_voxels = world_voxels.get(region_index)
 
-    x, y, z = local_voxel_pos
-    voxel_index = x % stg.c_size + z % stg.c_size * stg.c_size + y % stg.c_size * stg.c_area
+    if chunk_voxels is not None:
+        chunk_voxels = chunk_voxels[chunk_index]
 
-    if chunk_voxels[voxel_index]:
-        return False # Not void so don't create a mesh
+        x, y, z = local_voxel_pos
+        voxel_index = x % stg.c_size + z % stg.c_size * stg.c_size + y % stg.c_size * stg.c_area
+
+        if chunk_voxels[voxel_index]:
+            return False # Not void so don't create a mesh
+
     return True
 
 

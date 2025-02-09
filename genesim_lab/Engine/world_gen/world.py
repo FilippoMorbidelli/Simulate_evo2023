@@ -8,8 +8,7 @@
 import math
 import numpy as np
 import numpy.random as rnd
-from numba import float64, int32, types
-from numba.experimental import jitclass
+from numba import types
 from numba.typed import Dict
 from genesim_lab.Engine.world_gen.chunk import Chunk
 from genesim_lab.Engine.player.voxel_handler import VoxelHandler
@@ -23,29 +22,54 @@ from genesim_lab.Engine.settings import ChunkMeshSettings
 class World:
     # World structure is divided into multiple regions of stg.world.r_size chunks on each dim
 
-    def __init__(self, app, w_dims = None, regions = None, voxels = None):
+    def __init__(self, app, load_voxels = None):
         self.app = app
         self.info = app.stg.world
 
-        # Compute regions number to divide world in
-        if regions is None:
-            self.r_data = self.compute_regions(*w_dims)
-        else:
-            self.r_data = regions
-        # Prepare voxel dict to be also used by Numba NJit
-        self.voxels = Dict.empty(key_type = types.int64, value_type = types.uint8[:, :])
-        for r_id in range(self.info.r_number):
-            self.voxels[r_id] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
-        # Prepare chunks and voxels variables
-        self.chunks : dict = {r_id : [None for _ in range(self.info.r_vol)] for r_id in range(self.info.r_number)}
+        # Retrieve mesh settings and frustum
         self.mesh_stg = self.get_mesh_stg()
         self.frustum_check = self.app.player.frustum.is_on_frustum
 
-        self.build_chunks(self.r_data, voxels)
-        self.build_chunk_mesh()
+        # Create or load world
+        if load_voxels is None:
 
-        # Build world sparse voxel octree
-        self.svo : dict = {r : build_svo(self.app, self.info, self.chunks[r], self.r_data[r, :]) for r in range(self.info.r_number)}
+            # Create new world
+            regions_to_create = get_init_regions(self.info, self.app.player.position)
+
+            # Prepare voxel dict to be also used by Numba NJit
+            self.voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
+            for r_id in regions_to_create.keys():
+                self.voxels[r_id] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
+
+            # Prepare chunks dict
+            self.chunks: dict = {r_id: [None for _ in range(self.info.r_vol)] for r_id in regions_to_create.keys()}
+
+            # Build Chunks, mesh and SVO
+            self.build_chunks(regions_to_create, new=True)
+            self.build_chunk_mesh()
+
+            # Build world sparse voxel octree
+            self.svo: dict = {r: build_svo(self.app, self.info, self.chunks[r], regions_to_create[r]) for r in
+                              regions_to_create.keys()}
+
+        else:
+
+            # Load world
+            # Prepare voxel dict to be also used by Numba NJit
+            self.voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
+            for r_id in load_voxels.keys():
+                self.voxels[r_id] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
+
+            # Prepare chunks dict
+            self.chunks: dict = {r_id: [None for _ in range(self.info.r_vol)] for r_id in load_voxels.keys()}
+
+            # Build Chunks, mesh and SVO
+            self.build_chunks(load_voxels, new=False)
+            self.build_chunk_mesh()
+
+            # Build world sparse voxel octree
+            self.svo: dict = {r: build_svo(self.app, self.info, self.chunks[r], self.chunks[r][0].r_index) for r in
+                              load_voxels.keys()}
 
         # Player interactivity
         self.voxel_handler = VoxelHandler(self)
@@ -54,29 +78,21 @@ class World:
         # World objects
         self.celestial = Celestial(self)
 
-    def compute_regions(self, width, height, depth):
-        r_size = self.info.r_size
-        # Compute regions data
-        r_data = np.empty([self.info.r_number, 6], dtype='uint32')
-        for w in range(self.info.width_rn):
-            # Chunks present along width
-            w_c = width - (r_size * w) if w == self.info.width_rn - 1 else r_size
-            for h in range(self.info.height_rn):
-                # Chunk present along height
-                h_c = height - (r_size * h) if h == self.info.height_rn - 1 else r_size
-                for d in range(self.info.depth_rn):
-                    # Chunks present along depth
-                    d_c = depth - (r_size * d) if d == self.info.depth_rn - 1 else r_size
-                    # Compute region index
-                    r_id = w + self.info.width_rn * d + self.info.width_rn * self.info.depth_rn * h
-                    r_data[r_id, :] = [w, h, d, w_c, h_c, d_c]
+    def build_chunks(self, load_voxels, new=True):
+        for r in load_voxels.keys():
 
-        return r_data
-
-    def build_chunks(self, r_data, load_voxels):
-        for r in range(self.info.r_number):
             # Compute region chunk distribution
-            w, h, d, width, depth, height = r_data[r, :]
+            if new:
+                w, h, d = load_voxels[r]
+            else:
+                h = r // self.info.depth_rn * self.info.width_rn
+                d = (r - h * self.info.depth_rn * self.info.width_rn) // self.info.width_rn
+                w = r - h * self.info.depth_rn * self.info.width_rn - d * self.info.width_rn
+
+            width = int(self.info.w_width - w * self.info.r_size) if w == self.info.width_rn - 1 else self.info.r_size
+            height = int(self.info.w_height - h * self.info.r_size) if h == self.info.height_rn - 1 else self.info.r_size
+            depth = int(self.info.w_width - d * self.info.r_size) if d == self.info.depth_rn - 1 else self.info.r_size
+
             for x in range(width):
                 for y in range(height):
                     for z in range(depth):
@@ -86,11 +102,11 @@ class World:
                         self.chunks[r][chunk_index] = chunk
 
                         # Put the chunk voxels in a separate array
-                        if not load_voxels is None:
+                        if new:
+                            self.voxels[r][chunk_index] = chunk.build_voxels()
+                        else:
                             self.voxels[r][chunk_index] = load_voxels[r][chunk_index, :]
                             chunk.is_empty = False
-                        else:
-                            self.voxels[r][chunk_index] = chunk.build_voxels()
 
                         # Get pointer to voxels
                         chunk.voxels = self.voxels[r][chunk_index]
@@ -101,7 +117,49 @@ class World:
                 if chunk is not None:
                     chunk.build_mesh()
 
+    def update_active_regions(self):
+        # Compute new regions
+        p_pos = self.app.player.position
+        new_reg = get_init_regions(self.info, p_pos)
+
+        #Get Set of both region dicts
+        current_set = set(self.voxels.keys())
+        new_set = set(new_reg.keys())
+
+        to_delete = list(current_set - new_set)
+        to_add    = list(new_set - current_set)
+
+        # Delete regions
+        for rid in to_delete:
+            # Save region to delete
+            self.app.save_load.save_single_region(rid)
+            # Delete region data
+            self.voxels.pop(rid)
+            self.chunks.pop(rid)
+            self.svo.pop(rid)
+
+        # Load/Create regions
+        for rid in to_add:
+            # Find if region is already existing
+            is_loaded = self.app.save_load.load_single_region(rid)
+            # Create new
+            if not is_loaded:
+                # Build Chunk
+                self.voxels[rid] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
+                self.chunks[rid] = [None for _ in range(self.info.r_vol)]
+                self.build_chunks({rid : new_reg[rid]})
+                # Build Chunk Mesh
+                for chunk in self.chunks[rid]:
+                    if chunk is not None:
+                        chunk.build_mesh()
+                # Build SVO
+                self.svo[rid] = build_svo(self.app, self.info, self.chunks[rid], new_reg[rid])
+
+
     def update(self):
+        # Update Regions
+        self.update_active_regions()
+
         # Update Sky objects
         self.celestial.update()
 
@@ -145,6 +203,34 @@ class World:
                                 self.info.width_rn, self.info.height_rn, self.info.depth_rn)
 
         return stg
+
+# -- World Util functions ----------------------------------------------------------------------------------------------
+def get_init_regions(w_info, pos):
+    rx, ry, rz = (pos / w_info.scale + w_info.offset * w_info.c_size) // w_info.rc_size
+
+    regions = {}
+    for x in [rx - 1, rx, rx + 1]:
+
+        # Check if outside world bound
+        if not 0 <= x < w_info.width_rn:
+            continue
+
+        for y in [ry - 1, ry, ry + 1]:
+
+            # Check if outside world bound
+            if not 0 <= y < w_info.height_rn:
+                continue
+
+            for z in [rz - 1, rz, rz + 1]:
+
+                # Check if outside world bound
+                if not 0 <= z < w_info.depth_rn:
+                    continue
+
+                r_id = int(x + w_info.width_rn * z + w_info.width_rn * w_info.depth_rn * y)
+                regions[r_id] = [x, y, z]
+
+    return regions
 
 
 class SimGrid:

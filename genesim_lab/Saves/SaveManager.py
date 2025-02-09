@@ -6,15 +6,18 @@
 # Import third party and Engine packages --------------|
 from pathlib import Path
 from datetime import datetime
+from genesim_lab.Engine.world_gen.world import get_init_regions
 from genesim_lab.Engine.scene.surfaces import SaveLoadMenu
 from genesim_lab.Engine.scene.events import GS
 from genesim_lab.Engine.settings import World
+import glm
 import re
 import ntpath
 import numpy as np
 from numba import uint8, types
 from numba.typed import Dict
 from numba import njit
+from ast import literal_eval
 
 
 # Save and Load Manager -------------------------------|
@@ -77,15 +80,11 @@ class SaveManager:
                 voxels = save_encoder(r_voxels)
                 np.savez_compressed(self.save_path / name / path, voxels)
 
-        # Save Regions data
-        with open(self.save_path / name / self.path_regions, 'w+') as f:
-            np.savez_compressed(self.save_path / name / self.path_regions, self.app.scene.surfaces.surf.main_game.world.r_data)
-
         # Save player state
         with open(self.save_path / name / self.path_player, 'w+') as f:
-            f.write(str(self.app.player.position.to_list()) + " ;")
-            f.write(str(self.app.player.yaw) + " ;")
-            f.write(str(self.app.player.pitch) + " ;")
+            f.write(str(self.app.player.position.to_list()) + "; ")
+            f.write(str(self.app.player.yaw) + "; ")
+            f.write(str(self.app.player.pitch) + "; ")
 
         # Save Info
         with open(self.save_path / name / self.path_info, 'w+') as f:
@@ -93,36 +92,38 @@ class SaveManager:
 
     def load_whole_file(self, name):
         # Retrieve directory
-        save_dir = Path(self.save_path / name / self.path_world).glob('**/*.npz')
+        save_dir = self.save_path / name / self.path_world #.glob('**/*.npz')
 
         # Load World settings
         self.info = World.load_from_pickle(self.save_path / name / self.path_w_stg)
 
+        # Read player info (position) - necessary to retrieve active regions
+        with open(self.save_path / name / self.path_player, 'r') as f:
+            player = f.read().split("; ")[:-1]
+
+        # Compute 27 regions adjacent to player (if existing)
+        regions = get_init_regions(self.info, glm.vec3(literal_eval(player[0])))
+        regions_save_name = []
+        for r in regions.keys():
+            regions_save_name.append(self.get_name_from_index(r))
+
         # Read whole file data and set data to voxel container
         voxels = Dict.empty(key_type = types.int64, value_type = types.uint8[:, :])
-        for file in save_dir:
-            name_string = ntpath.basename(file)
-            r_index = self.get_index_from_name(name_string)
-            voxels[r_index] = load_decoder(np.load(str(file))['arr_0'], self.info.r_vol, self.info.c_vol)
-
-        # Save Regions data
-        regions = np.load(self.save_path / name / self.path_regions)['arr_0']
-
-        # Read player info (position)
-        with open(self.save_path / name / self.path_player, 'r') as f:
-            player = f.read().split(" ;")[:-1]
+        for file in regions_save_name:
+            r_index = self.get_index_from_name(file)
+            voxels[r_index] = load_decoder(np.load(str(save_dir / (file + self.path_world_ext)))['arr_0'], self.info.r_vol, self.info.c_vol)
 
         # Init game
         self.app.scene.surfaces.set_primary(GS.MainGame)
         self.app.custom_events.event_types.update_scene_logic()
-        self.app.scene.surfaces.surf.main_game.init_world(voxels, regions)
+        self.app.scene.surfaces.surf.main_game.init_world(voxels)
         self.app.player.move(*player)
 
 
-    def SaveRegion(self, data, region):
+    def save_single_region(self, region):
         pass
 
-    def LoadRegion(self, region):
+    def load_single_region(self, region):
         pass
 
     def get_index_from_name(self, region_string):
@@ -134,8 +135,11 @@ class SaveManager:
 
     def get_name_from_index(self, region_index):
         # Get region coordinates from region index by inspecting a chunk
-        r_name = self.app.scene.surfaces.surf.main_game.world.chunks[region_index][0].r_index
-        r_name = "r_" + str(r_name[0]) + "_" + str(r_name[1]) + "_" + str(r_name[2])
+        y = region_index // self.info.depth_rn * self.info.width_rn
+        z = (region_index - y * self.info.depth_rn * self.info.width_rn) // self.info.width_rn
+        x = region_index - y * self.info.depth_rn * self.info.width_rn - z * self.info.width_rn
+
+        r_name = "r_" + str(x) + "_" + str(y) + "_" + str(z)
 
         return r_name
 

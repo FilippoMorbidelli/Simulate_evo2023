@@ -5,22 +5,58 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fff5adcd-f083-4392-987a-75f0b3a625b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/Regions.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaveFiles/as/WorldSettings.pkl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaveFiles/coam/Player.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaveFiles/coam/SaveInfo.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaveFiles/coam/World/r_0_0_0.npz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaveFiles/coam/WorldSettings.pkl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/create_menu/button_confirm_F.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/genesim_lab/Assets/menu/create_menu/button_confirm_T.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Simulate_evo2023.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Simulate_evo2023.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GENESIM_LAB.py" beforeDir="false" afterPath="$PROJECT_DIR$/GENESIM_LAB.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/as/Player.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/as/Player.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/as/SaveInfo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/as/SaveInfo.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_0_0_0.npz" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_0_0_0.npz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_0_0_1.npz" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_0_0_1.npz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_1_0_0.npz" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_1_0_0.npz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_1_0_1.npz" beforeDir="false" afterPath="$PROJECT_DIR$/SaveFiles/as/World/r_1_0_1.npz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/whole.npz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/player/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/camera.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/player/frustum.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/frustum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/player/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/player.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/player/voxel_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/player/voxel_handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/Player.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/Regions.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/SaveInfo.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_0_0_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_0_0_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_0_1_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_0_1_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_1_0_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_1_0_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_1_1_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/World/r_1_1_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/as/WorldSettings.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/Player.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/Regions.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/SaveInfo.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/World/r_0_0_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/World/r_0_0_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/World/r_0_1_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/World/r_0_1_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/World/r_1_0_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/World/r_1_0_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/World/r_1_1_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/nbea/World/r_1_1_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/Player.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/Regions.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/SaveInfo.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/World/r_0_0_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/World/r_0_0_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/World/r_0_1_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/World/r_0_1_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/World/r_1_0_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/World/r_1_0_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/World/r_1_1_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/pesto/World/r_1_1_1.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/Player.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/Regions.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/SaveInfo.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/World/r_0_0_0.npz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaveFiles/prova/WorldSettings.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/scene/surfaces.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/sparsevoxeloctree.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/sparsevoxeloctree.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh_builder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py" afterDir="false" />
@@ -75,7 +111,7 @@
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/Filippo Morbidelli/PycharmProjects/Simulate_evo2023/genesim_lab/Assets/menu/main_menu",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -153,13 +189,23 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py</url>
-          <line>182</line>
+          <line>186</line>
           <option name="timeStamp" value="125" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/genesim_lab/Saves/SaveManager.py</url>
-          <line>95</line>
-          <option name="timeStamp" value="131" />
+          <line>110</line>
+          <option name="timeStamp" value="136" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/genesim_lab/Engine/world_gen/world.py</url>
+          <line>48</line>
+          <option name="timeStamp" value="149" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/genesim_lab/Meshes/chunk_mesh.py</url>
+          <line>32</line>
+          <option name="timeStamp" value="153" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

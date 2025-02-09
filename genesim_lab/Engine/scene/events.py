@@ -235,8 +235,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                     "button_play" : [
                         "change_scene",  # Event handle to use for this custom event
                         [pg.MOUSEBUTTONDOWN, "button", 1],
-                        [lambda : self.scene_ptr.set_primary(GS.MainGame),
-                         lambda : self.scene_ptr.surf.main_game.init_world(world_dims = [self.app.stg.world.w_width, self.app.stg.world.w_height, self.app.stg.world.w_depth])],
+                        [lambda : self.scene_ptr.set_primary(GS.CreateMenu)],
                     ],
                     "button_continue" : [
                         "change_scene",  # Event handle to use for this custom event
@@ -310,21 +309,43 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
             GS.SaveLoadMenu : {
                 "sprite" : {
                     "button_save_label": [
-                        "change_scene",  # Event handle to use for this custom event
+                        # -- Save or Load selected save file, depending on scene type
+                        "change_scene",
                         [pg.MOUSEBUTTONDOWN, "button", 1],
                         [lambda : self.app.save_load.manage_sl(self.active_sprite)],  # Event data
                     ],
                     "button_save_new": [
-                        "change_scene",  # Event handle to use for this custom event
+                        # -- Init user input for saving new file, if scene is "save"
+                        "change_scene",
                         [pg.MOUSEBUTTONDOWN, "button", 1],
                         [lambda: self.scene_ptr.set_userinput("save") if self.app.scene.sprite_util["SaveLoad"] == "save" else None],  # mAYBE PUT START NEW GAME SAVE?
                     ]
                 },
                 "non_sprite" : {
                     "return_main_menu": [
-                        "change_scene",  # Event handle to use for this custom event
+                        # -- Return to previous scene after exiting SaveLoad Menu
+                        "change_scene",
                         [pg.KEYDOWN, "key", pg.K_ESCAPE],
                         [lambda: self.scene_ptr.set_primary(GS.MainMenu) if self.app.scene.sprite_util["SaveLoad"] == "load" else self.scene_ptr.reset_status(GS.SaveLoadMenu)],
+                    ]
+                }
+            },
+            # Save-Load menu interactions
+            GS.CreateMenu: {
+                "sprite": {
+                    "button_confirm" : [
+                        # -- Load Main Game after user confirm
+                        "change_scene",
+                        [pg.MOUSEBUTTONDOWN, "button", 1],
+                        [lambda: self.scene_ptr.set_primary(GS.MainGame), lambda: self.scene_ptr.surf.main_game.init_world()]
+                    ]
+                },
+                "non_sprite": {
+                    "close_create_menu": [
+                        # -- Return to Main Menu
+                        "change_scene",  # Op type
+                        [pg.KEYDOWN, "key", pg.K_ESCAPE],  # Activation conditions
+                        [lambda: self.scene_ptr.set_primary(GS.MainMenu)],  # Outcomes
                     ]
                 }
             }

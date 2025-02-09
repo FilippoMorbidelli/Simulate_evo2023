@@ -12,7 +12,7 @@ import glm
 def build_svo(app, info, data, region_data):
     # Instantiate variables
     init_depth = 0
-    p_pos      = region_data[ : 3] * info.r_size * info.c_scale + info.vso_p_pos
+    p_pos      = np.array(region_data) * info.r_size * info.c_scale + info.vso_p_pos
     p_center   = p_pos + info.vso_p_sides / 2
     # Build octree
     parent     = build_node(app, data, init_depth, p_pos, info.vso_p_sides, p_center, np.array([0, 0, 0], dtype="int32"), info.vso_depth)
