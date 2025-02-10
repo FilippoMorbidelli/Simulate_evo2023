@@ -13,7 +13,9 @@ from genesim_lab.Engine.player.player import Player
 from genesim_lab.Engine.settings import GameSettings
 from genesim_lab.Engine.world_gen.textures import Textures
 from genesim_lab.Saves.SaveManager import SaveManager
+from genesim_lab.Threads.Threads import LoadThread
 
+import queue
 import moderngl as mgl
 import pygame as pg
 import sys
@@ -82,6 +84,16 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         # Init custom events and event list
         self.custom_events = EventHandler(self)
         self.event_list = None
+
+        # Init Load region Threads
+        self.load_q = queue.Queue()
+        self.LoadRegThread = LoadThread(self, self.load_q)
+        self.LoadRegThread.start()
+
+        # Init Save region Threads
+        save_q = queue.Queue()
+        self.SaveRegThread = None
+        self.SaveRegThread = None
 
     def update(self):
         # Update time, delta_time

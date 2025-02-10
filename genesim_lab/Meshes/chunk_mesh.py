@@ -13,7 +13,7 @@ import numpy as np
 # Import packages ------------------------------|
 class ChunkMesh(BaseMesh):
 
-    def __init__(self, chunk):
+    def __init__(self, chunk, threaded=False):
         super().__init__()
         self.app = chunk.app
         self.chunk = chunk
@@ -24,7 +24,15 @@ class ChunkMesh(BaseMesh):
         self.vbo_format = '1u4'  # All data passed as uint8
         self.format_size = sum(int(fmt[:1]) for fmt in self.vbo_format.split())
         self.attrs = ('packed_data',)
-        self.vao, self.vao_greedy = self.get_vao()
+
+        # Thread safe temporary variables
+        self.vertex_tmp = None
+        self.greedy_tmp = None
+
+        if not threaded:
+            self.vao, self.vao_greedy = self.get_vao()
+        else:
+            self.get_vertex_thread_safe()
 
     def rebuild(self):
         self.vao, self.vao_greedy = self.get_vao()
@@ -68,3 +76,32 @@ class ChunkMesh(BaseMesh):
 
     def render_greedy(self):
         self.vao_greedy.render()
+
+    def get_vertex_thread_safe(self):
+        self.vertex_tmp, self.greedy_tmp = self.get_vertex_data()
+
+    def get_vao_thread_save(self):
+        # Build normal vbo and vao
+        vbo = self.ctx.buffer(self.vertex_tmp)
+        self.vao = self.ctx.vertex_array(
+            self.program,
+            [
+                (vbo, self.vbo_format, *self.attrs),  # First vbo, dedicated to vertex
+            ],
+            skip_errors=True
+        )
+
+        self.vertex_tmp = None
+
+        # Build greedy vbo and vao
+        vbo_greedy = self.ctx.buffer(self.greedy_tmp)
+        self.vao_greedy = self.ctx.vertex_array(
+            self.program_greedy,
+            [
+                (vbo_greedy, self.vbo_format, *self.attrs),  # First vbo, dedicated to vertex
+            ],
+            skip_errors=True
+        )
+
+        self.greedy_tmp = None
+

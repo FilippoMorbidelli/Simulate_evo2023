@@ -43,6 +43,9 @@ class Chunk:
     def build_mesh(self):
         self.mesh = ChunkMesh(self)
 
+    def build_mesh_threaded(self):
+        self.mesh = ChunkMesh(self, threaded=True)
+
     def render(self):
         if not self.is_empty:
             self.set_uniform()

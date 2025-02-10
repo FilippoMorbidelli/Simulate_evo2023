@@ -78,6 +78,10 @@ class World:
         # World objects
         self.celestial = Celestial(self)
 
+        # Mimic other Threads queues
+        self.mimic_load_q = []
+        self.mesh_load_q  = []
+
     def build_chunks(self, load_voxels, new=True):
         for r in load_voxels.keys():
 
@@ -138,27 +142,28 @@ class World:
             self.chunks.pop(rid)
             self.svo.pop(rid)
 
-        # Load/Create regions
+        # Enqueue region id to Load/Create regions in separate Thread
         for rid in to_add:
-            # Find if region is already existing
-            is_loaded = self.app.save_load.load_single_region(rid)
-            # Create new
-            if not is_loaded:
-                # Build Chunk
-                self.voxels[rid] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
-                self.chunks[rid] = [None for _ in range(self.info.r_vol)]
-                self.build_chunks({rid : new_reg[rid]})
-                # Build Chunk Mesh
-                for chunk in self.chunks[rid]:
-                    if chunk is not None:
-                        chunk.build_mesh()
-                # Build SVO
-                self.svo[rid] = build_svo(self.app, self.info, self.chunks[rid], new_reg[rid])
+            if rid not in self.mimic_load_q:
+                self.mimic_load_q.append(rid)
+                self.app.load_q.put([rid, new_reg[rid]])
 
+
+    def update_mesh_thread_safe(self):
+        if not self.mesh_load_q:
+            pass
+        else:
+            r_id = self.mesh_load_q.pop(0)
+            for chunk in self.chunks[r_id]:
+                if chunk is not None:
+                    chunk.mesh.get_vao_thread_save()
 
     def update(self):
         # Update Regions
         self.update_active_regions()
+
+        # Update region mesh (thread safe)
+        self.update_mesh_thread_safe()
 
         # Update Sky objects
         self.celestial.update()

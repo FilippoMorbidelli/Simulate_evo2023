@@ -67,7 +67,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                             self.active_sprite = None
         # No sprite is present so no sprite can be active
         except(Exception,):
-            print("No Sprite in Scene") # TO BE REMOVED
+            #print("No Sprite in Scene") # TO BE REMOVED
             self.active_sprite = None
 
     def handle_events(self):
