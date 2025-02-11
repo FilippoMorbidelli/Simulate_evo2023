@@ -13,7 +13,7 @@ from genesim_lab.Engine.player.player import Player
 from genesim_lab.Engine.settings import GameSettings
 from genesim_lab.Engine.world_gen.textures import Textures
 from genesim_lab.Saves.SaveManager import SaveManager
-from genesim_lab.Threads.Threads import LoadThread
+from genesim_lab.Threads.Threads import LoadThread, SaveThread
 
 import queue
 import moderngl as mgl
@@ -91,9 +91,9 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         self.LoadRegThread.start()
 
         # Init Save region Threads
-        save_q = queue.Queue()
-        self.SaveRegThread = None
-        self.SaveRegThread = None
+        self.save_q = queue.Queue()
+        self.SaveRegThread = SaveThread(self, self.save_q)
+        self.SaveRegThread.start()
 
     def update(self):
         # Update time, delta_time

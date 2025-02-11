@@ -49,9 +49,42 @@ class LoadThread(threading.Thread):
                             if chunk is not None:
                                 chunk.build_mesh_threaded()
                         # Build SVO
-                        self.world.svo[r_id] = build_svo(self.app, self.world.info, self.world.chunks[r_id], r_index)
+                        self.world.svo[r_id] = build_svo(self.app, self.world.info, self.world.chunks[r_id], r_index, threaded=True)
                     # Dequeue from mimic queue
-                    self.world.mimic_load_q.pop(r_id)
+                    self.world.mimic_load_q.pop(0)
                     self.world.mesh_load_q.append(r_id)
 
 
+class SaveThread(threading.Thread):
+
+    def __init__(self, app, t_queue):
+        threading.Thread.__init__(self)
+        self.app = app
+        self.world = None
+        self.queue = t_queue
+        self.daemon = True
+
+    def run(self):
+        t_running = True
+
+        while t_running:
+            # Check if queue is empty
+            if self.queue.empty():
+                time.sleep(1)
+                pass
+            else:
+                queue_data = self.queue.get()
+                if queue_data == "Stop":
+                    t_running = False
+                else:
+                    self.world = self.app.scene.surfaces.surf.main_game.world
+                    r_id = queue_data
+                    # Find if region is already existing
+                    # Save region to delete
+                    self.app.save_load.save_single_region(r_id)
+                    # Delete region data
+                    self.world.voxels.pop(r_id)
+                    self.world.chunks.pop(r_id)
+                    self.world.svo.pop(r_id)
+                    # Dequeue from mimic queue
+                    self.world.mimic_save_q.pop(0)

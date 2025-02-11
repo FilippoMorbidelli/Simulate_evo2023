@@ -29,6 +29,9 @@ class ChunkMesh(BaseMesh):
         self.vertex_tmp = None
         self.greedy_tmp = None
 
+        self.vao = None
+        self.vao_greedy = None
+
         if not threaded:
             self.vao, self.vao_greedy = self.get_vao()
         else:

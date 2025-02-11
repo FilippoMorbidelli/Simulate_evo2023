@@ -9,7 +9,7 @@ import numpy as np
 import glm
 
 # Import packages ------------------------------|
-def build_svo(app, info, data, region_data):
+def build_svo(app, info, data, region_data, threaded=False):
     # Instantiate variables
     init_depth = 0
     p_pos      = np.array(region_data) * info.r_size * info.c_scale + info.vso_p_pos
@@ -17,7 +17,8 @@ def build_svo(app, info, data, region_data):
     # Build octree
     parent     = build_node(app, data, init_depth, p_pos, info.vso_p_sides, p_center, np.array([0, 0, 0], dtype="int32"), info.vso_depth)
     # Find void nodes recursively from most deep to least
-    find_void_nodes(parent, level=init_depth)
+    if not threaded:
+        find_void_nodes(parent, level=init_depth, data=data)
 
     return parent
 
@@ -46,7 +47,7 @@ def build_node(app, data, depth, position, sides, center, local_id, tot_depth):
                     chunk_dict[chunk_id] = data[chunk_id].center
 
         # Is Node visible?
-        visibility = any(data[c_id].mesh.vao.mglo.vertices > 1 for c_id in chunk_dict.keys())
+        visibility = True
 
         return Node(app, depth, position, sides, center, local_id, data=chunk_dict, visibility=visibility)
 
@@ -70,12 +71,12 @@ def build_node(app, data, depth, position, sides, center, local_id, tot_depth):
     return node
 
 
-def find_void_nodes(node, level):
+def find_void_nodes(node, level, data):
     if not node.children:
-        return
+        node.visibility = any(data[c_id].mesh.vao.mglo.vertices > 1 for c_id in node.data.keys())
     else:
         for child_node in node.children.values():
-            find_void_nodes(child_node, level + 1)
+            find_void_nodes(child_node, level + 1, data)
         node.visibility = any(child.visibility for child in node.children.values())
 
 

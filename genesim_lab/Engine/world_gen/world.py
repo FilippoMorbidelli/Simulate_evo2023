@@ -14,7 +14,7 @@ from genesim_lab.Engine.world_gen.chunk import Chunk
 from genesim_lab.Engine.player.voxel_handler import VoxelHandler
 from genesim_lab.Engine.world_objects.voxel_marker import VoxelMarker
 from genesim_lab.Engine.world_objects.celestial_body import Celestial
-from genesim_lab.Engine.world_gen.sparsevoxeloctree import build_svo
+from genesim_lab.Engine.world_gen.sparsevoxeloctree import build_svo, find_void_nodes
 from genesim_lab.Engine.settings import ChunkMeshSettings
 
 
@@ -81,6 +81,7 @@ class World:
         # Mimic other Threads queues
         self.mimic_load_q = []
         self.mesh_load_q  = []
+        self.mimic_save_q = []
 
     def build_chunks(self, load_voxels, new=True):
         for r in load_voxels.keys():
@@ -135,12 +136,9 @@ class World:
 
         # Delete regions
         for rid in to_delete:
-            # Save region to delete
-            self.app.save_load.save_single_region(rid)
-            # Delete region data
-            self.voxels.pop(rid)
-            self.chunks.pop(rid)
-            self.svo.pop(rid)
+            if rid not in self.mimic_save_q:
+                self.mimic_save_q.append(rid)
+                self.app.save_q.put(rid)
 
         # Enqueue region id to Load/Create regions in separate Thread
         for rid in to_add:
@@ -157,6 +155,7 @@ class World:
             for chunk in self.chunks[r_id]:
                 if chunk is not None:
                     chunk.mesh.get_vao_thread_save()
+            find_void_nodes(self.svo[r_id], level=0, data=self.chunks[r_id])
 
     def update(self):
         # Update Regions
