@@ -3,17 +3,19 @@
 # Created on: 31/07/2023
 # Last update: 17/12/2023
 # Notes: Main module to run simulation Engine
+import queue
 
 # Import third party and Engine packages ---------|
-from genesim_lab.Engine.scene.scene import Scene
-from genesim_lab.Engine.scene.surfaces import *
+from genesim_lab.Engine.scene.surfaces import Scene, init_shaders_2d
 from genesim_lab.Engine.world_gen.shader_program import ShaderProgram
 from genesim_lab.Engine.scene.events import *
 from genesim_lab.Engine.player.player import Player
-from genesim_lab.Engine.settings import GameSettings
+from genesim_lab.Engine.settings import *
 from genesim_lab.Engine.world_gen.textures import Textures
 from genesim_lab.Saves.SaveManager import SaveManager
+from multiprocessing import Queue
 
+import multiprocessing as mp
 import moderngl as mgl
 import pygame as pg
 import sys
@@ -32,10 +34,10 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)  # X. OpenGL version
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)  # .X OpenGL version
         pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)  #
-        pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  # 
+        pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #
 
-        # Initialize Engine settings
-        self.stg = GameSettings()
+        # Multiprocessing Manager and Engine settings
+        self.mp_manager, self.mp_stg, self.stg = init_manager_stg()
 
         # Set Engine window size (default: full screen)
         if self.stg.window.full_screen:
@@ -83,6 +85,14 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         self.custom_events = EventHandler(self)
         self.event_list = None
 
+        # Create Child Processes
+        self.processes = dict()
+        self.queues    = dict()
+        # Load region process
+        self.queues["load"] = Queue()
+        self.processes["load"] = LoadProcess(self.queues["load"], self.mp_stg)
+        self.processes["load"].start()
+
     def update(self):
         # Update time, delta_time
         self.delta_time = self.clock.tick(self.stg.util.fps_limit)
@@ -92,12 +102,12 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         self.mouse = pg.mouse.get_pos()
 
         # Update 3D Shaders, 2D Shaders and scene
-        self.scene.update()
+        self.scene.update_current_scene()
 
     def render(self):
         # Clear, render and update frame
         self.ctx.clear()
-        self.scene.render()
+        self.scene.render_current_scene()
         pg.display.flip()
 
     def handle_events(self):
@@ -113,6 +123,12 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
             self.handle_events()  # Handle event checks and computations
             self.update()         # Perform attributes, variables and state updates
             self.render()         # Perform render of current scene once every update has been done
+        # Shutdown manager
+        self.mp_manager.shutdown()
+        # Shutdown any running process
+        for process in self.processes.values():
+            process.terminate()
+        # Shutdown Pygame and System
         pg.quit()
         sys.exit()  # Comment during profiling
 

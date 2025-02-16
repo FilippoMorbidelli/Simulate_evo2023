@@ -27,11 +27,17 @@ class GS(IntEnum):  # GS stands for GameState
     CreateMenu     = 8
 
 # All surfaces ---------------------------------|
-class Surfaces:
+class Scene:
 
     def __init__(self, app):
         self.app = app
 
+        # Utilities
+        self.sprite_util = {
+            "SaveLoad": "",
+        }
+
+        # Scenes and attributes
         self.surf = self.init_surfaces()
         self.active = None
         self.master = None
@@ -350,7 +356,7 @@ class UserInput:
                 scene_to_blit = self.app.shader_prog_2D.saves_menu
                 sp_to_blit = [sp for sp in scene_to_blit.sprites() if sp.name == sprite][0]
                 ui_text = UITextSprite(app, sp_to_blit.rect, [50, 65] , self.app.custom_events.ui_dict,
-                                       self.app.stg.util.ui_font)
+                                       self.app.stg.font_util.ui_font)
                 app.shader_prog_2D.user_input.add(ui_text)
 
                 # Allow UI event to be queued

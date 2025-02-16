@@ -10,7 +10,7 @@ from genesim_lab.Engine.world_gen.world import get_init_regions
 from genesim_lab.Engine.scene.surfaces import SaveLoadMenu
 from genesim_lab.Engine.scene.events import GS
 from genesim_lab.Engine.settings import World
-import glm
+from pyglm import glm
 import re
 import ntpath
 import numpy as np
@@ -57,7 +57,7 @@ class SaveManager:
             # Reload save_load scene
             self.app.shader_prog_2D.saves_menu.empty()
             self.app.shader_prog_2D.saves_menu.gl_vertices.clear()
-            self.app.scene.surfaces.surf.saves_menu = SaveLoadMenu(self.app)
+            self.app.scene.surf.saves_menu = SaveLoadMenu(self.app)
 
     def save_whole_file(self, num, name = ""):
         # Get real date
@@ -73,7 +73,7 @@ class SaveManager:
             self.info.save_to_pickle(self.save_path / name / self.path_w_stg)
 
         # Save World voxels
-        for rid, r_voxels in self.app.scene.surfaces.surf.main_game.world.voxels.items():
+        for rid, r_voxels in self.app.scene.surf.main_game.world.voxels.items():
             r_name = self.get_name_from_index(rid)
             path = self.path_world + r_name + self.path_world_ext
             with open(self.save_path / name / path, 'w+') as f:
@@ -114,9 +114,9 @@ class SaveManager:
             voxels[r_index] = load_decoder(np.load(str(save_dir / (file + self.path_world_ext)))['arr_0'], self.info.r_vol, self.info.c_vol)
 
         # Init game
-        self.app.scene.surfaces.set_primary(GS.MainGame)
+        self.app.scene.set_primary(GS.MainGame)
         self.app.custom_events.event_types.update_scene_logic()
-        self.app.scene.surfaces.surf.main_game.init_world(voxels)
+        self.app.scene.surf.main_game.init_world(voxels)
         self.app.player.move(*player)
 
 
@@ -142,6 +142,16 @@ class SaveManager:
         r_name = "r_" + str(x) + "_" + str(y) + "_" + str(z)
 
         return r_name
+
+
+def asynch_save_region(self, region):
+    pass
+
+def asynch_load_region(self, region):
+    # Retrieve directory
+    save_dir = self.save_path / name / self.path_world
+
+    return loaded, voxels
 
 @njit
 def run_length_encoding(voxels):

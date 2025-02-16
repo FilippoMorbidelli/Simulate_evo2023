@@ -15,7 +15,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
     def __init__(self, app):
         # Init flags to define current scene and sprite to search on
         self.app           = app
-        self.scene_ptr     = app.scene.surfaces # Current state and data of each scene
+        self.scene_ptr     = app.scene # Current state and data of each scene
         self.master_scene  = None  # Master scene to search sprite on
         self.active_sprite = None  # Active sprite to search for events
         self.event_types   = EventTypes(app)  # Init event types class
@@ -357,7 +357,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
 class EventTypes:
     def __init__(self, app):
         self.app       = app
-        self.scene_ptr = app.scene.surfaces  # Current state and data of each scene
+        self.scene_ptr = app.scene  # Current state and data of each scene
         self.prev_master  = None  # Depth of master scene (no overlays)
 
     def update_scene_logic(self):

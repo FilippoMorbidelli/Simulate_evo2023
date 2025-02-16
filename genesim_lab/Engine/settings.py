@@ -5,12 +5,13 @@
 
 # Import third party and Engine packages --------------|
 import numpy as np
-import glm
+from pyglm import glm
 import math
 import pygame as pg
 import dataclasses
 import pickle
 
+from genesim_lab.Processes.Process import *
 from dataclasses import dataclass
 from numba.experimental import jitclass
 from numba import float64, int32
@@ -73,7 +74,7 @@ class World:  # Contains settings about world generation, chunks, regions, ecc
     scale_i : glm.vec3 = 1 / scale
 
     # World data
-    w_width  : int = 8
+    w_width  : int = 2
     w_height : int = 2
     w_depth  : int = w_width
     w_area   : int = w_width * w_depth
@@ -149,72 +150,80 @@ class CameraData:  # Contains settings about player camera parameters
 
 @dataclass(slots=True, order=True)
 class PlayerData:  # Contains settings about player data
-    speed: float = 0.1  # Limit player speed to move around
-    rot_speed: float = 0.003  # Limit player speed to rotate
-    pos: float = glm.vec3(0, 0, 0)  # Player initial position
-    mouse_sensitivity: float = 0.002  # Mouse sensitivity
-
-    def __iter__(self):
-        for field in dataclasses.fields(self):
-            yield getattr(self, field.name)
+        speed: float = 0.1  # Limit player speed to move around
+        rot_speed: float = 0.003  # Limit player speed to rotate
+        pos: glm.vec3 = glm.vec3(0, 0, 0)  # Player initial position
+        mouse_sensitivity: float = 0.002  # Mouse sensitivity
 
 
 @dataclass(slots=True, order=True)
 class Util:  # Contains settings about util parameters and functions
     fps_limit  : int = 1000  # Limit frame rate to value
-    text_font  : pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
-    text_color : tuple = (255, 255, 255)  # Color of displayed text
     save_path  : str = "SaveFiles/"  # Path in Game directory containing the save files
-    ui_font    : freetype.Font = freetype.Font(Path(__file__).parent.parent / "Assets/Fonts/Stormfaze.otf", 28)
-
-    def __iter__(self):
-        for field in dataclasses.fields(self):
-            yield getattr(self, field.name)
 
 
-@dataclass(slots=True, order=True)
-class GameSettings:  # Main wrapped settings class
-    world       = World()
-    sim         = Simulation()
-    world_obj   = WorldObj()
-    interaction = Interaction()
-    window      = Window()
-    camera      = CameraData()
-    player      = PlayerData()
-    util        = Util()
+class FontUtil:
+    def __init__(self):
+        self.text_font : pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
+        self.ui_font: freetype.Font = freetype.Font(Path(__file__).parent.parent / "Assets/Fonts/Stormfaze.otf", 28)
+        self.text_color: tuple = (255, 255, 255)  # Color of displayed text
 
-    # Addition settings to compute after init
-    player.pos = glm.vec3(0, world.w_height * world.c_size * world.v_y, 0)
 
-    def __iter__(self):
-        for field in dataclasses.fields(self):
-            yield getattr(self, field.name)
+#@dataclass(slots=True, order=True)
+class SharedGameSettings:  # Main wrapped settings class
+    def __init__(self, world, simulation,
+                 world_obj, interaction, window,
+                 camera_data, player_data, util):
+        # Set from input each subclass since they need to be ProxyClass to support MultiProcessing
+        self.world       = world
+        self.sim         = simulation
+        self.world_obj   = world_obj
+        self.interaction = interaction
+        self.window      = window
+        self.camera      = camera_data
+        self.player      = player_data
+        self.util        = util
 
-# Mesh builder util functions
+        # Addition settings to compute after init
+        self.player.pos = glm.vec3(0, self.world.w_height * self.world.c_size * self.world.v_y, 0)
+
+
+class GameSettings:  # Main settings class
+    def __init__(self):
+        self.world       = World()
+        self.sim         = Simulation()
+        self.world_obj   = WorldObj()
+        self.interaction = Interaction()
+        self.window      = Window()
+        self.camera      = CameraData()
+        self.player      = PlayerData()
+        self.util        = Util()
+        self.font_util   = FontUtil()
+
+        # Addition settings to compute after init
+        self.player.pos = glm.vec3(0, self.world.w_height * self.world.c_size * self.world.v_y, 0)
+
+
+# Mesh builder util functions ----------------------------------------|
 powers = 1 << np.array(range(48), dtype="int64")
 
-# World Settings for njit ------|
+# World Settings for njit --------------------------------------------|
 spec = [
-    ("c_size"   , int32),
-    ("c_area"   , int32),
-    ("c_vol"    , int32),
-    ("off_x"    , int32),
-    ("off_y"    , int32),
-    ("off_z"    , int32),
-    ("v_x"      , float64),
-    ("v_y"      , float64),
-    ("v_z"      , float64),
-    ("r_size"   , int32),
-    ("r_area"   , int32),
-    ("rc_size"  , int32),
-    ("width_rn" , int32),
-    ("height_rn", int32),
-    ("depth_rn" , int32),
+    ("c_size"   , int32), ("c_area"   , int32), ("c_vol"    , int32),
+    ("off_x"    , int32), ("off_y"    , int32), ("off_z"    , int32),
+    ("v_x"      , float64), ("v_y"    , float64), ("v_z"    , float64),
+    ("r_size"   , int32), ("r_area"   , int32), ("rc_size"  , int32),
+    ("width_rn" , int32), ("height_rn", int32), ("depth_rn" , int32),
 ]
 
 @jitclass(spec)
 class ChunkMeshSettings:
-    def __init__(self, c_size, c_area, c_vol, off_x, off_y, off_z, v_x, v_y, v_z, r_size, r_area, rc_size, width_rn, height_rn, depth_rn):
+    def __init__(self, c_size, c_area, c_vol,
+                       off_x, off_y, off_z,
+                       v_x, v_y, v_z,
+                       r_size, r_area, rc_size,
+                       width_rn, height_rn, depth_rn):
+        # Manually set each setting needed for mesh creation (GPU)
         self.c_size    = c_size
         self.c_area    = c_area
         self.c_vol     = c_vol
@@ -232,6 +241,40 @@ class ChunkMeshSettings:
         self.depth_rn  = depth_rn
 
 # Settings functions ----------|
+def init_manager_stg():
+    #Register to custom manager each class and subclass shared between processes
+    CustomManager.register('sh_settings'   , SharedGameSettings, TestProxy)
+    CustomManager.register('world'      , World       , SubProxy)
+    CustomManager.register('sim'        , Simulation  , SubProxy)
+    CustomManager.register('world_obj'  , WorldObj    , SubProxy)
+    CustomManager.register('interaction', Interaction , SubProxy)
+    CustomManager.register('window'     , Window      , SubProxy)
+    CustomManager.register('camera_data', CameraData  , SubProxy)
+    CustomManager.register('player_data', PlayerData  , SubProxy)
+    CustomManager.register('util'       , Util        , SubProxy)
+
+    # Init Manager
+    manager = CustomManager()
+    manager.start()
+
+    # Generate each subclass and then load main settings class
+    world       = manager.world()
+    simulation  = manager.sim()
+    world_obj   = manager.world_obj()
+    interaction = manager.interaction()
+    window      = manager.window()
+    camera_data = manager.camera_data()
+    player_data = manager.player_data()
+    util        = manager.util()
+
+    # Main settings class
+    shared_stg = manager.sh_settings(world, simulation,
+                                    world_obj, interaction, window,
+                                     camera_data, player_data, util)
+    # Generate Font util separately
+    stg = GameSettings()
+
+    return manager, shared_stg, stg
 
 # Change Setting Value
 

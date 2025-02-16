@@ -255,7 +255,7 @@ class UtilityStaticText(pg.sprite.Sprite):
         # Extract each line and blit to surface
         for lines in collection:
             words = lines[0]
-            w_surf = app.stg.util.text_font.render(words, True, app.stg.util.text_color)
+            w_surf = app.stg.font_util.text_font.render(words, True, app.stg.font_util.text_color)
             w_width, w_height = w_surf.get_size()
 
             # adjust x blit position depending on line length
@@ -286,8 +286,8 @@ class FpsSprite(pg.sprite.Sprite):
     def __init__(self, app):
         super().__init__()
         self.image = pg.Surface((100, 100), pg.SRCALPHA, 32)
-        self.image.blit(app.stg.util.text_font.render(f'{app.clock.get_fps() :.0f}',
-                                                      True, app.stg.util.text_color), (0, 0))
+        self.image.blit(app.stg.font_util.text_font.render(f'{app.clock.get_fps() :.0f}',
+                                                      True, app.stg.font_util.text_color), (0, 0))
         self.rect = pg.Rect(0, 0, 100, 100)
         self.name = "fps_counter"
         # Flags
@@ -298,8 +298,8 @@ class FpsSprite(pg.sprite.Sprite):
     def update(self, app):
         if app.custom_events.FPS_EVENT in [e.type for e in app.event_list]:
             self.image = pg.Surface((100, 100), pg.SRCALPHA, 32)
-            self.image.blit(app.stg.util.text_font.render(f'{app.clock.get_fps() :.0f}',
-                                                                  True, app.stg.util.text_color), (0, 0))
+            self.image.blit(app.stg.font_util.text_font.render(f'{app.clock.get_fps() :.0f}',
+                                                                  True, app.stg.font_util.text_color), (0, 0))
 
 
 class UITextSprite(pg.sprite.Sprite):
@@ -323,10 +323,10 @@ class UITextSprite(pg.sprite.Sprite):
     def update(self, app):
         _, rect = self.font.render(self.string["ui_string"], self.color)
         self.image = pg.Surface((500, 120), pg.SRCALPHA, 32)
-        self.app.stg.util.ui_font.render_to(self.image, (self.topleft[0], self.topleft[1] - rect.height/2.2), self.string["ui_string"], (250,50,50))
+        self.app.stg.font_util.ui_font.render_to(self.image, (self.topleft[0], self.topleft[1] - rect.height/2.2), self.string["ui_string"], (250,50,50))
 
 def blit_text_to_surf(app, sprite, text, anchor = (0, 0)):
-    text_surf = app.stg.util.ui_font.render(text, app.stg.util.text_color, size = 22)[0]
+    text_surf = app.stg.font_util.ui_font.render(text, app.stg.font_util.text_color, size = 22)[0]
     # Blit text to sprite image
     sprite.image.blit(text_surf, anchor)
     sprite.sprite_F.blit(text_surf, anchor)
