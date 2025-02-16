@@ -140,20 +140,8 @@ class World:
 
         # Load/Create regions
         for rid in to_add:
-            # Find if region is already existing
-            is_loaded = self.app.save_load.load_single_region(rid)
-            # Create new
-            if not is_loaded:
-                # Build Chunk
-                self.voxels[rid] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
-                self.chunks[rid] = [None for _ in range(self.info.r_vol)]
-                self.build_chunks({rid : new_reg[rid]})
-                # Build Chunk Mesh
-                for chunk in self.chunks[rid]:
-                    if chunk is not None:
-                        chunk.build_mesh()
-                # Build SVO
-                self.svo[rid] = build_svo(self.app, self.info, self.chunks[rid], new_reg[rid])
+            # Send to Load Process queue the required region to be loaded or created
+            self.app.req_queues["load"].put(rid)
 
 
     def update(self):

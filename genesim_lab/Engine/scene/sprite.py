@@ -63,7 +63,8 @@ class GLTextures2D(pg.sprite.Group):
     def render(self, sprite, surface):
         # Check if VBO for sprite exists, in case builds it or update it (forced_reconstruct == True)
         if sprite.to_render:
-            if sprite.name not in self.gl_vertices or sprite.to_rebuild:
+            if sprite.name not in self.gl_vertices or sprite.to_rebuild or sprite.oneshot_rebuild:
+                sprite.oneshot_rebuild = False
                 self.scale_sprite(sprite)
                 w, h = surface.get_size()
                 left, top, width, height = sprite.rect
@@ -133,10 +134,12 @@ class DynamicSprite(pg.sprite.Sprite):
         self.image = self.sprite
         self.mask = pg.mask.from_surface(self.image)
         self.name = f"dynamic_{name}"
+
         # Flags
         self.to_render = True
         self.to_interact = flag  # Flag to determine if button is dynamic or not
         self.to_rebuild = True  # Flag to determine if vertices for vbo must be reconstructed every frame
+        self.oneshot_rebuild: bool = False  # Flag to rebuild sprite oneshot
 
     def update(self, app):
         self.rect.topleft = app.mouse
@@ -150,10 +153,12 @@ class OverlaySprite(pg.sprite.Sprite):
         self.image = self.sprite
         self.mask = pg.mask.from_surface(self.image)
         self.name = f"overlay_{name}"
+
         # Flags
         self.to_render = True
         self.to_interact = flag  # Flag to determine if button is dynamic or not
         self.to_rebuild = False  # Flag to determine if vertices for vbo must be reconstructed every frame
+        self.oneshot_rebuild: bool = False  # Flag to rebuild sprite oneshot
 
     def update(self, *args):
         pass
@@ -169,10 +174,12 @@ class BackgroundSprite(pg.sprite.Sprite):
         wh = self.sprite.get_size()
         self.rect = pg.Rect(anchor[0], anchor[1], wh[0], wh[1])
         self.name = f"background_{button}" + name_add
+
         # Flags
         self.to_render = True
         self.to_interact = flag  # Flag to determine if button is dynamic or not
         self.to_rebuild = False  # Flag to determine if vertices for vbo must be reconstructed every frame
+        self.oneshot_rebuild: bool = False  # Flag to rebuild sprite oneshot
 
     def update(self, *args):
         pass
@@ -181,6 +188,7 @@ class BackgroundSprite(pg.sprite.Sprite):
 class ButtonSprite(pg.sprite.Sprite):
     def __init__(self, app, scene, button, ext, flag, anchor = (0, 0), name_add = "", threshold = 127):
         super().__init__()
+        self.app = app
         self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.{ext}').convert_alpha()
         self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.{ext}').convert_alpha()
         self.image    = self.sprite_F
@@ -190,13 +198,20 @@ class ButtonSprite(pg.sprite.Sprite):
 
         self.over : int  = 0 #self.mask.get_at(app.mouse)  # Add check if mouse is over from start
         self.name : str  = f"button_{button}" + name_add
+
         # Flags
         self.to_render = True
         self.to_interact : bool = flag  # Flag to determine if sprite is dynamic or not
         self.to_rebuild : bool = False  # Flag to determine if vertices for vbo must be reconstructed every frame
+        self.oneshot_rebuild : bool = False # Flag to rebuild sprite oneshot
 
     def update(self, *args):
         pass
+
+    def blit_text(self, text = "", anchor=(0, 0)):
+        blit_text_to_surf(self.app, self, text, anchor=anchor)
+        self.oneshot_rebuild = True
+
 
 class StaticAltSprite(pg.sprite.Sprite):
     def __init__(self, app, scene, flag, alts, xy, ext = "svg"):
@@ -215,10 +230,12 @@ class StaticAltSprite(pg.sprite.Sprite):
         self.alt = a
         self.mask = pg.mask.from_surface(self.image)
         self.name = f"static_alt_{a}"
+
         # Flags
         self.to_render = True
         self.to_interact = flag  # Flag to determine if sprite is dynamic or not
         self.to_rebuild = False  # Flag to determine if vertices for vbo must be reconstructed every frame
+        self.oneshot_rebuild: bool = False  # Flag to rebuild sprite oneshot
 
     def alternate(self, alt):
         # Switch active sprite
@@ -239,10 +256,12 @@ class UtilityStaticText(pg.sprite.Sprite):
         collection = [line.split('\n') for line in text.splitlines()]  # Get single lines from text
         x, y = rect.topleft  # Initial blit coordinates
         self.name = name
+
         # Flags
         self.to_render = True
         self.to_interact = False
         self.to_rebuild = False  # Flag to determine if vertices for vbo must be reconstructed every frame
+        self.oneshot_rebuild = False  # Flag to rebuild sprite oneshot
 
         # adjust x blit position depending on align
         if align == "left":
@@ -290,10 +309,12 @@ class FpsSprite(pg.sprite.Sprite):
                                                       True, app.stg.font_util.text_color), (0, 0))
         self.rect = pg.Rect(0, 0, 100, 100)
         self.name = "fps_counter"
+
         # Flags
         self.to_render = True
         self.to_interact = False
         self.to_rebuild = False  # Flag to determine if vertices for vbo must be reconstructed every frame
+        self.oneshot_rebuild: bool = False  # Flag to rebuild sprite oneshot
 
     def update(self, app):
         if app.custom_events.FPS_EVENT in [e.type for e in app.event_list]:
@@ -315,10 +336,12 @@ class UITextSprite(pg.sprite.Sprite):
         self.name    = name
         self.image = pg.Surface((500, 120), pg.SRCALPHA, 32)
         self.rect = pg.Rect(blit_rect.left, blit_rect.top, 500, 120)
+
         # Sprite flags
         self.to_render = True
         self.to_interact = False
         self.to_rebuild = False
+        self.oneshot_rebuild: bool = False  # Flag to rebuild sprite oneshot
 
     def update(self, app):
         _, rect = self.font.render(self.string["ui_string"], self.color)

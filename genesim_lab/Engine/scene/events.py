@@ -8,6 +8,7 @@
 import pygame as pg
 from string import digits
 from genesim_lab.Engine.scene.surfaces import GS
+from pathlib import Path
 
 
 # Main event handler ---------------------------------------------------------------------------------------------------
@@ -67,7 +68,7 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                             self.active_sprite = None
         # No sprite is present so no sprite can be active
         except(Exception,):
-            print("No Sprite in Scene") # TO BE REMOVED
+            #print("No Sprite in Scene") # TO BE REMOVED
             self.active_sprite = None
 
     def handle_events(self):
@@ -338,6 +339,12 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
                         "change_scene",
                         [pg.MOUSEBUTTONDOWN, "button", 1],
                         [lambda: self.scene_ptr.set_primary(GS.MainGame), lambda: self.scene_ptr.surf.main_game.init_world()]
+                    ],
+                    "button_world_name" : [
+                        # -- World name player can insert and use as savefile name
+                        "change_scene",
+                        [pg.MOUSEBUTTONDOWN, "button", 1],
+                        [lambda: self.scene_ptr.set_userinput("world_name")]
                     ]
                 },
                 "non_sprite": {
@@ -433,10 +440,25 @@ class EventTypes:
     def user_input_action(self, action):
         # Exec action depending on type of user input
         self.scene_ptr.reset_status(GS.UserInput)
-        if action == "save":
-            self.app.save_load.manage_sl(self.app.custom_events.ui_dict["ui_sprite"], self.app.custom_events.ui_dict["ui_string"])
-        else:
-            pass # TBD
+        match action:
+
+            case "save":
+                # Save current world with name given
+                self.app.save_load.manage_sl(self.app.custom_events.ui_dict["ui_sprite"], self.app.custom_events.ui_dict["ui_string"])
+
+            case "world_name":
+                # Set confirmed name on settings and on sprite
+                self.app.stg.util.curr_save_name = self.app.custom_events.ui_dict["ui_string"]
+                self.app.mp_stg.util.curr_save_name = self.app.custom_events.ui_dict["ui_string"]
+                self.scene_ptr.surf.create_menu.update_name(self.app.custom_events.ui_dict["ui_string"])
+                # TEMPORARY TO REMOVE - CREATE SAVE DIRECTORY
+                path_to_create = Path(__file__).parent.parent.parent.parent / self.app.stg.util.save_path / self.app.custom_events.ui_dict["ui_string"] / "World/"
+                path_to_create.parent.mkdir(exist_ok=True, parents=True)
+                path_to_create.mkdir(exist_ok=True, parents=True)
+
+            case _:
+                pass # TBD
+
         # Reset Sprite TO BE DONEEEEEEEEEEE
         #if self.app.custom_events.active_sprite:
         #    for sprite in self.scene_ptr.handle[self.app.custom_events.master_scene]:

@@ -6,7 +6,7 @@
 
 # Import packages ------------------------------|
 import random
-import glm
+from pyglm import glm
 import numpy as np
 from genesim_lab.Meshes.chunk_mesh import ChunkMesh
 

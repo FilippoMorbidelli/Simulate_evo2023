@@ -11,7 +11,6 @@ import pygame as pg
 import dataclasses
 import pickle
 
-from genesim_lab.Processes.Process import *
 from dataclasses import dataclass
 from numba.experimental import jitclass
 from numba import float64, int32
@@ -74,8 +73,8 @@ class World:  # Contains settings about world generation, chunks, regions, ecc
     scale_i : glm.vec3 = 1 / scale
 
     # World data
-    w_width  : int = 2
-    w_height : int = 2
+    w_width  : int = 4
+    w_height : int = 4
     w_depth  : int = w_width
     w_area   : int = w_width * w_depth
     w_vol    : int = w_area * w_height
@@ -86,7 +85,7 @@ class World:  # Contains settings about world generation, chunks, regions, ecc
     offset    : glm.vec3 = glm.vec3(w_width/2, 0, w_depth/2)
 
     # Region data
-    r_size   : int = 2  # Number of chunks per dimension per region
+    r_size   : int = 4  # Number of chunks per dimension per region
     r_area   : int = r_size ** 2
     r_vol    : int = r_size ** 3
     rc_size  : int = r_size * c_size
@@ -160,7 +159,7 @@ class PlayerData:  # Contains settings about player data
 class Util:  # Contains settings about util parameters and functions
     fps_limit  : int = 1000  # Limit frame rate to value
     save_path  : str = "SaveFiles/"  # Path in Game directory containing the save files
-
+    curr_save_name : str = ""  # Temporary save name of current loaded game name
 
 class FontUtil:
     def __init__(self):
@@ -241,40 +240,6 @@ class ChunkMeshSettings:
         self.depth_rn  = depth_rn
 
 # Settings functions ----------|
-def init_manager_stg():
-    #Register to custom manager each class and subclass shared between processes
-    CustomManager.register('sh_settings'   , SharedGameSettings, TestProxy)
-    CustomManager.register('world'      , World       , SubProxy)
-    CustomManager.register('sim'        , Simulation  , SubProxy)
-    CustomManager.register('world_obj'  , WorldObj    , SubProxy)
-    CustomManager.register('interaction', Interaction , SubProxy)
-    CustomManager.register('window'     , Window      , SubProxy)
-    CustomManager.register('camera_data', CameraData  , SubProxy)
-    CustomManager.register('player_data', PlayerData  , SubProxy)
-    CustomManager.register('util'       , Util        , SubProxy)
-
-    # Init Manager
-    manager = CustomManager()
-    manager.start()
-
-    # Generate each subclass and then load main settings class
-    world       = manager.world()
-    simulation  = manager.sim()
-    world_obj   = manager.world_obj()
-    interaction = manager.interaction()
-    window      = manager.window()
-    camera_data = manager.camera_data()
-    player_data = manager.player_data()
-    util        = manager.util()
-
-    # Main settings class
-    shared_stg = manager.sh_settings(world, simulation,
-                                    world_obj, interaction, window,
-                                     camera_data, player_data, util)
-    # Generate Font util separately
-    stg = GameSettings()
-
-    return manager, shared_stg, stg
 
 # Change Setting Value
 

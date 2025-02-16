@@ -107,7 +107,7 @@ class Scene:
         surf_group.settings_menu = SettingsMenu(self.app)
         surf_group.pause_menu    = PauseMenu(self.app)
         surf_group.other         = Other(self.app)
-        surf_group.user_input    = UserInput(self.app, "", "")
+        surf_group.user_input    = UserInput(self.app)
         surf_group.create_menu   = CreateMenu(self.app)
 
         return surf_group
@@ -211,6 +211,7 @@ class MainMenu:
         # Init game
         #self.app.player.move(*player)
         #self.world = World(app, vox)
+
         # Background menu button
         background_menu = BackgroundSprite(app, "menu/main_menu", "menu",  "svg", False)
         app.shader_prog_2D.main_menu.add(background_menu)
@@ -282,8 +283,10 @@ class SaveLoadMenu:
         self.save_anchor_basic = [350, 200]
         self.save_anchor_n = [0, 160]
         self.free_saves = [0, 1, 2, 3, 4]
+
         # Init each sprite for the SaveLoad menu scene
         max_n = -1
+
         # Background
 
         # Temp background TO BE REMOVED!!!!
@@ -296,14 +299,17 @@ class SaveLoadMenu:
         temp_surf.image = pg.Surface(app.stg.window.rect.size, pg.SRCALPHA, 32)
         temp_surf.image.fill((0, 0, 0))
         app.shader_prog_2D.saves_menu.add(temp_surf)
+
         # Title (alternating between Load and Save)
         static_alt_title = StaticAltSprite(app, "menu/saves_menu", False, ["load", "save"], [75, 30])
         app.shader_prog_2D.saves_menu.add(static_alt_title)
+
         # Save File blank container
         for n in range(5):
             anchor = (self.save_anchor_basic[0] +  n * self.save_anchor_n[0], self.save_anchor_basic[1] +  n * self.save_anchor_n[1])
             container_save_n = BackgroundSprite(app, "menu/saves_menu", "save_container", "svg", False, anchor, str(n))
             app.shader_prog_2D.saves_menu.add(container_save_n)
+
         # Save File info and interaction
         for save in os.listdir(self.save_path):
             with open(self.save_path / save / self.save_info, "r") as f:
@@ -322,6 +328,7 @@ class SaveLoadMenu:
                 app.shader_prog_2D.saves_menu.add(button_save_n)
                 # Save name to SaveManager
                 app.save_load.existing_saves[num] = name
+
         # New Save File
         for n in self.free_saves:
             anchor = (self.save_anchor_basic[0] + n * self.save_anchor_n[0], self.save_anchor_basic[1] + n * self.save_anchor_n[1])
@@ -332,18 +339,29 @@ class SaveLoadMenu:
 class CreateMenu:
 
     def __init__(self, app):
-        # Load Background
+        self.app = app
+        # -- [Load Background]
 
-        # Load settings
+        # -- [Load settings pages]
+        # [Page 1] - World and generation options
+        # World Name used for savefile
+        button_world_name = ButtonSprite(app, "menu/create_menu", "world_name", "svg", True, (250, 200))
+        app.shader_prog_2D.create_menu.add(button_world_name) # [0]
 
-        # Load Confirm action
+        # [Page 2] - Simulation options
+
+        # [Page 3] - Creatures options
+
+        # -- [Load Confirm action]
         button_confirm = ButtonSprite(app, "menu/create_menu", "confirm", "svg", True, (1450, 800))
-        app.shader_prog_2D.create_menu.add(button_confirm)
+        app.shader_prog_2D.create_menu.add(button_confirm) # [1]
 
+    def update_name(self, text):
+        self.app.shader_prog_2D.create_menu.sprites()[0].blit_text(text, (55, 58))
 
 class UserInput:
 
-    def __init__(self, app, scene, sprite):
+    def __init__(self, app, scene = "", sprite = ""):
         self.app = app
         # Clear all sprites present in the shader program
         app.shader_prog_2D.user_input.empty()
@@ -356,6 +374,18 @@ class UserInput:
                 scene_to_blit = self.app.shader_prog_2D.saves_menu
                 sp_to_blit = [sp for sp in scene_to_blit.sprites() if sp.name == sprite][0]
                 ui_text = UITextSprite(app, sp_to_blit.rect, [50, 65] , self.app.custom_events.ui_dict,
+                                       self.app.stg.font_util.ui_font)
+                app.shader_prog_2D.user_input.add(ui_text)
+
+                # Allow UI event to be queued
+                pg.event.set_allowed(self.app.custom_events.UI_EVENT)
+
+            case "world_name":
+                # UI text
+                scene_to_blit = self.app.shader_prog_2D.create_menu
+                sp_to_blit = [sp for sp in scene_to_blit.sprites() if sp.name == sprite][0]
+                offset = [50, 65]
+                ui_text = UITextSprite(app, sp_to_blit.rect, offset, self.app.custom_events.ui_dict,
                                        self.app.stg.font_util.ui_font)
                 app.shader_prog_2D.user_input.add(ui_text)
 

@@ -144,14 +144,40 @@ class SaveManager:
         return r_name
 
 
-def asynch_save_region(self, region):
+def asynch_save_region(region):
     pass
 
-def asynch_load_region(self, region):
+def asynch_load_region(util, info, region):
     # Retrieve directory
-    save_dir = self.save_path / name / self.path_world
+    save_dir = Path(__file__).parent.parent.parent / util.save_path / util.curr_save_name / "World/"
+    save_name = asynch_name_from_index(info, region)
+
+    loaded = False
+    voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
+    found = list(Path(save_dir).glob(save_name + '*'))
+    if found:
+        voxels[region] = load_decoder(np.load(str(save_dir / (found[0])))['arr_0'],
+                                 info.r_vol, info.c_vol)
+        loaded = True
 
     return loaded, voxels
+
+def asynch_name_from_index(info, region_index):
+    # Get region coordinates from region index by inspecting a chunk
+    y = region_index // info.depth_rn * info.width_rn
+    z = (region_index - y * info.depth_rn * info.width_rn) // info.width_rn
+    x = region_index - y * info.depth_rn * info.width_rn - z * info.width_rn
+
+    r_name = "r_" + str(x) + "_" + str(y) + "_" + str(z)
+
+    return r_name
+
+def asynch_index_from_name(info, region_string):
+    # Extract indexes from name and compute index to corresponding region
+    x, y, z = re.findall(r'\d+', region_string)
+    index = int(x) + info.width_rn * int(z) + info.width_rn * info.depth_rn * int(y)
+
+    return index
 
 @njit
 def run_length_encoding(voxels):
