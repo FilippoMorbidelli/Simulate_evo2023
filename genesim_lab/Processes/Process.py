@@ -61,21 +61,27 @@ class LoadProcess(mp.Process):
                     self.terminate()
                 else:
                     # Unwrap data
-                    r_id = to_process
-                    # Find if region is already existing
+                    r_id, r_coord = to_process
+
+                    # If region already exists load it (only voxels)
                     is_loaded, voxels = asynch_load_region(self.stg.util, self.stg.world, r_id)
-                    # Create new region
+
+                    # Preallocate Chunk and voxels
                     chunk = [None for _ in range(self.stg.world.r_vol)]
+                    svo = dict()
                     if not is_loaded:
-                        # Build Chunk
                         voxels = np.zeros([self.stg.world.r_vol, self.stg.world.c_vol], dtype='uint8')
-                        self.world.build_chunks({r_id: r_index})
-                    # Build Chunk Mesh
+
+                    # Build chunks
+                    asynch_build_chunks({r_id: r_coord}, new=not is_loaded)
+
+                    # Build Chunks Mesh
                     for chunk in self.world.chunks[r_id]:
                         if chunk is not None:
                             chunk.build_mesh_threaded()
+
                     # Build SVO
-                    self.world.svo[r_id] = build_svo(self.app, self.world.info, self.world.chunks[r_id], r_index)
+                    svo[r_id] = build_svo(self.app, self.world.info, self.world.chunks[r_id], r_index)
 
                     # Load response to dedicated queue (to be read by main process)
                     self.rsp_queue.put([result, voxels, chunk, svo])

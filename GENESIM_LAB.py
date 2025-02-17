@@ -85,14 +85,14 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         self.custom_events = EventHandler(self)
         self.event_list = None
 
-        # Create Child Processes
-        self.processes   = dict()
-        self.req_queues  = dict()
-        self.resp_queues = dict()
+        # Create Child Processes and Queues
+        self.processes  = dict()
+        self.req_queues = dict()
+        self.resp_queue = Queue() # The response queue is unique since all processes communicate with parent only
+
         # Load region process
         self.req_queues["load"] = Queue()
-        self.resp_queues["load"] = Queue()
-        self.processes["load"] = LoadProcess(self.req_queues["load"], self.resp_queues["load"], self.mp_stg)
+        self.processes["load"] = LoadProcess(self.req_queues["load"], self.resp_queue, self.mp_stg)
         self.processes["load"].start()
 
     def update(self):

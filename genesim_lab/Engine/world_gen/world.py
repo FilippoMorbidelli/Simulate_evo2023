@@ -141,7 +141,7 @@ class World:
         # Load/Create regions
         for rid in to_add:
             # Send to Load Process queue the required region to be loaded or created
-            self.app.req_queues["load"].put(rid)
+            self.app.req_queues["load"].put([rid, new_reg[rid]])
 
 
     def update(self):
