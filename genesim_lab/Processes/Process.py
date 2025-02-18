@@ -6,11 +6,15 @@
 # Import third party and Engine packages --------------|
 import multiprocessing as mp
 import time
+import re
+import random
+from numba import types
+from numba.typed import Dict
 
 from multiprocessing.managers import BaseManager, BaseProxy
 from genesim_lab.Engine.settings import *
-from genesim_lab.Engine.world_gen.chunk import Chunk
-from genesim_lab.Engine.world_gen.sparsevoxeloctree import build_svo
+from genesim_lab.Engine.sl_manager.SaveManager import load_decoder
+from genesim_lab.Meshes.chunk_mesh_builder import build_chunk_mesh
 
 # All Processes to spawn -------------------------------|
 # custom manager to support custom classes
@@ -63,37 +67,37 @@ class LoadProcess(mp.Process):
                 else:
                     # Unwrap data
                     r_id, r_coord = to_process
-                    stg = (self.stg.world.depth_rn, self.stg.world.width_rn, self.stg.world.w_width,
+                    stg = (self.stg.world.depth_rn, self.stg.world.width_rn, self.stg.world.height_rn, self.stg.world.w_width,
                            self.stg.world.w_height, self.stg.world.w_width, self.stg.world.r_size, self.stg.world.r_area)
+                    ck_stg = (r_id, r_coord, self.stg.world.r_size, self.stg.world.c_size, self.stg.world.c_area, self.stg.world.c_vol)
 
                     # If region already exists load it (only voxels)
-                    is_loaded, voxels = asynch_load_region(self.stg.util, self.stg.world, r_id)
-
-                    # Preallocate Chunks and voxels
-                    chunks = [None for _ in range(self.stg.world.r_vol)]
-                    svo = dict()
+                    is_loaded, l_voxels = asynch_load_region(self.stg.util, self.stg.world, r_id)
 
                     # Build Chunks
+                    voxels = np.zeros([self.stg.world.r_vol, self.stg.world.c_vol], dtype='uint8')
                     if not is_loaded:
-                        voxels = np.zeros([self.stg.world.r_vol, self.stg.world.c_vol], dtype='uint8')
-                        asynch_build_chunks({r_id: r_coord}, stg, new=True)
+                        asynch_build_chunks(voxels, {r_id: r_coord}, stg, ck_stg, new=True)
                     else:
-                        asynch_build_chunks({r_id: voxels}, stg, new=False)
+                        asynch_build_chunks(voxels, {r_id: l_voxels}, stg, ck_stg, new=False)
 
                     # Build Chunks Mesh
-                    for chunk in chunks[r_id]:
+                    format_size = sum(int(fmt[:1]) for fmt in '1u4'.split())
+                    for vox in voxels:
                         if chunk is not None:
-                            chunk.build_mesh_threaded()
-
-                    # Build SVO
-                    svo[r_id] = build_svo(self.app, self.world.info, self.world.chunks[r_id], r_index)
+                            vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = vox,
+                                                                         format_size  = format_size,
+                                                                            chunk_pos    = self.chunk.index,
+                                                                         world_voxels = voxels,
+                                                                            region_pos   = self.chunk.r_index,
+                                                                            stg          = self.chunk.mesh_stg,)
 
                     # Load response to dedicated queue (to be read by main process)
-                    self.rsp_queue.put([result, voxels, chunk, svo])
+                    self.rsp_queue.put([r_id, voxels, vox_mesh, vox_mesh_greedy])
 
 # Functions called by Child Processes -----------------|
-def asynch_build_chunks(load_voxels, stg, new=True):
-    depth_rn, width_rn, w_width, w_height, w_width, r_size, r_area = stg
+def asynch_build_chunks(vx, load_voxels, stg, ck_stg, new=True):
+    depth_rn, width_rn, height_rn, w_width, w_height, w_width, r_size, r_area = stg
     for r in load_voxels.keys():
 
         # Compute region chunk distribution
@@ -111,20 +115,36 @@ def asynch_build_chunks(load_voxels, stg, new=True):
             for x in range(width):
                 for y in range(height):
                     for z in range(depth):
-                        chunk = Chunk(self, index=(x, y, z), r_index=(w, h, d))
 
                         chunk_index = x + r_size * z + r_area * y
-                        self.chunks[r][chunk_index] = chunk
 
                         # Put the chunk voxels in a separate array
                         if new:
-                            self.voxels[r][chunk_index] = chunk.build_voxels()
+                            vx[chunk_index] = asynch_build_voxels(ck_stg)
                         else:
-                            self.voxels[r][chunk_index] = load_voxels[r][chunk_index, :]
-                            chunk.is_empty = False
+                            vx[chunk_index] = load_voxels[r][chunk_index, :]
 
-                        # Get pointer to voxels
-                        chunk.voxels = self.voxels[r][chunk_index]
+def asynch_build_voxels(stg):
+    index, r_index, r_size, c_size, c_area, c_vol = stg
+    # Empty chunk
+    voxels = np.zeros(c_vol, dtype='uint8')
+    rng = random.randrange(1, 100)
+
+    # Fill chunk
+    cx, cy, cz = (glm.ivec3(index) + glm.ivec3(r_index) * r_size) * c_size
+
+    for x in range(c_size):
+        for z in range(c_size):
+            wx = x + cx
+            wz = z + cz
+            world_height = int(glm.simplex(glm.vec2(wx, wz) * 0.01) * 32 + 32)
+            local_height = min(world_height - cy, c_size)
+
+            for y in range(local_height):
+                wy = y + cy
+                voxels[x + c_size * z + c_area * y] = 1
+
+    return voxels
 
 def asynch_save_region(region):
     pass
