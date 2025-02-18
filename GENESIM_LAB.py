@@ -3,7 +3,6 @@
 # Created on: 31/07/2023
 # Last update: 17/12/2023
 # Notes: Main module to run simulation Engine
-import queue
 
 # Import third party and Engine packages ---------|
 from genesim_lab.Engine.scene.surfaces import Scene, init_shaders_2d
@@ -12,10 +11,9 @@ from genesim_lab.Engine.scene.events import *
 from genesim_lab.Engine.player.player import Player
 from genesim_lab.Processes.Process import init_manager_stg, LoadProcess
 from genesim_lab.Engine.world_gen.textures import Textures
-from genesim_lab.Saves.SaveManager import SaveManager
+from genesim_lab.Engine.sl_manager.SaveManager import SaveManager
 from multiprocessing import Queue
 
-import multiprocessing as mp
 import moderngl as mgl
 import pygame as pg
 import sys
