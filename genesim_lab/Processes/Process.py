@@ -41,15 +41,15 @@ class SubProxy(BaseProxy):
            self._callmethod('__setattr__', (key, value))
 
 
+# Processes ----
 class LoadProcess(mp.Process):
 
-    def __init__(self, request_q, response_q, settings, voxels=None):
+    def __init__(self, request_q, response_q, settings):
         # Extend class
         super().__init__()
 
         # Init shared data
         self.stg = settings # Share world settings
-        self.voxels = voxels # Share world voxels (dict of np array)
         self.rq_queue = request_q
         self.rsp_queue = response_q
 
@@ -69,7 +69,7 @@ class LoadProcess(mp.Process):
                     r_id, r_coord = to_process
                     stg = (self.stg.world.depth_rn, self.stg.world.width_rn, self.stg.world.height_rn, self.stg.world.w_width,
                            self.stg.world.w_height, self.stg.world.w_width, self.stg.world.r_size, self.stg.world.r_area)
-                    ck_stg = (r_id, r_coord, self.stg.world.r_size, self.stg.world.c_size, self.stg.world.c_area, self.stg.world.c_vol)
+                    ck_stg = [r_id, r_coord, self.stg.world.r_size, self.stg.world.c_size, self.stg.world.c_area, self.stg.world.c_vol]
                     mesh_stg = ChunkMeshSettings(self.stg.world.c_size, self.stg.world.c_area, self.stg.world.c_vol,
                                 self.stg.world.offset[0], self.stg.world.offset[1], self.stg.world.offset[2],
                                 self.stg.world.v_x, self.stg.world.v_y, self.stg.world.v_z,
@@ -80,7 +80,8 @@ class LoadProcess(mp.Process):
                     is_loaded, l_voxels = asynch_load_region(self.stg.util, self.stg.world, r_id)
 
                     # Build Chunks
-                    voxels = {r_id : np.zeros([self.stg.world.r_vol, self.stg.world.c_vol], dtype='uint8')}
+                    voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
+                    voxels[r_id] = np.zeros([self.stg.world.r_vol, self.stg.world.c_vol], dtype='uint8')
                     vox_meshes = {c : None for c in range(self.stg.world.r_vol)}
                     vox_meshes_greedy = {c: None for c in range(self.stg.world.r_vol)}
                     if not is_loaded:
@@ -91,12 +92,12 @@ class LoadProcess(mp.Process):
                     # Build Chunks Mesh
                     format_size = sum(int(fmt[:1]) for fmt in '1u4'.split())
                     for idx in range(self.stg.world.r_vol):
-                        if np.any(voxels[idx]):
+                        if np.any(voxels[r_id][idx, :]):
                             y = idx // self.stg.world.c_area
                             z = (idx - y * self.stg.world.c_area) // self.stg.world.c_size
                             x = (idx - y * self.stg.world.c_area) % self.stg.world.c_size
                             c_index = [x, y, z]
-                            vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = voxels[idx],
+                            vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = voxels[r_id][idx, :],
                                                                          format_size  = format_size,
                                                                          chunk_pos    = c_index,
                                                                          world_voxels = voxels,
@@ -106,7 +107,38 @@ class LoadProcess(mp.Process):
                             vox_meshes_greedy[idx] = vox_mesh_greedy
 
                     # Load response to dedicated queue (to be read by main process)
-                    self.rsp_queue.put([r_id, voxels, vox_meshes, vox_meshes_greedy])
+                    self.rsp_queue.put({"load" : [r_id, voxels, vox_meshes, vox_meshes_greedy]})
+
+
+class SaveProcess(mp.Process):
+
+    def __init__(self, request_q, response_q, settings):
+        # Extend class
+        super().__init__()
+
+        # Init shared data
+        self.stg = settings # Share world settings
+        self.rq_queue = request_q
+        self.rsp_queue = response_q
+
+    def run(self):
+        while True:
+            if self.rq_queue.empty():
+                # Sleep
+                time.sleep(1)
+            else:
+                # Retrieve data to process
+                to_process = self.rq_queue.get()
+                # Check if Kill command
+                if to_process == "Kill":
+                    self.terminate()
+                else:
+                    # Unwrap data
+                    r_id, r_coord = to_process
+
+                    # Load response to dedicated queue (to be read by main process)
+                    self.rsp_queue.put({"save" : [r_id]})
+
 
 # Functions called by Child Processes -----------------|
 def asynch_build_chunks(vx, load_voxels, stg, ck_stg, new=True):
@@ -133,6 +165,7 @@ def asynch_build_chunks(vx, load_voxels, stg, ck_stg, new=True):
 
                     # Put the chunk voxels in a separate array
                     if new:
+                        ck_stg[0] = [x, y, z]
                         vx[r][chunk_index] = asynch_build_voxels(ck_stg)
                     else:
                         vx[r][chunk_index] = load_voxels[r][chunk_index, :]

@@ -184,7 +184,7 @@ class SharedGameSettings:  # Main wrapped settings class
         self.util        = util
 
         # Addition settings to compute after init
-        self.player.pos = glm.vec3(0, self.world.w_height * self.world.c_size * self.world.v_y, 0)
+        self.player.pos = glm.vec3(0, self.world.w_height * self.world.c_size * self.world.v_y / 2, 0)
 
 
 class GameSettings:  # Main settings class
@@ -200,7 +200,7 @@ class GameSettings:  # Main settings class
         self.font_util   = FontUtil()
 
         # Addition settings to compute after init
-        self.player.pos = glm.vec3(0, self.world.w_height * self.world.c_size * self.world.v_y, 0)
+        self.player.pos = glm.vec3(0, self.world.w_height * self.world.c_size * self.world.v_y / 2, 0)
 
 
 # Mesh builder util functions ----------------------------------------|

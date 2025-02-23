@@ -36,6 +36,9 @@ class EventHandler:  # Manage every event related to player and scenes (simulati
             "ui_action"     : "",
             "ui_show"       : False
         }
+        # Custom event to search for region updates each second
+        self.REGION_EVENT = pg.USEREVENT + 3
+        pg.time.set_timer(self.REGION_EVENT, 500)
 
 #---## Main Event handler functions ------------------------------------------------------------------------------------
     def find_active_sprite(self, scene):

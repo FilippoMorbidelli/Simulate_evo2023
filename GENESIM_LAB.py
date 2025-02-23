@@ -9,7 +9,7 @@ from genesim_lab.Engine.scene.surfaces import Scene, init_shaders_2d
 from genesim_lab.Engine.world_gen.shader_program import ShaderProgram
 from genesim_lab.Engine.scene.events import *
 from genesim_lab.Engine.player.player import Player
-from genesim_lab.Processes.Process import init_manager_stg, LoadProcess
+from genesim_lab.Processes.Process import init_manager_stg, LoadProcess, SaveProcess
 from genesim_lab.Engine.world_gen.textures import Textures
 from genesim_lab.Engine.sl_manager.SaveManager import SaveManager
 from multiprocessing import Queue
@@ -92,6 +92,11 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         self.req_queues["load"] = Queue()
         self.processes["load"] = LoadProcess(self.req_queues["load"], self.resp_queue, self.mp_stg)
         self.processes["load"].start()
+
+        # Save region process
+        self.req_queues["save"] = Queue()
+        self.processes["save"] = SaveProcess(self.req_queues["save"], self.resp_queue, self.mp_stg)
+        self.processes["save"].start()
 
     def update(self):
         # Update time, delta_time
