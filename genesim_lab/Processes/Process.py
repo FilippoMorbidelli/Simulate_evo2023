@@ -80,7 +80,7 @@ class LoadProcess(mp.Process):
                     is_loaded, l_voxels = asynch_load_region(self.stg.util, self.stg.world, r_id)
 
                     # Build Chunks
-                    voxels = np.zeros([self.stg.world.r_vol, self.stg.world.c_vol], dtype='uint8')
+                    voxels = {r_id : np.zeros([self.stg.world.r_vol, self.stg.world.c_vol], dtype='uint8')}
                     vox_meshes = {c : None for c in range(self.stg.world.r_vol)}
                     vox_meshes_greedy = {c: None for c in range(self.stg.world.r_vol)}
                     if not is_loaded:
@@ -90,13 +90,13 @@ class LoadProcess(mp.Process):
 
                     # Build Chunks Mesh
                     format_size = sum(int(fmt[:1]) for fmt in '1u4'.split())
-                    for idx, vox in np.ndenumerate(voxels):
-                        if vox.any():
+                    for idx in range(self.stg.world.r_vol):
+                        if np.any(voxels[idx]):
                             y = idx // self.stg.world.c_area
                             z = (idx - y * self.stg.world.c_area) // self.stg.world.c_size
                             x = (idx - y * self.stg.world.c_area) % self.stg.world.c_size
                             c_index = [x, y, z]
-                            vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = vox,
+                            vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = voxels[idx],
                                                                          format_size  = format_size,
                                                                          chunk_pos    = c_index,
                                                                          world_voxels = voxels,
@@ -133,9 +133,9 @@ def asynch_build_chunks(vx, load_voxels, stg, ck_stg, new=True):
 
                     # Put the chunk voxels in a separate array
                     if new:
-                        vx[chunk_index] = asynch_build_voxels(ck_stg)
+                        vx[r][chunk_index] = asynch_build_voxels(ck_stg)
                     else:
-                        vx[chunk_index] = load_voxels[r][chunk_index, :]
+                        vx[r][chunk_index] = load_voxels[r][chunk_index, :]
 
 def asynch_build_voxels(stg):
     index, r_index, r_size, c_size, c_area, c_vol = stg
