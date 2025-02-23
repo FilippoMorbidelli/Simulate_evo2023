@@ -85,7 +85,7 @@ class World:  # Contains settings about world generation, chunks, regions, ecc
     offset    : glm.vec3 = glm.vec3(w_width/2, 0, w_depth/2)
 
     # Region data
-    r_size   : int = 4  # Number of chunks per dimension per region
+    r_size   : int = 2  # Number of chunks per dimension per region
     r_area   : int = r_size ** 2
     r_vol    : int = r_size ** 3
     rc_size  : int = r_size * c_size

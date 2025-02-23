@@ -70,12 +70,19 @@ class LoadProcess(mp.Process):
                     stg = (self.stg.world.depth_rn, self.stg.world.width_rn, self.stg.world.height_rn, self.stg.world.w_width,
                            self.stg.world.w_height, self.stg.world.w_width, self.stg.world.r_size, self.stg.world.r_area)
                     ck_stg = (r_id, r_coord, self.stg.world.r_size, self.stg.world.c_size, self.stg.world.c_area, self.stg.world.c_vol)
+                    mesh_stg = ChunkMeshSettings(self.stg.world.c_size, self.stg.world.c_area, self.stg.world.c_vol,
+                                self.stg.world.offset[0], self.stg.world.offset[1], self.stg.world.offset[2],
+                                self.stg.world.v_x, self.stg.world.v_y, self.stg.world.v_z,
+                                self.stg.world.r_size, self.stg.world.r_area, self.stg.world.rc_size,
+                                self.stg.world.width_rn, self.stg.world.height_rn, self.stg.world.depth_rn)
 
                     # If region already exists load it (only voxels)
                     is_loaded, l_voxels = asynch_load_region(self.stg.util, self.stg.world, r_id)
 
                     # Build Chunks
                     voxels = np.zeros([self.stg.world.r_vol, self.stg.world.c_vol], dtype='uint8')
+                    vox_meshes = {c : None for c in range(self.stg.world.r_vol)}
+                    vox_meshes_greedy = {c: None for c in range(self.stg.world.r_vol)}
                     if not is_loaded:
                         asynch_build_chunks(voxels, {r_id: r_coord}, stg, ck_stg, new=True)
                     else:
@@ -83,17 +90,23 @@ class LoadProcess(mp.Process):
 
                     # Build Chunks Mesh
                     format_size = sum(int(fmt[:1]) for fmt in '1u4'.split())
-                    for vox in voxels:
-                        if chunk is not None:
+                    for idx, vox in np.ndenumerate(voxels):
+                        if vox.any():
+                            y = idx // self.stg.world.c_area
+                            z = (idx - y * self.stg.world.c_area) // self.stg.world.c_size
+                            x = (idx - y * self.stg.world.c_area) % self.stg.world.c_size
+                            c_index = [x, y, z]
                             vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = vox,
                                                                          format_size  = format_size,
-                                                                            chunk_pos    = self.chunk.index,
+                                                                         chunk_pos    = c_index,
                                                                          world_voxels = voxels,
-                                                                            region_pos   = self.chunk.r_index,
-                                                                            stg          = self.chunk.mesh_stg,)
+                                                                         region_pos   = r_coord,
+                                                                         stg          = mesh_stg)
+                            vox_meshes[idx] = vox_mesh
+                            vox_meshes_greedy[idx] = vox_mesh_greedy
 
                     # Load response to dedicated queue (to be read by main process)
-                    self.rsp_queue.put([r_id, voxels, vox_mesh, vox_mesh_greedy])
+                    self.rsp_queue.put([r_id, voxels, vox_meshes, vox_meshes_greedy])
 
 # Functions called by Child Processes -----------------|
 def asynch_build_chunks(vx, load_voxels, stg, ck_stg, new=True):
@@ -108,21 +121,21 @@ def asynch_build_chunks(vx, load_voxels, stg, ck_stg, new=True):
             d = (r - h * depth_rn * width_rn) // width_rn
             w = r - h * depth_rn * width_rn - d * width_rn
 
-            width = int(w_width - w * r_size) if w == width_rn - 1 else r_size
-            height = int(w_height - h * r_size) if h == height_rn - 1 else r_size
-            depth = int(w_width - d * r_size) if d == depth_rn - 1 else r_size
+        width = int(w_width - w * r_size) if w == width_rn - 1 else r_size
+        height = int(w_height - h * r_size) if h == height_rn - 1 else r_size
+        depth = int(w_width - d * r_size) if d == depth_rn - 1 else r_size
 
-            for x in range(width):
-                for y in range(height):
-                    for z in range(depth):
+        for x in range(width):
+            for y in range(height):
+                for z in range(depth):
 
-                        chunk_index = x + r_size * z + r_area * y
+                    chunk_index = x + r_size * z + r_area * y
 
-                        # Put the chunk voxels in a separate array
-                        if new:
-                            vx[chunk_index] = asynch_build_voxels(ck_stg)
-                        else:
-                            vx[chunk_index] = load_voxels[r][chunk_index, :]
+                    # Put the chunk voxels in a separate array
+                    if new:
+                        vx[chunk_index] = asynch_build_voxels(ck_stg)
+                    else:
+                        vx[chunk_index] = load_voxels[r][chunk_index, :]
 
 def asynch_build_voxels(stg):
     index, r_index, r_size, c_size, c_area, c_vol = stg

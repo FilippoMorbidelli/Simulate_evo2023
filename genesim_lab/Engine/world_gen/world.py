@@ -221,49 +221,6 @@ def get_init_regions(w_info, pos):
     return regions
 
 
-class SimGrid:
-    def __init__(self, settings):
-        # Preallocate attributes
-        self.masks = type("Terrain masks", (), {})()
-
-        # Preallocate grid
-        n = settings['terrain']['shape']
-        grid = np.ones(n, dtype=np.int32)
-
-        # Compute noise
-        noise = fractal_noise(settings)
-        noise = (noise - noise.min()) / (noise.max() - noise.min())
-
-        # Generate water
-        threshold = settings['terrain']['water_threshold']
-        grid[noise < threshold] = settings['terrain']['water_ID']
-
-        # Generate vegetation
-        potential = ((noise - threshold) / (1 - threshold)) ** 4 * 0.7
-        mask = (noise > threshold) * (rnd.rand(n[0], n[1]) < potential)
-        grid[mask] = settings['terrain']['vegetation_ID']
-        self.grid = grid
-
-        # Extract terrain masks
-        veg_mask = np.argwhere(mask)
-        veg_mask[:, 0] = veg_mask[:, 0] - n[0] / 2  # change y values (on rows)
-        veg_mask[:, 0] = - veg_mask[:, 0]
-        veg_mask[:, 1] = veg_mask[:, 1] - n[1] / 2  # change x values (on columns)
-        self.masks.veg_mask = veg_mask
-
-        grass_mask = np.argwhere(grid == 1)
-        grass_mask[:, 0] = grass_mask[:, 0] - n[0] / 2
-        grass_mask[:, 0] = - grass_mask[:, 0]
-        grass_mask[:, 1] = grass_mask[:, 1] - n[1] / 2
-        self.masks.grass_mask = grass_mask
-
-        water_mask = np.argwhere(grid == 0)
-        water_mask[:, 0] = water_mask[:, 0] - n[0] / 2
-        water_mask[:, 0] = - water_mask[:, 0]
-        water_mask[:, 1] = water_mask[:, 1] - n[1] / 2
-        self.masks.water_mask = water_mask
-
-
 # Utility functions----------------------------------
 def generate_perlin_noise_2d(shape, res):
     f = lambda tt: 6 * tt ** 5 - 15 * tt ** 4 + 10 * tt ** 3
