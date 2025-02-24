@@ -155,7 +155,11 @@ class World:
 
             match r_type:
                 case "Load":
-                    pass
+                    r_id, vox, vm, vmg = data
+                    # Set Voxels Data in dict
+                    self.voxels[r_id] = vox
+                    # Create Chunks classes and vao/vbo
+                    # Create SVO
 
                 case "Save":
                     pass

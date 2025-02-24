@@ -96,7 +96,7 @@ class LoadProcess(mp.Process):
                             y = idx // self.stg.world.c_area
                             z = (idx - y * self.stg.world.c_area) // self.stg.world.c_size
                             x = (idx - y * self.stg.world.c_area) % self.stg.world.c_size
-                            c_index = [x, y, z]
+                            c_index = (x, y, z)
                             vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = voxels[r_id][idx, :],
                                                                          format_size  = format_size,
                                                                          chunk_pos    = c_index,
@@ -107,7 +107,7 @@ class LoadProcess(mp.Process):
                             vox_meshes_greedy[idx] = vox_mesh_greedy
 
                     # Load response to dedicated queue (to be read by main process)
-                    self.rsp_queue.put({"load" : [r_id, voxels, vox_meshes, vox_meshes_greedy]})
+                    self.rsp_queue.put(["load", [r_id, voxels[r_id], vox_meshes, vox_meshes_greedy]])
 
 
 class SaveProcess(mp.Process):
