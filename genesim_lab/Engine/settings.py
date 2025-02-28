@@ -73,8 +73,8 @@ class World:  # Contains settings about world generation, chunks, regions, ecc
     scale_i : glm.vec3 = 1 / scale
 
     # World data
-    w_width  : int = 4
-    w_height : int = 4
+    w_width  : int = 16
+    w_height : int = 8
     w_depth  : int = w_width
     w_area   : int = w_width * w_depth
     w_vol    : int = w_area * w_height
@@ -85,7 +85,7 @@ class World:  # Contains settings about world generation, chunks, regions, ecc
     offset    : glm.vec3 = glm.vec3(w_width/2, 0, w_depth/2)
 
     # Region data
-    r_size   : int = 2  # Number of chunks per dimension per region
+    r_size   : int = 8  # Number of chunks per dimension per region
     r_area   : int = r_size ** 2
     r_vol    : int = r_size ** 3
     rc_size  : int = r_size * c_size

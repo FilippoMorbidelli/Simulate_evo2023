@@ -75,6 +75,7 @@ class LoadProcess(mp.Process):
                                 self.stg.world.v_x, self.stg.world.v_y, self.stg.world.v_z,
                                 self.stg.world.r_size, self.stg.world.r_area, self.stg.world.rc_size,
                                 self.stg.world.width_rn, self.stg.world.height_rn, self.stg.world.depth_rn)
+                    send_iter = max(2, self.stg.world.r_vol/16)
 
                     # If region already exists load it (only voxels)
                     is_loaded, l_voxels = asynch_load_region(self.stg.util, self.stg.world, r_id)
@@ -82,12 +83,15 @@ class LoadProcess(mp.Process):
                     # Build Chunks
                     voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
                     voxels[r_id] = np.zeros([self.stg.world.r_vol, self.stg.world.c_vol], dtype='uint8')
-                    vox_meshes = {c : None for c in range(self.stg.world.r_vol)}
-                    vox_meshes_greedy = {c: None for c in range(self.stg.world.r_vol)}
+                    vox_meshes = dict()
+                    vox_meshes_greedy = dict()
                     if not is_loaded:
                         asynch_build_chunks(voxels, {r_id: r_coord}, stg, ck_stg, new=True)
                     else:
                         asynch_build_chunks(voxels, {r_id: l_voxels}, stg, ck_stg, new=False)
+
+                    # Send response to signal that loading has been initialized
+                    self.rsp_queue.put(["Load", "Init", [r_id, voxels[r_id]]])
 
                     # Build Chunks Mesh
                     format_size = sum(int(fmt[:1]) for fmt in '1u4'.split())
@@ -105,9 +109,18 @@ class LoadProcess(mp.Process):
                                                                          stg          = mesh_stg)
                             vox_meshes[idx] = vox_mesh
                             vox_meshes_greedy[idx] = vox_mesh_greedy
+                        else:
+                            vox_meshes[idx] = np.empty(1, dtype='uint32')
+                            vox_meshes_greedy[idx] = np.empty(1, dtype='uint32')
 
-                    # Load response to dedicated queue (to be read by main process)
-                    self.rsp_queue.put(["load", [r_id, voxels[r_id], vox_meshes, vox_meshes_greedy]])
+                        if (idx + 1) % send_iter == 0:
+                            # Send response after max(2, r_vol/16) chunk meshes have been computed
+                            self.rsp_queue.put(["Load", "InProgress", [r_id, r_coord, vox_meshes, vox_meshes_greedy]])
+                            vox_meshes = dict()
+                            vox_meshes_greedy = dict()
+
+                    # Load response to confirm computation of new region has ended
+                    self.rsp_queue.put(["Load", "Done", r_id])
 
 
 class SaveProcess(mp.Process):

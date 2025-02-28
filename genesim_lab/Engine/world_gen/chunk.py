@@ -40,8 +40,8 @@ class Chunk:
         self.mesh.program['m_model'].write(self.m_model)
         self.mesh.program_greedy['m_model'].write(self.m_model)
 
-    def build_mesh(self):
-        self.mesh = ChunkMesh(self)
+    def build_mesh(self, asynch=False, vao_v = None, vao_vg = None):
+        self.mesh = ChunkMesh(self, asynch=asynch, vao_v = vao_v, vao_vg = vao_vg)
 
     def render(self):
         if not self.is_empty:

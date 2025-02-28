@@ -13,7 +13,7 @@ import numpy as np
 # Import packages ------------------------------|
 class ChunkMesh(BaseMesh):
 
-    def __init__(self, chunk):
+    def __init__(self, chunk, asynch=False, vao_v = None, vao_vg = None):
         super().__init__()
         self.app = chunk.app
         self.chunk = chunk
@@ -24,7 +24,10 @@ class ChunkMesh(BaseMesh):
         self.vbo_format = '1u4'  # All data passed as uint8
         self.format_size = sum(int(fmt[:1]) for fmt in self.vbo_format.split())
         self.attrs = ('packed_data',)
-        self.vao, self.vao_greedy = self.get_vao()
+        if not asynch:
+            self.vao, self.vao_greedy = self.get_vao()
+        else:
+            self.vao, self.vao_greedy = self.asynch_get_vao(vao_v, vao_vg)
 
     def rebuild(self):
         self.vao, self.vao_greedy = self.get_vao()
@@ -43,6 +46,30 @@ class ChunkMesh(BaseMesh):
 
     def get_vao(self):
         vertex_data, greedy_data = self.get_vertex_data()
+
+        # Build normal vbo and vao
+        vbo = self.ctx.buffer(vertex_data)
+        vao = self.ctx.vertex_array(
+            self.program,
+            [
+                (vbo, self.vbo_format, *self.attrs),  # First vbo, dedicated to vertex
+            ],
+            skip_errors=True
+        )
+
+        # Build greedy vbo and vao
+        vbo_greedy = self.ctx.buffer(greedy_data)
+        vao_greedy = self.ctx.vertex_array(
+            self.program_greedy,
+            [
+                (vbo_greedy, self.vbo_format, *self.attrs),  # First vbo, dedicated to vertex
+            ],
+            skip_errors=True
+        )
+
+        return vao, vao_greedy
+
+    def asynch_get_vao(self, vertex_data, greedy_data):
 
         # Build normal vbo and vao
         vbo = self.ctx.buffer(vertex_data)

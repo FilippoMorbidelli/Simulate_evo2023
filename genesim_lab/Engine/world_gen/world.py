@@ -30,6 +30,9 @@ class World:
         self.mesh_stg = self.get_mesh_stg()
         self.frustum_check = self.app.player.frustum.is_on_frustum
 
+        # Instantiate voxel dict in NJit
+        self.voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
+
         # Create or load world
         if load_voxels is None:
 
@@ -37,7 +40,6 @@ class World:
             regions_to_create = get_init_regions(self.info, self.app.player.position)
 
             # Prepare voxel dict to be also used by Numba NJit
-            self.voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
             for r_id in regions_to_create.keys():
                 self.voxels[r_id] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
 
@@ -56,7 +58,6 @@ class World:
 
             # Load world
             # Prepare voxel dict to be also used by Numba NJit
-            self.voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
             for r_id in load_voxels.keys():
                 self.voxels[r_id] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
 
@@ -149,20 +150,52 @@ class World:
                     self.app.req_queues["load"].put([rid, new_reg[rid]])
 
         else:
-
             # Process any response
-            r_type, data = self.app.resp_queue.get()
+            event, status, data = self.app.resp_queue.get()
 
-            match r_type:
+            match event:
                 case "Load":
-                    r_id, vox, vm, vmg = data
-                    # Set Voxels Data in dict
-                    self.voxels[r_id] = vox
-                    # Create Chunks classes and vao/vbo
-                    # Create SVO
+
+                    # Unwrap data
+                    if status == "Init":
+                        r_id, vox = data
+                        # Insert voxels in Dict and instantiate chunks
+                        self.voxels[r_id] = vox
+                        self.chunks[r_id] = [None for _ in range(self.info.r_vol)]
+
+                    elif status == "InProgress":
+                        r_id, r_coord, vm, vmg = data
+                        # Add Chunks and Meshes
+                        self.asynch_load_region(r_id, r_coord, vm, vmg)
+
+                    elif status == "Done":
+                        r_id = data
+                        # Create SVO
+                        self.svo[r_id] = build_svo(self.app, self.info, self.chunks[r_id], self.chunks[r_id][0].r_index)
 
                 case "Save":
                     pass
+
+    def asynch_load_region(self, r_id, r_coord, vm, vmg):
+
+        # Compute region chunk distribution
+        w, h, d = r_coord
+
+        for c_id in vm.keys():
+            y = c_id // self.info.r_area
+            z = c_id % self.info.r_area // self.info.r_size
+            x = c_id % self.info.r_area % self.info.r_size
+
+            chunk = Chunk(self, index=(x, y, z), r_index=(w, h, d))
+
+            self.chunks[r_id][c_id] = chunk
+
+            # Get pointer to voxels
+            chunk.voxels = self.voxels[r_id][c_id]
+            chunk.is_empty = False
+
+            # Build mesh with already computed data
+            chunk.build_mesh(asynch=True, vao_v=vm[c_id], vao_vg=vmg[c_id])
 
     def update(self):
         # Update Regions
