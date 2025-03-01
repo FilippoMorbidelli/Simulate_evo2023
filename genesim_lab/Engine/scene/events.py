@@ -452,7 +452,6 @@ class EventTypes:
             case "world_name":
                 # Set confirmed name on settings and on sprite
                 self.app.stg.util.curr_save_name = self.app.custom_events.ui_dict["ui_string"]
-                self.app.mp_stg.util.curr_save_name = self.app.custom_events.ui_dict["ui_string"]
                 self.scene_ptr.surf.create_menu.update_name(self.app.custom_events.ui_dict["ui_string"])
                 # TEMPORARY TO REMOVE - CREATE SAVE DIRECTORY
                 path_to_create = Path(__file__).parent.parent.parent.parent / self.app.stg.util.save_path / self.app.custom_events.ui_dict["ui_string"] / "World/"

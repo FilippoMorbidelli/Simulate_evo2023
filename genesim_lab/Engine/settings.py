@@ -73,7 +73,7 @@ class World:  # Contains settings about world generation, chunks, regions, ecc
     scale_i : glm.vec3 = 1 / scale
 
     # World data
-    w_width  : int = 16
+    w_width  : int = 8
     w_height : int = 8
     w_depth  : int = w_width
     w_area   : int = w_width * w_depth
@@ -85,7 +85,7 @@ class World:  # Contains settings about world generation, chunks, regions, ecc
     offset    : glm.vec3 = glm.vec3(w_width/2, 0, w_depth/2)
 
     # Region data
-    r_size   : int = 8  # Number of chunks per dimension per region
+    r_size   : int = 4  # Number of chunks per dimension per region
     r_area   : int = r_size ** 2
     r_vol    : int = r_size ** 3
     rc_size  : int = r_size * c_size
@@ -93,6 +93,12 @@ class World:  # Contains settings about world generation, chunks, regions, ecc
     height_rn: int = int(np.ceil(w_height / r_size))
     depth_rn : int = int(np.ceil(w_depth / r_size))
     r_number : int = width_rn * height_rn * depth_rn
+    r_limit  = []
+    for x in range(r_size):
+        for y in range(r_size):
+            for z in range(r_size):
+                if x == 0 or x == r_size - 1 or z == 0 or z == r_size - 1:
+                    r_limit.append(x + z * r_size + y * r_size**2)
 
     # Octree creation data
     vso_depth    : int = int(np.log2(r_size) - 1)  # log2(r_size)
@@ -161,30 +167,12 @@ class Util:  # Contains settings about util parameters and functions
     save_path  : str = "SaveFiles/"  # Path in Game directory containing the save files
     curr_save_name : str = ""  # Temporary save name of current loaded game name
 
+
 class FontUtil:
     def __init__(self):
         self.text_font : pg.font = pg.font.SysFont('Verdana', 16)  # Font and size for utility text
         self.ui_font: freetype.Font = freetype.Font(Path(__file__).parent.parent / "Assets/Fonts/Stormfaze.otf", 28)
         self.text_color: tuple = (255, 255, 255)  # Color of displayed text
-
-
-#@dataclass(slots=True, order=True)
-class SharedGameSettings:  # Main wrapped settings class
-    def __init__(self, world, simulation,
-                 world_obj, interaction, window,
-                 camera_data, player_data, util):
-        # Set from input each subclass since they need to be ProxyClass to support MultiProcessing
-        self.world       = world
-        self.sim         = simulation
-        self.world_obj   = world_obj
-        self.interaction = interaction
-        self.window      = window
-        self.camera      = camera_data
-        self.player      = player_data
-        self.util        = util
-
-        # Addition settings to compute after init
-        self.player.pos = glm.vec3(0, self.world.w_height * self.world.c_size * self.world.v_y / 2, 0)
 
 
 class GameSettings:  # Main settings class

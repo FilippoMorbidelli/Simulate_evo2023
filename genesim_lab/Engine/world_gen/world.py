@@ -147,7 +147,7 @@ class World:
             if self.app.req_queues["load"].empty():
                 for rid in to_add:
                     # Send to Load Process queue the required region to be loaded or created
-                    self.app.req_queues["load"].put([rid, new_reg[rid]])
+                    self.app.req_queues["load"].put([rid, new_reg[rid], self.info, self.app.stg.util])
 
         else:
             # Process any response
@@ -169,9 +169,9 @@ class World:
                         self.asynch_load_region(r_id, r_coord, vm, vmg)
 
                     elif status == "Done":
-                        r_id = data
+                        r_id, r_coord = data
                         # Create SVO
-                        self.svo[r_id] = build_svo(self.app, self.info, self.chunks[r_id], self.chunks[r_id][0].r_index)
+                        self.svo[r_id] = build_svo(self.app, self.info, self.chunks[r_id], r_coord)
 
                 case "Save":
                     pass
@@ -195,7 +195,10 @@ class World:
             chunk.is_empty = False
 
             # Build mesh with already computed data
-            chunk.build_mesh(asynch=True, vao_v=vm[c_id], vao_vg=vmg[c_id])
+            if c_id in self.info.r_limit:
+                chunk.build_mesh()
+            else:
+                chunk.build_mesh(asynch=True, vao_v=vm[c_id], vao_vg=vmg[c_id])
 
     def update(self):
         # Update Regions
@@ -226,14 +229,12 @@ class World:
 
             # Check if parent at level X contains data to be rendered
             if node.data:
-
-                for ck_id, _ in node.data.items():
+                for ck_id in node.data.keys():
                     self.chunks[region][ck_id].render()
 
             # If node doesn't contain item check if it has children and is visible from player frustum
             elif node.children:
-
-                for child_coord, child_node in node.children.items():
+                for child_node in node.children.values():
                     self.svo_frustum_render(child_node, region)
 
     def get_mesh_stg(self):

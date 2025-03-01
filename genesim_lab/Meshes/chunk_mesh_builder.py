@@ -251,10 +251,10 @@ def greedy_mesh_builder(v_mask, face, voxel, level, gvd, indexGreedy, stg):
 @njit
 def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_pos, stg):
     # Array containing additional properties [Voxel_ID, Face_ID] - type: uint8 to reduce memory size
-    vertex_data = np.empty(stg.c_vol * 36 * format_size, dtype='uint32')
+    vertex_data = np.empty(stg.c_vol * 18 * format_size, dtype='uint32')
     # Array containing voxel type per face, after culling (used by greedy meshing algo)
     greedy_raw_data = np.zeros((stg.c_vol, 6), dtype = 'uint8')
-    greedy_vertex_data = np.empty(stg.c_vol * 36 * format_size, dtype='uint32')
+    greedy_vertex_data = np.empty(stg.c_vol * 18 * format_size, dtype='uint32')
     # Init index to extract actual size of matrix
     index = 0
     indexGreedy = 0

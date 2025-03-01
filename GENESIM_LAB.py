@@ -9,9 +9,10 @@ from genesim_lab.Engine.scene.surfaces import Scene, init_shaders_2d
 from genesim_lab.Engine.world_gen.shader_program import ShaderProgram
 from genesim_lab.Engine.scene.events import *
 from genesim_lab.Engine.player.player import Player
-from genesim_lab.Processes.Process import init_manager_stg, LoadProcess, SaveProcess
+from genesim_lab.Processes.Process import LoadProcess, SaveProcess
 from genesim_lab.Engine.world_gen.textures import Textures
 from genesim_lab.Engine.sl_manager.SaveManager import SaveManager
+from genesim_lab.Engine.settings import GameSettings
 from multiprocessing import Queue
 
 import moderngl as mgl
@@ -35,7 +36,7 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #
 
         # Multiprocessing Manager and Engine settings
-        self.mp_manager, self.mp_stg, self.stg = init_manager_stg()
+        self.stg = GameSettings()
 
         # Set Engine window size (default: full screen)
         if self.stg.window.full_screen:
@@ -90,12 +91,12 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
 
         # Load region process
         self.req_queues["load"] = Queue()
-        self.processes["load"] = LoadProcess(self.req_queues["load"], self.resp_queue, self.mp_stg)
+        self.processes["load"] = LoadProcess(self.req_queues["load"], self.resp_queue)
         self.processes["load"].start()
 
         # Save region process
         self.req_queues["save"] = Queue()
-        self.processes["save"] = SaveProcess(self.req_queues["save"], self.resp_queue, self.mp_stg)
+        self.processes["save"] = SaveProcess(self.req_queues["save"], self.resp_queue)
         self.processes["save"].start()
 
     def update(self):
@@ -128,8 +129,6 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
             self.handle_events()  # Handle event checks and computations
             self.update()         # Perform attributes, variables and state updates
             self.render()         # Perform render of current scene once every update has been done
-        # Shutdown manager
-        self.mp_manager.shutdown()
         # Shutdown any running process
         for process in self.processes.values():
             process.terminate()
