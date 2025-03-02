@@ -26,6 +26,9 @@ freetype.init() # Init pygame fonts to create font inside settings
 
 
 # All game settings -----------------|
+class Proxy:
+    pass
+
 @dataclass(slots=True, order=True)
 class WorldObj:  # Contains settings about any world object
     # Skybox

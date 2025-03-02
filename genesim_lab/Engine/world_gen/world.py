@@ -7,6 +7,7 @@
 # Import packages ------------------------------|
 import math
 import numpy as np
+import time
 import numpy.random as rnd
 from numba import types
 from numba.typed import Dict
@@ -25,6 +26,10 @@ class World:
     def __init__(self, app, load_voxels = None):
         self.app = app
         self.info = app.stg.world
+
+        # Load and Save processes status
+        self.load_status = "Idle"
+        self.save_status = "Idle"
 
         # Retrieve mesh settings and frustum
         self.mesh_stg = self.get_mesh_stg()
@@ -144,10 +149,15 @@ class World:
                     self.svo.pop(rid)
 
             # Load/Create regions
-            if self.app.req_queues["load"].empty():
-                for rid in to_add:
-                    # Send to Load Process queue the required region to be loaded or created
-                    self.app.req_queues["load"].put([rid, new_reg[rid], self.info, self.app.stg.util])
+            if self.load_status == "Idle" and to_add:
+                # Copy voxels dict to send
+                to_send_dict = dict()
+                for r in self.voxels:
+                    to_send_dict[r] = self.voxels[r]
+                # Send to Load Process queue the required region to be loaded or created
+                self.app.req_queues["load"].put([to_add, new_reg, to_send_dict, self.info, self.app.stg.util])
+                # Update local load process status
+                self.load_status = "Occupied"
 
         else:
             # Process any response
@@ -162,16 +172,26 @@ class World:
                         # Insert voxels in Dict and instantiate chunks
                         self.voxels[r_id] = vox
                         self.chunks[r_id] = [None for _ in range(self.info.r_vol)]
+                        # Update local load process status
+                        self.load_status = status
 
                     elif status == "InProgress":
                         r_id, r_coord, vm, vmg = data
                         # Add Chunks and Meshes
                         self.asynch_load_region(r_id, r_coord, vm, vmg)
+                        # Update local load process status
+                        self.load_status = status
 
-                    elif status == "Done":
+                    elif status == "DoneRegion":
                         r_id, r_coord = data
                         # Create SVO
                         self.svo[r_id] = build_svo(self.app, self.info, self.chunks[r_id], r_coord)
+                        # Update local load process status
+                        self.load_status = status
+
+                    elif status == "Done":
+                        # Update local load process status
+                        self.load_status = "Idle"
 
                 case "Save":
                     pass
@@ -195,10 +215,7 @@ class World:
             chunk.is_empty = False
 
             # Build mesh with already computed data
-            if c_id in self.info.r_limit:
-                chunk.build_mesh()
-            else:
-                chunk.build_mesh(asynch=True, vao_v=vm[c_id], vao_vg=vmg[c_id])
+            chunk.build_mesh(asynch=True, vao_v=vm[c_id], vao_vg=vmg[c_id])
 
     def update(self):
         # Update Regions
@@ -251,7 +268,7 @@ class World:
 def get_init_regions(w_info, pos):
     rx, ry, rz = (pos / w_info.scale + w_info.offset * w_info.c_size) // w_info.rc_size
 
-    regions = {}
+    new_regions = {}
     for x in [rx - 1, rx, rx + 1]:
 
         # Check if outside world bound
@@ -271,9 +288,9 @@ def get_init_regions(w_info, pos):
                     continue
 
                 r_id = int(x + w_info.width_rn * z + w_info.width_rn * w_info.depth_rn * y)
-                regions[r_id] = [x, y, z]
+                new_regions[r_id] = [x, y, z]
 
-    return regions
+    return new_regions
 
 
 # Utility functions----------------------------------

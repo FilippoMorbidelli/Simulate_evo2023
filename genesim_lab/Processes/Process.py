@@ -11,10 +11,10 @@ import random
 from numba import types
 from numba.typed import Dict
 
-from multiprocessing.managers import BaseManager, BaseProxy
 from genesim_lab.Engine.settings import *
 from genesim_lab.Engine.sl_manager.SaveManager import load_decoder
 from genesim_lab.Meshes.chunk_mesh_builder import build_chunk_mesh
+from genesim_lab.Engine.world_gen.chunk import ChunkProxy
 
 # All Processes to spawn -------------------------------|
 
@@ -42,13 +42,11 @@ class LoadProcess(mp.Process):
                     self.terminate()
                 else:
                     # Unwrap data
-                    r_id, r_coord, w_stg, util = to_process
+                    r_ids, r_coord, w_vox, w_stg, util = to_process
 
                     # Compute specialized settings
                     stg = (w_stg.depth_rn, w_stg.width_rn, w_stg.height_rn, w_stg.w_width,
                            w_stg.w_height, w_stg.w_width, w_stg.r_size, w_stg.r_area)
-
-                    ck_stg = [r_id, r_coord, w_stg.r_size, w_stg.c_size, w_stg.c_area, w_stg.c_vol]
 
                     mesh_stg = ChunkMeshSettings(w_stg.c_size, w_stg.c_area, w_stg.c_vol,
                                                  w_stg.offset[0], w_stg.offset[1], w_stg.offset[2],
@@ -58,50 +56,59 @@ class LoadProcess(mp.Process):
 
                     send_iter = max(2, w_stg.r_vol/16)
 
-                    # If region already exists load it (only voxels)
-                    is_loaded, l_voxels = asynch_load_region(util, w_stg, r_id)
-
-                    # Build Chunks
+                    # Create NJit dict with already known voxels
                     voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
-                    voxels[r_id] = np.zeros([w_stg.r_vol, w_stg.c_vol], dtype='uint8')
-                    vox_meshes = dict()
-                    vox_meshes_greedy = dict()
-                    if not is_loaded:
-                        asynch_build_chunks(voxels, {r_id: r_coord}, stg, ck_stg, new=True)
-                    else:
-                        asynch_build_chunks(voxels, {r_id: l_voxels}, stg, ck_stg, new=False)
+                    for r_key, vox in w_vox.items():
+                        voxels[r_key] = vox
 
-                    # Send response to signal that loading has been initialized
-                    self.rsp_queue.put(["Load", "Init", [r_id, voxels[r_id]]])
+                    for r in r_ids:
+                        # If region already exists load it (only voxels)
+                        is_loaded, l_voxels = asynch_load_region(util, w_stg, r)
+
+                        # Build Chunks
+                        voxels[r] = np.zeros([w_stg.r_vol, w_stg.c_vol], dtype='uint8')
+                        vox_meshes = dict()
+                        vox_meshes_greedy = dict()
+                        if not is_loaded:
+                            asynch_build_chunks(voxels, {r: r_coord[r]}, stg, w_stg, new=True)
+                        else:
+                            asynch_build_chunks(voxels, {r: l_voxels}, stg, w_stg, new=False)
+
+                        # Send response to signal that loading has been initialized
+                        self.rsp_queue.put(["Load", "Init", [r, voxels[r]]])
 
                     # Build Chunks Mesh
                     format_size = sum(int(fmt[:1]) for fmt in '1u4'.split())
-                    for idx in range(w_stg.r_vol):
-                        if np.any(voxels[r_id][idx, :]) and idx not in w_stg.r_limit:
-                            y = idx // w_stg.r_area
-                            z = (idx - y * w_stg.r_area) // w_stg.r_size
-                            x = (idx - y * w_stg.r_area) % w_stg.r_size
-                            c_index = (x, y, z)
-                            vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = voxels[r_id][idx],
-                                                                         format_size  = format_size,
-                                                                         chunk_pos    = c_index,
-                                                                         world_voxels = voxels,
-                                                                         region_pos   = np.asarray(r_coord),
-                                                                         stg          = mesh_stg)
-                            vox_meshes[idx] = vox_mesh
-                            vox_meshes_greedy[idx] = vox_mesh_greedy
-                        else:
-                            vox_meshes[idx] = np.empty(1, dtype='uint32')
-                            vox_meshes_greedy[idx] = np.empty(1, dtype='uint32')
+                    for r in r_ids:
+                        for idx in range(w_stg.r_vol):
+                            if np.any(voxels[r][idx, :]): # and idx not in w_stg.r_limit:
+                                y = idx // w_stg.r_area
+                                z = (idx - y * w_stg.r_area) // w_stg.r_size
+                                x = (idx - y * w_stg.r_area) % w_stg.r_size
+                                c_index = (x, y, z)
+                                vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = voxels[r][idx],
+                                                                             format_size  = format_size,
+                                                                             chunk_pos    = c_index,
+                                                                             world_voxels = voxels,
+                                                                             region_pos   = np.asarray(r_coord[r]),
+                                                                             stg          = mesh_stg)
+                                vox_meshes[idx] = vox_mesh
+                                vox_meshes_greedy[idx] = vox_mesh_greedy
+                            else:
+                                vox_meshes[idx] = np.empty(1, dtype='uint32')
+                                vox_meshes_greedy[idx] = np.empty(1, dtype='uint32')
 
-                        if (idx + 1) % send_iter == 0:
-                            # Send response after max(2, r_vol/16) chunk meshes have been computed
-                            self.rsp_queue.put(["Load", "InProgress", [r_id, r_coord, vox_meshes, vox_meshes_greedy]])
-                            vox_meshes = dict()
-                            vox_meshes_greedy = dict()
+                            if (idx + 1) % send_iter == 0:
+                                # Send response after max(2, r_vol/16) chunk meshes have been computed
+                                self.rsp_queue.put(["Load", "InProgress", [r, r_coord[r], vox_meshes, vox_meshes_greedy]])
+                                vox_meshes = dict()
+                                vox_meshes_greedy = dict()
+
+                        # Load response to confirm computation of new region has ended
+                        self.rsp_queue.put(["Load", "DoneRegion", [r, r_coord[r]]])
 
                     # Load response to confirm computation of new region has ended
-                    self.rsp_queue.put(["Load", "Done", [r_id, r_coord]])
+                    self.rsp_queue.put(["Load", "Done", []])
 
 
 class SaveProcess(mp.Process):
@@ -134,7 +141,7 @@ class SaveProcess(mp.Process):
 
 
 # Functions called by Child Processes -----------------|
-def asynch_build_chunks(vx, load_voxels, stg, ck_stg, new=True):
+def asynch_build_chunks(vx, load_voxels, stg, w_stg, new=True):
     depth_rn, width_rn, height_rn, w_width, w_height, w_width, r_size, r_area = stg
     for r in load_voxels.keys():
 
@@ -158,32 +165,10 @@ def asynch_build_chunks(vx, load_voxels, stg, ck_stg, new=True):
 
                     # Put the chunk voxels in a separate array
                     if new:
-                        ck_stg[0] = [x, y, z]
-                        vx[r][chunk_index] = asynch_build_voxels(ck_stg)
+                        chunk = ChunkProxy(w_stg, index=(x, y, z), r_index=(w, h, d))
+                        vx[r][chunk_index] = chunk.build_voxels()
                     else:
                         vx[r][chunk_index] = load_voxels[r][chunk_index, :]
-
-def asynch_build_voxels(stg):
-    index, r_index, r_size, c_size, c_area, c_vol = stg
-    # Empty chunk
-    voxels = np.zeros(c_vol, dtype='uint8')
-    rng = random.randrange(1, 100)
-
-    # Fill chunk
-    cx, cy, cz = (glm.ivec3(index) + glm.ivec3(r_index) * r_size) * c_size
-
-    for x in range(c_size):
-        for z in range(c_size):
-            wx = x + cx
-            wz = z + cz
-            world_height = int(glm.simplex(glm.vec2(wx, wz) * 0.01) * 32 + 32)
-            local_height = min(world_height - cy, c_size)
-
-            for y in range(local_height):
-                wy = y + cy
-                voxels[x + c_size * z + c_area * y] = 1
-
-    return voxels
 
 def asynch_save_region(region):
     pass

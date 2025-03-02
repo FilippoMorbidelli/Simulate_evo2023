@@ -9,6 +9,7 @@ import random
 from pyglm import glm
 import numpy as np
 from genesim_lab.Meshes.chunk_mesh import ChunkMesh
+from genesim_lab.Engine.settings import Proxy
 
 
 # World generator ------------------------------|
@@ -75,3 +76,18 @@ class Chunk:
             self.is_empty = False
 
         return voxels
+
+
+class ChunkProxy(Chunk):
+
+    def __init__(self, w_stg, index, r_index):
+        # Create proxy class
+        world = Proxy()
+        world.app = Proxy()
+        world.app.player = Proxy()
+        world.app.player.frustum = Proxy()
+        world.app.player.frustum.is_on_frustum = None
+        world.info = w_stg
+        world.mesh_stg = None
+        # Super init with proxy class
+        super().__init__(world, index, r_index)

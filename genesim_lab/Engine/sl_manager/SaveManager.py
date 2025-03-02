@@ -28,7 +28,7 @@ class SaveManager:
         self.info = app.stg.world
 
         self.current_save   = ""
-        self.save_path      = Path(__file__).parent.parent.parent / app.stg.util.save_path
+        self.save_path      = Path(__file__).parent.parent.parent.parent / app.stg.util.save_path
         self.path_world     = "World/"
         self.path_world_ext = ".npz"
 
