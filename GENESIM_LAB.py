@@ -146,7 +146,7 @@ def profiling():
     ps = pstats.Stats(pr, stream=s).sort_stats('tottime')
     ps.print_stats()
 
-    with open('profiling/stats_11012025.txt', 'w+') as f:
+    with open('profiling/stats_02_03_025.txt', 'w+') as f:
         f.write(s.getvalue())
 
 

@@ -76,8 +76,8 @@ class World:  # Contains settings about world generation, chunks, regions, ecc
     scale_i : glm.vec3 = 1 / scale
 
     # World data
-    w_width  : int = 8
-    w_height : int = 8
+    w_width  : int = 64
+    w_height : int = 16
     w_depth  : int = w_width
     w_area   : int = w_width * w_depth
     w_vol    : int = w_area * w_height
@@ -191,7 +191,7 @@ class GameSettings:  # Main settings class
         self.font_util   = FontUtil()
 
         # Addition settings to compute after init
-        self.player.pos = glm.vec3(0, self.world.w_height * self.world.c_size * self.world.v_y / 2, 0)
+        self.player.pos = glm.vec3(0, 47, 0)
 
 
 # Mesh builder util functions ----------------------------------------|

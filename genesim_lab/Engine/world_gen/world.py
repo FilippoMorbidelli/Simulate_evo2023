@@ -124,8 +124,9 @@ class World:
                     chunk.build_mesh()
 
     def update_active_regions(self):
+
+        # If no responses are available check if active regions changed
         if self.app.resp_queue.empty():
-            # If no responses are available check if active regions changed
 
             # Compute new regions
             p_pos = self.app.player.position
@@ -139,14 +140,15 @@ class World:
             to_add    = list(new_set - current_set)
 
             # Delete regions
-            if self.app.req_queues["save"].empty():
-                for rid in to_delete:
-                    # Save region to delete
-                    self.app.save_load.save_single_region(rid)
-                    # Delete region data
-                    self.voxels.pop(rid)
-                    self.chunks.pop(rid)
-                    self.svo.pop(rid)
+            if self.save_status == "Idle" and self.load_status == "Idle" and to_delete:
+                # Copy voxels dict to send
+                to_send_dict = dict()
+                for r in to_delete:
+                    to_send_dict[r] = self.voxels[r]
+                # Send to Save Process queue the required region to be loaded or created
+                self.app.req_queues["save"].put([to_delete, to_send_dict, self.info, self.app.stg.util])
+                # Update local load process status
+                self.save_status = "Occupied"
 
             # Load/Create regions
             if self.load_status == "Idle" and to_add:
@@ -160,13 +162,15 @@ class World:
                 self.load_status = "Occupied"
 
         else:
+
             # Process any response
             event, status, data = self.app.resp_queue.get()
 
+            # Match type of response
             match event:
                 case "Load":
 
-                    # Unwrap data
+                    # Handle response depending on status
                     if status == "Init":
                         r_id, vox = data
                         # Insert voxels in Dict and instantiate chunks
@@ -194,7 +198,20 @@ class World:
                         self.load_status = "Idle"
 
                 case "Save":
-                    pass
+
+                    # Handle response depending on status
+                    if status == "InProgress":
+                        r_id = data
+                        # Delete region data
+                        self.voxels.pop(r_id)
+                        self.chunks.pop(r_id)
+                        self.svo.pop(r_id)
+                        # Reset local save process status
+                        self.save_status = status
+
+                    elif status == "Done":
+                        # Reset local save process status
+                        self.save_status = "Idle"
 
     def asynch_load_region(self, r_id, r_coord, vm, vmg):
 

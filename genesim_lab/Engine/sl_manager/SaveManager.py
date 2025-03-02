@@ -135,7 +135,7 @@ class SaveManager:
 
     def get_name_from_index(self, region_index):
         # Get region coordinates from region index by inspecting a chunk
-        y = region_index // self.info.depth_rn * self.info.width_rn
+        y = region_index // (self.info.depth_rn * self.info.width_rn)
         z = (region_index - y * self.info.depth_rn * self.info.width_rn) // self.info.width_rn
         x = region_index - y * self.info.depth_rn * self.info.width_rn - z * self.info.width_rn
 

@@ -12,7 +12,7 @@ from numba import types
 from numba.typed import Dict
 
 from genesim_lab.Engine.settings import *
-from genesim_lab.Engine.sl_manager.SaveManager import load_decoder
+from genesim_lab.Engine.sl_manager.SaveManager import load_decoder, save_encoder
 from genesim_lab.Meshes.chunk_mesh_builder import build_chunk_mesh
 from genesim_lab.Engine.world_gen.chunk import ChunkProxy
 
@@ -72,7 +72,7 @@ class LoadProcess(mp.Process):
                         if not is_loaded:
                             asynch_build_chunks(voxels, {r: r_coord[r]}, stg, w_stg, new=True)
                         else:
-                            asynch_build_chunks(voxels, {r: l_voxels}, stg, w_stg, new=False)
+                            asynch_build_chunks(voxels, l_voxels, stg, w_stg, new=False)
 
                         # Send response to signal that loading has been initialized
                         self.rsp_queue.put(["Load", "Init", [r, voxels[r]]])
@@ -121,6 +121,9 @@ class SaveProcess(mp.Process):
         self.rq_queue = request_q
         self.rsp_queue = response_q
 
+        # Init other constant data
+        self.app_path = Path(__file__).parent.parent.parent
+
     def run(self):
         while True:
             if self.rq_queue.empty():
@@ -134,10 +137,23 @@ class SaveProcess(mp.Process):
                     self.terminate()
                 else:
                     # Unwrap data
-                    r_id, r_coord = to_process
+                    r_ids, r_vox, w_stg, util = to_process
 
-                    # Load response to dedicated queue (to be read by main process)
-                    self.rsp_queue.put({"save" : [r_id]})
+                    # Prepare save path
+                    path = self.app_path / util.save_path / util.curr_save_name
+
+                    # Save each region
+                    for r in r_ids:
+                        r_name = asynch_name_from_index(w_stg, r)
+                        r_path = "World/" + r_name + ".npz"
+                        with open(path / r_path, 'w+') as f:
+                            voxels = save_encoder(r_vox[r])
+                            np.savez_compressed(path / r_path, voxels)
+                        # Load response of single region saved
+                        self.rsp_queue.put(["Save", "InProgress", r])
+
+                    # Load response to dedicated queue, process finished
+                    self.rsp_queue.put(["Save", "Done", []])
 
 
 # Functions called by Child Processes -----------------|
@@ -190,7 +206,7 @@ def asynch_load_region(util, info, region):
 
 def asynch_name_from_index(info, region_index):
     # Get region coordinates from region index by inspecting a chunk
-    y = region_index // info.depth_rn * info.width_rn
+    y = region_index // (info.depth_rn * info.width_rn)
     z = (region_index - y * info.depth_rn * info.width_rn) // info.width_rn
     x = region_index - y * info.depth_rn * info.width_rn - z * info.width_rn
 
