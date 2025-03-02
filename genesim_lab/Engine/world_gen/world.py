@@ -26,6 +26,7 @@ class World:
     def __init__(self, app, load_voxels = None):
         self.app = app
         self.info = app.stg.world
+        self.center_region = 0
 
         # Load and Save processes status
         self.load_status = "Idle"
@@ -42,7 +43,7 @@ class World:
         if load_voxels is None:
 
             # Create new world
-            regions_to_create = get_init_regions(self.info, self.app.player.position)
+            regions_to_create, _, _ = get_init_regions(self.info, self.app.player.position, self.center_region)
 
             # Prepare voxel dict to be also used by Numba NJit
             for r_id in regions_to_create.keys():
@@ -130,7 +131,7 @@ class World:
 
             # Compute new regions
             p_pos = self.app.player.position
-            new_reg = get_init_regions(self.info, p_pos)
+            new_reg, self.center_region, p_dir = get_init_regions(self.info, p_pos, self.center_region)
 
             #Get Set of both region dicts
             current_set = set(self.voxels.keys())
@@ -154,8 +155,10 @@ class World:
             if self.load_status == "Idle" and to_add:
                 # Copy voxels dict to send
                 to_send_dict = dict()
-                for r in self.voxels:
-                    to_send_dict[r] = self.voxels[r]
+                for r in to_add:
+                    r_index = [new_reg[r][0] - p_dir[0], new_reg[r][1] - p_dir[1], new_reg[r][2] - p_dir[2]]
+                    r_id = int(r_index[0] + self.info.width_rn * r_index[2] + self.info.width_rn * self.info.depth_rn * r_index[1])
+                    to_send_dict[r_id] = self.voxels[r_id]
                 # Send to Load Process queue the required region to be loaded or created
                 self.app.req_queues["load"].put([to_add, new_reg, to_send_dict, self.info, self.app.stg.util])
                 # Update local load process status
@@ -282,8 +285,16 @@ class World:
         return stg
 
 # -- World Util functions ----------------------------------------------------------------------------------------------
-def get_init_regions(w_info, pos):
+def get_init_regions(w_info, pos, c_reg):
     rx, ry, rz = (pos / w_info.scale + w_info.offset * w_info.c_size) // w_info.rc_size
+
+    new_center = rx + w_info.width_rn * rz + w_info.width_rn * w_info.depth_rn * ry
+
+    pry = c_reg // (w_info.width_rn * w_info.depth_rn)
+    prz = (c_reg - pry * w_info.width_rn * w_info.depth_rn) // w_info.width_rn
+    prx = (c_reg - pry * w_info.width_rn * w_info.depth_rn) % w_info.width_rn
+
+    direction = [rx - prx, ry - pry, rz - prz]
 
     new_regions = {}
     for x in [rx - 1, rx, rx + 1]:
@@ -307,7 +318,7 @@ def get_init_regions(w_info, pos):
                 r_id = int(x + w_info.width_rn * z + w_info.width_rn * w_info.depth_rn * y)
                 new_regions[r_id] = [x, y, z]
 
-    return new_regions
+    return new_regions, new_center, direction
 
 
 # Utility functions----------------------------------
