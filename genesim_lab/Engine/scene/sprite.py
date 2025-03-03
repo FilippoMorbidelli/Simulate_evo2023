@@ -186,18 +186,18 @@ class BackgroundSprite(pg.sprite.Sprite):
 
 
 class ButtonSprite(pg.sprite.Sprite):
-    def __init__(self, app, scene, button, ext, flag, anchor = (0, 0), name_add = "", threshold = 127):
+    def __init__(self, app, scene, name, ext, flag, anchor = (0, 0), name_add = "", threshold = 127):
         super().__init__()
         self.app = app
-        self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_F.{ext}').convert_alpha()
-        self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{button}_T.{ext}').convert_alpha()
+        self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{name}_F.{ext}').convert_alpha()
+        self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{name}_T.{ext}').convert_alpha()
         self.image    = self.sprite_F
         self.mask = pg.mask.from_surface(self.image, threshold)
         wh = self.sprite_F.get_size()
         self.rect = pg.Rect(anchor[0], anchor[1], wh[0], wh[1])
 
         self.over : int  = 0 #self.mask.get_at(app.mouse)  # Add check if mouse is over from start
-        self.name : str  = f"button_{button}" + name_add
+        self.name : str  = f"button_{name}" + name_add
 
         # Flags
         self.to_render = True
@@ -322,6 +322,57 @@ class FpsSprite(pg.sprite.Sprite):
             self.image.blit(app.stg.font_util.text_font.render(f'{app.clock.get_fps() :.0f}',
                                                                   True, app.stg.font_util.text_color), (0, 0))
 
+
+class MovingSprite(pg.sprite.Sprite):
+    def __init__(self, app, scene, name, ext, anchor, mov, rot):
+        super().__init__()
+        self.app = app
+        self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/mov_{name}.{ext}').convert_alpha()
+        self.image = self.sprite
+        self.mask = pg.mask.from_surface(self.image)
+        self.or_rect = pg.Rect(anchor[0], anchor[1], self.sprite.get_width(), self.sprite.get_height())
+        self.rect = pg.Rect(anchor[0], anchor[1], self.sprite.get_width(), self.sprite.get_height())
+
+        self.over: int = 0  # self.mask.get_at(app.mouse)  # Add check if mouse is over from start
+        self.name: str = f"button_{name}"
+
+        # Attributes used to compute movement
+        self.mov_logic = mov[0]  # Lambda function that determines sprite behaviour
+        self.mov_speed = mov[1]  # Speed in frames
+
+        self.rot_logic = rot[0]  # Lambda function that determines sprite behaviour
+        self.rot_speed = rot[1]  # Speed in frames
+
+        # Flags
+        self.to_render   = True
+        self.to_interact = False  # Flag to determine if sprite is dynamic or not
+        self.to_rebuild  = True  # Flag to determine if vertices for vbo must be reconstructed every frame
+        self.oneshot_rebuild = False  # Flag to rebuild sprite oneshot
+
+    def update(self, app):
+        # Init image
+        mr_image = self.sprite
+        mr_rect = self.or_rect
+
+        # Compute motion
+        if self.mov_logic:
+            anchor = self.mov_logic(self.mov_speed, self.app.time)
+            mr_rect.x = anchor[0]
+            mr_rect.y = anchor[1]
+
+        # Compute rotation
+        if self.rot_logic:
+            angle = self.rot_logic(self.rot_speed, self.app.time)
+            mr_image = pg.transform.rotate(self.sprite, angle)
+            mr_rect = mr_image.get_rect(center=mr_rect.center)
+
+        # Finalize image
+        self.image = mr_image
+        self.rect = mr_rect
+
+    def reset(self):
+        self.image = self.sprite
+        self.rect = self.or_rect
 
 class UITextSprite(pg.sprite.Sprite):
     def __init__(self, app, blit_rect, xy, string_ptr, font, color = (255, 255, 255), dim = 22, name = ""):

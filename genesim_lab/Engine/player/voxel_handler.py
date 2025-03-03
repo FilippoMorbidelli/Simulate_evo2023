@@ -155,7 +155,11 @@ class VoxelHandler:
         if 0 <= rx < self.w_info.width_rn and 0 <= ry < self.w_info.height_rn and 0 <= rz < self.w_info.depth_rn:
             region_index = rx + self.w_info.width_rn * rz + self.w_info.depth_rn * self.w_info.width_rn * ry
             chunk_index = cx + self.w_info.r_size * cz + self.w_info.r_area * cy
-            chunk = self.chunks[region_index][chunk_index] # Maybe add a try - exception if region is not loaded?
+            try:
+                chunk = self.chunks[region_index][chunk_index] # Maybe add a try - exception if region is not loaded?
+            except (Exception, ):
+                chunk = None
+                print("No voxel available for handling")
 
             if chunk is None:
                 return 0, 0, 0, 0

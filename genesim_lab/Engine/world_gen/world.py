@@ -49,16 +49,14 @@ class World:
             for r_id in regions_to_create.keys():
                 self.voxels[r_id] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
 
-            # Prepare chunks dict
-            self.chunks: dict = {r_id: [None for _ in range(self.info.r_vol)] for r_id in regions_to_create.keys()}
+            # Prepare chunks and svo dict
+            self.chunks = dict()
+            self.svo = dict()
 
-            # Build Chunks, mesh and SVO
-            self.build_chunks(regions_to_create, new=True)
-            self.build_chunk_mesh()
-
-            # Build world sparse voxel octree
-            self.svo: dict = {r: build_svo(self.app, self.info, self.chunks[r], regions_to_create[r]) for r in
-                              regions_to_create.keys()}
+            # Send to Load Process queue the required region to be loaded or created
+            self.app.req_queues["load"].put([list(regions_to_create.keys()), regions_to_create, {}, self.info, self.app.stg.util])
+            # Update local load process status
+            self.load_status = "Occupied"
 
         else:
 
@@ -67,16 +65,14 @@ class World:
             for r_id in load_voxels.keys():
                 self.voxels[r_id] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
 
-            # Prepare chunks dict
-            self.chunks: dict = {r_id: [None for _ in range(self.info.r_vol)] for r_id in load_voxels.keys()}
+            # Prepare chunks and svo dict
+            self.chunks = dict()
+            self.svo = dict()
 
-            # Build Chunks, mesh and SVO
-            self.build_chunks(load_voxels, new=False)
-            self.build_chunk_mesh()
-
-            # Build world sparse voxel octree
-            self.svo: dict = {r: build_svo(self.app, self.info, self.chunks[r], self.chunks[r][0].r_index) for r in
-                              load_voxels.keys()}
+            # Send to Load Process queue the required region to be loaded or created
+            self.app.req_queues["load"].put([list(load_voxels.keys()), load_voxels, {}, self.info, self.app.stg.util])
+            # Update local load process status
+            self.load_status = "Occupied"
 
         # Player interactivity
         self.voxel_handler = VoxelHandler(self)
@@ -155,10 +151,18 @@ class World:
             if self.load_status == "Idle" and to_add:
                 # Copy voxels dict to send
                 to_send_dict = dict()
-                for r in to_add:
-                    r_index = [new_reg[r][0] - p_dir[0], new_reg[r][1] - p_dir[1], new_reg[r][2] - p_dir[2]]
-                    r_id = int(r_index[0] + self.info.width_rn * r_index[2] + self.info.width_rn * self.info.depth_rn * r_index[1])
-                    to_send_dict[r_id] = self.voxels[r_id]
+                case = abs(p_dir[0]) + abs(p_dir[1]) + abs(p_dir[2])
+                if case == 1:
+                    for r in to_add:
+                        r_index = [new_reg[r][0] - p_dir[0], new_reg[r][1] - p_dir[1], new_reg[r][2] - p_dir[2]]
+                        r_id = int(r_index[0] + self.info.width_rn * r_index[2] + self.info.width_rn * self.info.depth_rn * r_index[1])
+                        try:
+                            to_send_dict[r_id] = self.voxels[r_id]
+                        except (Exception, ):
+                            pass
+                else:
+                    for r in new_set.intersection(current_set):
+                        to_send_dict[r] = self.voxels[r]
                 # Send to Load Process queue the required region to be loaded or created
                 self.app.req_queues["load"].put([to_add, new_reg, to_send_dict, self.info, self.app.stg.util])
                 # Update local load process status

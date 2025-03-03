@@ -409,26 +409,44 @@ class MainGame:
         # Instance world
         self.world = None
 
+        # MainGame status
+        self.status = "Inactive"
+
         # Init overlay elements
         overlay_crosshair = OverlaySprite(app, "main_game", "crosshair", "svg", True)
         app.shader_prog_2D.main_game.add(overlay_crosshair)
 
+        # Init loading screen elements
+        load_icon = MovingSprite(app, "main_game/loading", "load_icon", "svg", (1500, 800), [None, None],[lambda x,y : x*y % 360 , 135])
+        app.shader_prog_2D.main_game_loading.add(load_icon)
+
     def init_world(self, vox = None):
         # Initialize 3D graphic elements
+        self.status = "Loading"
         self.world = World(self.app, vox)
 
     def handle(self):
-        self.app.shader_prog_3D()
-        self.app.shader_prog_2D.main_game()
+        if self.status == "Active":
+            self.app.shader_prog_3D()
+            self.app.shader_prog_2D.main_game()
 
     def update(self, app):
-        self.world.update()
-        self.app.shader_prog_3D.update()
-        self.app.shader_prog_2D.main_game.update(app)
+        if self.status == "Active":
+            self.world.update()
+            self.app.shader_prog_3D.update()
+            self.app.shader_prog_2D.main_game.update(app)
+        elif self.status == "Loading":
+            self.world.update()
+            self.app.shader_prog_2D.main_game_loading.update(app)
+            if len(self.world.svo) >= 1:
+                self.status = "Active"
 
     def render(self):
-        self.world.render()
-        self.app.shader_prog_2D.main_game.draw2d()
+        if self.status == "Active":
+            self.world.render()
+            self.app.shader_prog_2D.main_game.draw2d()
+        elif self.status == "Loading":
+            self.app.shader_prog_2D.main_game_loading.draw2d()
 
 
 class SettingsMenu:
@@ -439,6 +457,7 @@ class SettingsMenu:
 
 def init_shaders_2d(app):
     # Creates Shaders programs organized in subgroups relative to the different scenes
+    # Primary Scenes
     programs = type("Contains all subgroup related to same shader program", (), {})()
     programs.main_menu     = GLTextures2D(app)
     programs.utility       = GLTextures2D(app)
@@ -449,5 +468,8 @@ def init_shaders_2d(app):
     programs.other         = GLTextures2D(app)
     programs.user_input    = GLTextures2D(app)
     programs.create_menu   = GLTextures2D(app)
+
+    # Secondary Scenes
+    programs.main_game_loading = GLTextures2D(app)
 
     return programs
