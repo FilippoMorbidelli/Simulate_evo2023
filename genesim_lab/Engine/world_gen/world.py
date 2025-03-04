@@ -16,7 +16,6 @@ from genesim_lab.Engine.player.voxel_handler import VoxelHandler
 from genesim_lab.Engine.world_objects.voxel_marker import VoxelMarker
 from genesim_lab.Engine.world_objects.celestial_body import Celestial
 from genesim_lab.Engine.world_gen.sparsevoxeloctree import build_svo
-from genesim_lab.Engine.settings import ChunkMeshSettings
 
 
 # World generator ------------------------------|
@@ -32,8 +31,7 @@ class World:
         self.load_status = "Idle"
         self.save_status = "Idle"
 
-        # Retrieve mesh settings and frustum
-        self.mesh_stg = self.get_mesh_stg()
+        # Retrieve frustum
         self.frustum_check = self.app.player.frustum.is_on_frustum
 
         # Instantiate voxel dict in NJit
@@ -277,16 +275,6 @@ class World:
             elif node.children:
                 for child_node in node.children.values():
                     self.svo_frustum_render(child_node, region)
-
-    def get_mesh_stg(self):
-
-        stg = ChunkMeshSettings(self.info.c_size, self.info.c_area, self.info.c_vol,
-                                self.info.offset[0], self.info.offset[1], self.info.offset[2],
-                                self.info.v_x, self.info.v_y, self.info.v_z,
-                                self.info.r_size, self.info.r_area, self.info.rc_size,
-                                self.info.width_rn, self.info.height_rn, self.info.depth_rn)
-
-        return stg
 
 # -- World Util functions ----------------------------------------------------------------------------------------------
 def get_init_regions(w_info, pos, c_reg):

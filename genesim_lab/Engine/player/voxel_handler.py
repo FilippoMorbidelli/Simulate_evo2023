@@ -95,7 +95,7 @@ class VoxelHandler:
         # end point
         x2, y2, z2 = self.app.player.position + self.app.player.forward * self.app.stg.interaction.max_ray_dist
 
-        current_voxel_pos = glm.vec3(floor(x1), self.w_info.v_y * floor(self.w_info.v_y_i * y1), floor(z1))
+        current_voxel_pos = glm.vec3(floor(x1), self.w_info.v_y * floor(self.w_info.iv_y * y1), floor(z1))
         self.voxel_id = 0
         self.voxel_normal = glm.vec3(0)
         step_dir = -1

@@ -7,13 +7,14 @@
 import multiprocessing as mp
 import time
 import re
-import random
+import numpy as np
+
+from pathlib import Path
 from numba import types
 from numba.typed import Dict
 
-from genesim_lab.Engine.settings import *
 from genesim_lab.Engine.sl_manager.SaveManager import load_decoder, save_encoder
-from genesim_lab.Meshes.chunk_mesh_builder import build_chunk_mesh
+from genesim_lab.Meshes.chunk_mesh_builder import build_chunk_mesh, let_settings_global
 from genesim_lab.Engine.world_gen.chunk import ChunkProxy
 
 # All Processes to spawn -------------------------------|
@@ -42,19 +43,13 @@ class LoadProcess(mp.Process):
                     self.terminate()
                 else:
                     # Unwrap data
-                    r_ids, r_coord, w_vox, w_stg, util = to_process
+                    r_ids, r_coord, w_vox, world_info, util = to_process
 
                     # Compute specialized settings
-                    stg = (w_stg.depth_rn, w_stg.width_rn, w_stg.height_rn, w_stg.w_width,
-                           w_stg.w_height, w_stg.w_width, w_stg.r_size, w_stg.r_area)
+                    stg = (world_info.depth_rn, world_info.width_rn, world_info.height_rn, world_info.w_width,
+                           world_info.w_height, world_info.w_width, world_info.r_size, world_info.r_area)
 
-                    mesh_stg = ChunkMeshSettings(w_stg.c_size, w_stg.c_area, w_stg.c_vol,
-                                                 w_stg.offset[0], w_stg.offset[1], w_stg.offset[2],
-                                                 w_stg.v_x, w_stg.v_y, w_stg.v_z,
-                                                 w_stg.r_size, w_stg.r_area, w_stg.rc_size,
-                                                 w_stg.width_rn, w_stg.height_rn, w_stg.depth_rn)
-
-                    send_iter = max(2, w_stg.r_vol/16)
+                    send_iter = max(2, world_info.r_vol/16)
 
                     # Create NJit dict with already known voxels
                     voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
@@ -63,35 +58,35 @@ class LoadProcess(mp.Process):
 
                     for r in r_ids:
                         # If region already exists load it (only voxels)
-                        is_loaded, l_voxels = asynch_load_region(util, w_stg, r)
+                        is_loaded, l_voxels = asynch_load_region(util, world_info, r)
 
                         # Build Chunks
-                        voxels[r] = np.zeros([w_stg.r_vol, w_stg.c_vol], dtype='uint8')
+                        voxels[r] = np.zeros([world_info.r_vol, world_info.c_vol], dtype='uint8')
                         vox_meshes = dict()
                         vox_meshes_greedy = dict()
                         if not is_loaded:
-                            asynch_build_chunks(voxels, {r: r_coord[r]}, stg, w_stg, new=True)
+                            asynch_build_chunks(voxels, {r: r_coord[r]}, stg, world_info, new=True)
                         else:
-                            asynch_build_chunks(voxels, l_voxels, stg, w_stg, new=False)
+                            asynch_build_chunks(voxels, l_voxels, stg, world_info, new=False)
 
                         # Send response to signal that loading has been initialized
                         self.rsp_queue.put(["Load", "Init", [r, voxels[r]]])
 
                     # Build Chunks Mesh
                     format_size = sum(int(fmt[:1]) for fmt in '1u4'.split())
+                    let_settings_global(world_info)
                     for r in r_ids:
-                        for idx in range(w_stg.r_vol):
-                            if np.any(voxels[r][idx, :]): # and idx not in w_stg.r_limit:
-                                y = idx // w_stg.r_area
-                                z = (idx - y * w_stg.r_area) // w_stg.r_size
-                                x = (idx - y * w_stg.r_area) % w_stg.r_size
+                        for idx in range(world_info.r_vol):
+                            if np.any(voxels[r][idx, :]): # and idx not in world_info.r_limit:
+                                y = idx // world_info.r_area
+                                z = (idx - y * world_info.r_area) // world_info.r_size
+                                x = (idx - y * world_info.r_area) % world_info.r_size
                                 c_index = (x, y, z)
                                 vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = voxels[r][idx],
                                                                              format_size  = format_size,
                                                                              chunk_pos    = c_index,
                                                                              world_voxels = voxels,
-                                                                             region_pos   = np.asarray(r_coord[r]),
-                                                                             stg          = mesh_stg)
+                                                                             region_pos   = np.asarray(r_coord[r]))
                                 vox_meshes[idx] = vox_mesh
                                 vox_meshes_greedy[idx] = vox_mesh_greedy
                             else:
@@ -137,14 +132,14 @@ class SaveProcess(mp.Process):
                     self.terminate()
                 else:
                     # Unwrap data
-                    r_ids, r_vox, w_stg, util = to_process
+                    r_ids, r_vox, world_info, util = to_process
 
                     # Prepare save path
                     path = self.app_path / util.save_path / util.curr_save_name
 
                     # Save each region
                     for r in r_ids:
-                        r_name = asynch_name_from_index(w_stg, r)
+                        r_name = asynch_name_from_index(world_info, r)
                         r_path = "World/" + r_name + ".npz"
                         with open(path / r_path, 'w+') as f:
                             voxels = save_encoder(r_vox[r])
@@ -157,7 +152,7 @@ class SaveProcess(mp.Process):
 
 
 # Functions called by Child Processes -----------------|
-def asynch_build_chunks(vx, load_voxels, stg, w_stg, new=True):
+def asynch_build_chunks(vx, load_voxels, stg, world_info, new=True):
     depth_rn, width_rn, height_rn, w_width, w_height, w_width, r_size, r_area = stg
     for r in load_voxels.keys():
 
@@ -181,7 +176,7 @@ def asynch_build_chunks(vx, load_voxels, stg, w_stg, new=True):
 
                     # Put the chunk voxels in a separate array
                     if new:
-                        chunk = ChunkProxy(w_stg, index=(x, y, z), r_index=(w, h, d))
+                        chunk = ChunkProxy(world_info, index=(x, y, z), r_index=(w, h, d))
                         vx[r][chunk_index] = chunk.build_voxels()
                     else:
                         vx[r][chunk_index] = load_voxels[r][chunk_index, :]
