@@ -78,8 +78,8 @@ class LoadProcess(mp.Process):
                     for r in r_ids:
                         for idx in range(world_info.r_vol):
                             if np.any(voxels[r][idx, :]): # and idx not in world_info.r_limit:
-                                y = idx // world_info.r_area
-                                z = (idx - y * world_info.r_area) // world_info.r_size
+                                y = int(idx / world_info.r_area)
+                                z = int((idx - y * world_info.r_area) / world_info.r_size)
                                 x = (idx - y * world_info.r_area) % world_info.r_size
                                 c_index = (x, y, z)
                                 vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = voxels[r][idx],

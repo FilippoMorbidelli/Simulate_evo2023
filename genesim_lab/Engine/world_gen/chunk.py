@@ -19,7 +19,6 @@ class Chunk:
         self.app = world.app
         self.world = world
         self.info = world.info
-        self.mesh_stg = world.mesh_stg
         self.index = index
         self.r_index = rx, ry, rz = np.array(r_index)
         self.pos = (glm.vec3(self.index) + glm.vec3(rx, ry, rz) * self.info.r_size - self.info.offset) * self.info.c_scale

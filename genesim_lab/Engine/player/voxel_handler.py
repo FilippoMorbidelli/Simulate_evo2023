@@ -17,7 +17,6 @@ class VoxelHandler:
     def __init__(self, world):
         self.app = world.app
         self.chunks = world.chunks
-        self.mesh_stg = world.mesh_stg
         self.w_info = world.app.stg.world
 
         # Ray casting result
@@ -47,7 +46,7 @@ class VoxelHandler:
                     chunk.is_empty = False
 
     def rebuild_adj_chunk(self, adj_voxel_pos):
-        r_index, index = get_chunk_index(adj_voxel_pos, self.mesh_stg)
+        r_index, index = get_chunk_index(adj_voxel_pos)
         # If chunk exists rebuild it
         if r_index != -1 and self.chunks[r_index][index] is not None:
             self.chunks[r_index][index].mesh.rebuild()
