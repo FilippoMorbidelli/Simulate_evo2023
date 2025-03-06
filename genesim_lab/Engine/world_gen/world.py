@@ -16,6 +16,7 @@ from genesim_lab.Engine.player.voxel_handler import VoxelHandler
 from genesim_lab.Engine.world_objects.voxel_marker import VoxelMarker
 from genesim_lab.Engine.world_objects.celestial_body import Celestial
 from genesim_lab.Engine.world_gen.sparsevoxeloctree import build_svo
+from genesim_lab.Meshes.chunk_mesh_builder import let_settings_global
 
 
 # World generator ------------------------------|
@@ -30,6 +31,7 @@ class World:
         # Load and Save processes status
         self.load_status = "Idle"
         self.save_status = "Idle"
+        let_settings_global(self.info)
 
         # Retrieve frustum
         self.frustum_check = self.app.player.frustum.is_on_frustum

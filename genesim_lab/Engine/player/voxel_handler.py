@@ -4,7 +4,6 @@
 # Last update: 20/11/2023
 # Notes:
 
-
 # Import packages ------------------------------|
 from genesim_lab.Engine.settings import *
 from genesim_lab.Meshes.chunk_mesh_builder import get_chunk_index
