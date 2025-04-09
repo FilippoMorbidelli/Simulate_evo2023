@@ -421,6 +421,12 @@ class MainGame:
         app.shader_prog_2D.main_game_loading.add(load_icon)
 
     def init_world(self, vox = None):
+        # Create temporary Save Directory
+        path_to_create = Path(__file__).parent.parent.parent.parent / self.app.stg.util.save_path / \
+                         self.app.stg.util.curr_save_name / "World/"
+        path_to_create.parent.mkdir(exist_ok=True, parents=True)
+        path_to_create.mkdir(exist_ok=True, parents=True)
+
         # Initialize 3D graphic elements
         self.status = "Loading"
         self.world = World(self.app, vox)

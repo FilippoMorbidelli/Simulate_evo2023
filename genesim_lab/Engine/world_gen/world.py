@@ -54,7 +54,7 @@ class World:
             self.svo = dict()
 
             # Send to Load Process queue the required region to be loaded or created
-            self.app.req_queues["load"].put([list(regions_to_create.keys()), regions_to_create, {}, self.info, self.app.stg.util])
+            self.app.req_queues["load"].put(["InitWorld", list(regions_to_create.keys()), regions_to_create, {}, self.info, self.app.stg.util])
             # Update local load process status
             self.load_status = "Occupied"
 
@@ -70,7 +70,7 @@ class World:
             self.svo = dict()
 
             # Send to Load Process queue the required region to be loaded or created
-            self.app.req_queues["load"].put([list(load_voxels.keys()), load_voxels, {}, self.info, self.app.stg.util])
+            self.app.req_queues["load"].put(["InitWorld", list(load_voxels.keys()), load_voxels, {}, self.info, self.app.stg.util])
             # Update local load process status
             self.load_status = "Occupied"
 
@@ -143,7 +143,7 @@ class World:
                 for r in to_delete:
                     to_send_dict[r] = self.voxels[r]
                 # Send to Save Process queue the required region to be loaded or created
-                self.app.req_queues["save"].put([to_delete, to_send_dict, self.info, self.app.stg.util])
+                self.app.req_queues["save"].put(["SaveRegion", to_delete, to_send_dict, self.info, self.app.stg.util])
                 # Update local load process status
                 self.save_status = "Occupied"
 
@@ -164,7 +164,7 @@ class World:
                     for r in new_set.intersection(current_set):
                         to_send_dict[r] = self.voxels[r]
                 # Send to Load Process queue the required region to be loaded or created
-                self.app.req_queues["load"].put([to_add, new_reg, to_send_dict, self.info, self.app.stg.util])
+                self.app.req_queues["load"].put(["LoadRegion", to_add, new_reg, to_send_dict, self.info, self.app.stg.util])
                 # Update local load process status
                 self.load_status = "Occupied"
 
@@ -203,6 +203,20 @@ class World:
                     elif status == "Done":
                         # Update local load process status
                         self.load_status = "Idle"
+
+                    elif status == "InitDone":
+                        # Update local load process status
+                        self.load_status = "Idle"
+                        # Save World Info
+                        #self.app.req_queues["save"].put(["CompleteSave", self.info, self.app.stg.util])
+                        # Save Each region
+                        for r in self.voxels:
+                            # Send Complete save request
+                            self.app.req_queues["save"].put(
+                                ["SaveRegion", r, {r : self.voxels[r]}, self.info, self.app.stg.util])
+                        # Update local load process status
+                        self.save_status = "Occupied"
+
 
                 case "Save":
 

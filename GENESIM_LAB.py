@@ -22,6 +22,8 @@ import sys
 import cProfile
 import pstats
 import io
+import gc
+import tracemalloc
 
 
 # Game start -----------------------------------|
@@ -123,15 +125,23 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         # Check always functioning events (ALT+F4, ecc)
         self.custom_events.handle_events()
 
+    def gc_collection(self):
+        # Collect garbage every 2 seconds
+        if not (self.time % 0.080):
+            gc.collect()
+
     def run(self):
         # Main Engine loop
         while self.is_running:
             self.handle_events()  # Handle event checks and computations
             self.update()         # Perform attributes, variables and state updates
             self.render()         # Perform render of current scene once every update has been done
+            self.gc_collection()  # Perform garbage collection
+
         # Shutdown any running process
         for process in self.processes.values():
             process.terminate()
+
         # Shutdown Pygame and System
         pg.quit()
         sys.exit()  # Comment during profiling

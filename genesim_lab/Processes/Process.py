@@ -43,7 +43,7 @@ class LoadProcess(mp.Process):
                     self.terminate()
                 else:
                     # Unwrap data
-                    r_ids, r_coord, w_vox, world_info, util = to_process
+                    command, r_ids, r_coord, w_vox, world_info, util = to_process
 
                     # Compute specialized settings
                     stg = (world_info.depth_rn, world_info.width_rn, world_info.height_rn, world_info.w_width,
@@ -103,7 +103,10 @@ class LoadProcess(mp.Process):
                         self.rsp_queue.put(["Load", "DoneRegion", [r, r_coord[r]]])
 
                     # Load response to confirm computation of new region has ended
-                    self.rsp_queue.put(["Load", "Done", []])
+                    if command == "InitWorld":
+                        self.rsp_queue.put(["Load", "InitDone", []])
+                    else:
+                        self.rsp_queue.put(["Load", "Done", []])
 
 
 class SaveProcess(mp.Process):
@@ -132,7 +135,7 @@ class SaveProcess(mp.Process):
                     self.terminate()
                 else:
                     # Unwrap data
-                    r_ids, r_vox, world_info, util = to_process
+                    command, r_ids, r_vox, world_info, util = to_process
 
                     # Prepare save path
                     path = self.app_path / util.save_path / util.curr_save_name

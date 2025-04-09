@@ -157,7 +157,7 @@ class VoxelHandler:
                 chunk = self.chunks[region_index][chunk_index] # Maybe add a try - exception if region is not loaded?
             except (Exception, ):
                 chunk = None
-                print("No voxel available for handling")
+                #print("No voxel available for handling")
 
             if chunk is None:
                 return 0, 0, 0, 0

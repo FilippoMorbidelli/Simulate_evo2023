@@ -57,7 +57,8 @@ class Interaction:  # Contains settings about player interaction inside world
 @dataclass(slots=True, order=True)
 class World:  # Contains settings about world generation, chunks, regions, ecc
     # Chunk data
-    c_size          : float = 48  # Chunk size == number of cubes along a dimension [N x N x N]
+    c_size          : float = 32  # Chunk size == number of cubes along a dimension [N x N x N] -- reduced to 32 from 48 for performances
+    c_size_min      : float = c_size - 1
     c_half          : float = c_size // 2
     c_area          : float = c_size ** 2
     c_vol           : float = c_size ** 3
@@ -195,7 +196,7 @@ class GameSettings:  # Main settings class
 
 
 # Mesh builder util functions ----------------------------------------|
-powers = 1 << np.array(range(48), dtype="int64")
+powers = 1 << np.array(range(32), dtype="int64")
 
 # World Settings for njit --------------------------------------------|
 #spec = [
