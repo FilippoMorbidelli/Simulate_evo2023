@@ -55,7 +55,6 @@ def pack_data(x, y, z, voxel_id, face_id, flip_id, ao_id):
     # x: 6bit, y: 6bit, z: 6bit, voxel_id: 8bit, face_id: 3bit, ao_id: 2bit, flip_id: 1bit
     a, b, c, d, e, f, g = x, y, z, voxel_id, face_id, ao_id, flip_id
 
-    b_bit, c_bit, d_bit, e_bit, f_bit, g_bit = 6, 6, 8, 3, 2, 1
     fg_bit = f_bit + g_bit
     efg_bit = e_bit + fg_bit
     defg_bit = d_bit + efg_bit
@@ -78,7 +77,6 @@ def greedy_pack_data(x, y, z, voxel_id, face_id):
     # x: 6bit, y: 6bit, z: 6bit, voxel_id: 8bit, face_id: 3bit, void --> 3bit
     a, b, c, d, e = x, y, z, voxel_id, face_id
 
-    b_bit, c_bit, d_bit, e_bit = 6, 6, 8, 3
     de_bit = d_bit + e_bit
     cde_bit = c_bit + de_bit
     bcde_bit = b_bit + cde_bit
@@ -102,19 +100,23 @@ def to_uint8_ao(ao):
 def get_chunk_index(world_voxel_pos):
     # Unpack voxel position in world coordinates
     wx, wy, wz = world_voxel_pos
-    wx = int(wx * iv_x + off_x * c_size)
-    wy = int(wy * iv_y + off_y * c_size)
-    wz = int(wz * iv_z + off_z * c_size)
+    wx = int(wx * iv_x + off_xc)
+    wy = int(wy * iv_y + off_yc)
+    wz = int(wz * iv_z + off_zc)
+
     # Compute region index
     rx = wx >> 7
     ry = wy >> 7
     rz = wz >> 7
+
     # Compute chunk index
-    cx = (wx - (rx << 7)) >> 5
-    cy = (wy - (ry << 7)) >> 5
-    cz = (wz - (rz << 7)) >> 5
-    if not (0 <= rx < width_rn and 0 <= ry < height_rn and 0 <= rz < depth_rn):
-        return - 1, -1
+    cx = (wx & 0b1111111) >> 5
+    cy = (wy & 0b1111111) >> 5
+    cz = (wz & 0b1111111) >> 5
+
+    # Out of region check
+    if rx // width_rn or ry // height_rn or rz // depth_rn:
+        return -1, -1
 
     r_index = rx + width_rn * rz + depth_rn * width_rn * ry
     index = cx + r_size * cz + r_area * cy
@@ -131,14 +133,8 @@ def is_void(local_voxel_pos, world_voxel_pos, world_voxels):
     chunk_voxels = world_voxels[region_index][chunk_index]
 
     x, y, z = local_voxel_pos
-    # if not 0 <= x < c_size:
-    #     x += (x < 0) * c_size
-    # if not 0 <= y < c_size:
-    #     y += (y < 0) * c_size
-    # if not 0 <= z < c_size:
-    #     z += (z < 0) * c_size
 
-    voxel_index = x % c_size + z % c_size * c_size + y % c_size * c_area
+    voxel_index = (x & 0b11111) + (z & 0b11111) * c_size + (y & 0b11111) * c_area
 
     if chunk_voxels[voxel_index]:
         return False # Not void so don't create a mesh
@@ -488,60 +484,65 @@ def build_chunk_mesh(chunk_voxels, format_size, chunk_pos, world_voxels, region_
     return vertex_data, greedy_vertex_data
 
 # ---
+def define_globals():
+    # Define globals for mesh computation
+    global b_bit, c_bit, d_bit, e_bit, f_bit, g_bit
+
+    # Data packing (both greedy and not)
+    b_bit, c_bit, d_bit, e_bit, f_bit, g_bit = 6, 6, 8, 3, 2, 1
+
+
 def let_settings_global(settings):
-    global c_size
+    # Define global settings used by mesh builder
+    global c_size, c_area, c_vol
     c_size = settings.c_size
-    global c_area
     c_area = settings.c_area
-    global c_vol
     c_vol = settings.c_vol
-    global off_x
+
+    global off_x, off_y, off_z
     off_x = settings.offset[0]
-    global off_y
     off_y = settings.offset[1]
-    global off_z
     off_z = settings.offset[2]
-    global v_x
+
+    global v_x, v_y, v_z
     v_x = settings.v_x
-    global v_y
     v_y = settings.v_y
-    global v_z
     v_z = settings.v_z
-    global iv_x
+
+    global iv_x, iv_y, iv_z
     iv_x = settings.iv_x
-    global iv_y
     iv_y = settings.iv_y
-    global iv_z
     iv_z = settings.iv_z
-    global r_size
+
+    global r_size, r_area, rc_size
     r_size = settings.r_size
-    global r_area
     r_area = settings.r_area
-    global rc_size
     rc_size = settings.rc_size
-    global width_rn
+
+    global width_rn, height_rn, depth_rn
     width_rn = settings.width_rn
-    global height_rn
     height_rn = settings.height_rn
-    global depth_rn
     depth_rn = settings.depth_rn
 
+    global off_xc, off_yc, off_zc
+    off_xc = off_x * c_size
+    off_yc = off_y * c_size
+    off_zc = off_z * c_size
+
+
 # Declare global var ----
-c_size = 0
-c_area = 0
-c_vol = 0
-off_x = 0
-off_y = 0
-off_z = 0
-v_x = 0
-v_y = 0
-v_z = 0
-iv_x = 0
-iv_y = 0
-iv_z = 0
-r_size = 0
-r_area = 0
-rc_size = 0
-width_rn = 0
-height_rn = 0
-depth_rn = 0
+# Vars to Pack data
+b_bit, c_bit, d_bit, e_bit, f_bit, g_bit = 0, 0, 0, 0, 0, 0
+
+# Chunk and Region Data
+c_size, c_area, c_vol         = 0, 0, 0
+r_size, r_area, rc_size       = 0, 0, 0
+width_rn, height_rn, depth_rn = 0, 0, 0
+
+# World offset
+off_x, off_y, off_z    = 0, 0, 0
+off_xc, off_yc, off_zc = 0, 0, 0
+
+# Voxel stretch along axis
+v_x, v_y, v_z    = 0, 0, 0
+iv_x, iv_y, iv_z = 0, 0, 0

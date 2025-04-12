@@ -14,7 +14,7 @@ from numba import types
 from numba.typed import Dict
 
 from genesim_lab.Engine.sl_manager.SaveManager import load_decoder, save_encoder
-from genesim_lab.Meshes.chunk_mesh_builder import build_chunk_mesh, let_settings_global
+from genesim_lab.Meshes.chunk_mesh_builder import build_chunk_mesh, let_settings_global, define_globals
 from genesim_lab.Engine.world_gen.chunk import ChunkProxy
 
 # All Processes to spawn -------------------------------|
@@ -72,9 +72,12 @@ class LoadProcess(mp.Process):
                         # Send response to signal that loading has been initialized
                         self.rsp_queue.put(["Load", "Init", [r, voxels[r]]])
 
+                    # Define globals to be used by voxel mesh creator
+                    define_globals()
+                    let_settings_global(world_info)
+
                     # Build Chunks Mesh
                     format_size = sum(int(fmt[:1]) for fmt in '1u4'.split())
-                    let_settings_global(world_info)
                     for r in r_ids:
                         for idx in range(world_info.r_vol):
                             if np.any(voxels[r][idx, :]): # and idx not in world_info.r_limit:
