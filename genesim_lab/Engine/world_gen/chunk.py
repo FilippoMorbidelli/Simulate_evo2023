@@ -19,9 +19,9 @@ class Chunk:
         self.app = world.app
         self.world = world
         self.info = world.info
-        self.index = index
+        self.index = cx, cy, cz = index
         self.r_index = rx, ry, rz = np.array(r_index)
-        self.pos = (glm.vec3(self.index) + glm.vec3(rx, ry, rz) * self.info.r_size - self.info.offset) * self.info.c_scale
+        self.pos = (glm.vec3(cx, cy, cz) + glm.vec3(rx, ry, rz) * self.info.r_size - self.info.offset) * self.info.c_scale
         self.m_model = self.get_model_matrix()
 
         # Build chunk

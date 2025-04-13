@@ -37,8 +37,8 @@ class ChunkMesh(BaseMesh):
             chunk_voxels = self.chunk.voxels,
             format_size  = self.format_size,
             chunk_pos    = self.chunk.index,
-            world_voxels = self.chunk.world.voxels,
             region_pos   = self.chunk.r_index,
+            world_voxels = self.chunk.world.voxels,
         )
 
         return mesh, greedy_mesh

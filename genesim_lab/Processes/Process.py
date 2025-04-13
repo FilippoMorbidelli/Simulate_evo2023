@@ -12,6 +12,7 @@ import numpy as np
 from pathlib import Path
 from numba import types
 from numba.typed import Dict
+from concurrent.futures import ThreadPoolExecutor
 
 from genesim_lab.Engine.sl_manager.SaveManager import load_decoder, save_encoder
 from genesim_lab.Meshes.chunk_mesh_builder import build_chunk_mesh, let_settings_global, define_globals
@@ -43,7 +44,7 @@ class LoadProcess(mp.Process):
                     self.terminate()
                 else:
                     # Unwrap data
-                    command, r_ids, r_coord, w_vox, world_info, util = to_process
+                    command, Regions, r_coord, w_vox, world_info, util = to_process
 
                     # Compute specialized settings
                     stg = (world_info.depth_rn, world_info.width_rn, world_info.height_rn, world_info.w_width,
@@ -56,14 +57,12 @@ class LoadProcess(mp.Process):
                     for r_key, vox in w_vox.items():
                         voxels[r_key] = vox
 
-                    for r in r_ids:
+                    for r in Regions:
                         # If region already exists load it (only voxels)
                         is_loaded, l_voxels = asynch_load_region(util, world_info, r)
 
                         # Build Chunks
                         voxels[r] = np.zeros([world_info.r_vol, world_info.c_vol], dtype='uint8')
-                        vox_meshes = dict()
-                        vox_meshes_greedy = dict()
                         if not is_loaded:
                             asynch_build_chunks(voxels, {r: r_coord[r]}, stg, world_info, new=True)
                         else:
@@ -76,31 +75,43 @@ class LoadProcess(mp.Process):
                     define_globals()
                     let_settings_global(world_info)
 
-                    # Build Chunks Mesh
-                    format_size = sum(int(fmt[:1]) for fmt in '1u4'.split())
-                    for r in r_ids:
-                        for idx in range(world_info.r_vol):
-                            if np.any(voxels[r][idx, :]): # and idx not in world_info.r_limit:
-                                y = int(idx / world_info.r_area)
-                                z = int((idx - y * world_info.r_area) / world_info.r_size)
-                                x = (idx - y * world_info.r_area) % world_info.r_size
-                                c_index = (x, y, z)
-                                vox_mesh, vox_mesh_greedy = build_chunk_mesh(chunk_voxels = voxels[r][idx],
-                                                                             format_size  = format_size,
-                                                                             chunk_pos    = c_index,
-                                                                             world_voxels = voxels,
-                                                                             region_pos   = np.asarray(r_coord[r]))
-                                vox_meshes[idx] = vox_mesh
-                                vox_meshes_greedy[idx] = vox_mesh_greedy
-                            else:
-                                vox_meshes[idx] = np.empty(1, dtype='uint32')
-                                vox_meshes_greedy[idx] = np.empty(1, dtype='uint32')
+                    # Build Chunks Mesh for each region
+                    format_size = [sum(int(fmt[:1]) for fmt in '1u4'.split()) for _ in range(8)]
+                    for r in Regions:
+                        # Vox meshes dict (to send)
+                        vox_meshes = dict()
+                        vox_meshes_greedy = dict()
 
-                            if (idx + 1) % send_iter == 0:
-                                # Send response after max(2, r_vol/16) chunk meshes have been computed
-                                self.rsp_queue.put(["Load", "InProgress", [r, r_coord[r], vox_meshes, vox_meshes_greedy]])
-                                vox_meshes = dict()
-                                vox_meshes_greedy = dict()
+                        # Loop over 8 chunks each
+                        for cc in range(int(world_info.r_vol/8)):
+
+                            # Create ThreadPool to compute 8 chunks in parallel
+                            with ThreadPoolExecutor(max_workers=8) as executor:
+                                # Compute inputs for each task
+                                ccIds = cc * 8 + np.linspace(0,7,8, dtype='uint32')
+                                voxArray = voxels[r][ccIds]
+                                regionPos = [np.asarray(r_coord[r]) for _ in range(8)]
+
+                                # Compute Chunk Pos
+                                chunkPos = []
+                                for c in ccIds:
+                                    y = c // world_info.r_area
+                                    x = (c - y * world_info.r_area) & world_info.rMask
+                                    z = (c - y * world_info.r_area) // world_info.r_size
+                                    chunkPos.append((x, y, z))
+
+                                # Submit Tasks
+                                futures = [executor.submit(build_chunk_mesh, Vox, FormatS, cPos, rPos, voxels)
+                                           for Vox, FormatS, cPos, rPos in zip(voxArray, format_size, chunkPos, regionPos)
+                                           ]
+
+                                # Get Results
+                                for c in range(8):
+                                    mesh, meshGreedy = futures[c].result()
+                                    vox_meshes[ccIds[c]] = mesh
+                                    vox_meshes_greedy[ccIds[c]] = meshGreedy
+
+                            self.rsp_queue.put(["Load", "InProgress", [r, r_coord[r], vox_meshes, vox_meshes_greedy]])
 
                         # Load response to confirm computation of new region has ended
                         self.rsp_queue.put(["Load", "DoneRegion", [r, r_coord[r]]])
@@ -144,7 +155,7 @@ class SaveProcess(mp.Process):
                     path = self.app_path / util.save_path / util.curr_save_name
 
                     # Save each region
-                    for r in r_ids:
+                    for r in r_vox.keys():
                         r_name = asynch_name_from_index(world_info, r)
                         r_path = "World/" + r_name + ".npz"
                         with open(path / r_path, 'w+') as f:

@@ -58,7 +58,8 @@ class Interaction:  # Contains settings about player interaction inside world
 class World:  # Contains settings about world generation, chunks, regions, ecc
     # Chunk data
     c_size          : float = 32  # Chunk size == number of cubes along a dimension [N x N x N] -- reduced to 32 from 48 for performances
-    c_size_min      : float = c_size - 1
+    cSizeBin        : int   = int(math.log2(c_size))
+    cMask           : bin   = (1 << cSizeBin) - 1
     c_half          : float = c_size // 2
     c_area          : float = c_size ** 2
     c_vol           : float = c_size ** 3
@@ -92,10 +93,16 @@ class World:  # Contains settings about world generation, chunks, regions, ecc
     r_size   : int = 4  # Number of chunks per dimension per region
     r_area   : int = r_size ** 2
     r_vol    : int = r_size ** 3
+    rSizeBin : int = int(math.log2(r_size))
+    rcSzBin  : int = int(math.log2(r_size * c_size))
+    rMask    : bin = (1 << rSizeBin) - 1
+    rcMask   : bin = (1 << rcSzBin) - 1
+
     rc_size  : int = r_size * c_size
     width_rn : int = int(np.ceil(w_width / r_size))
     height_rn: int = int(np.ceil(w_height / r_size))
     depth_rn : int = int(np.ceil(w_depth / r_size))
+
     r_number : int = width_rn * height_rn * depth_rn
     r_limit  = []
     for x in range(r_size):

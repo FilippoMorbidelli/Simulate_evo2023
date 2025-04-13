@@ -57,6 +57,7 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         self.clock = pg.time.Clock()
         self.delta_time = 0
         self.time = 0
+        self.cycle = 0
 
         # Keep track of mouse position and lock it inside screen, change cursor to custom one
         cursor = pg.image.load(f'genesim_lab/assets/other/cursor.svg').convert_alpha()
@@ -102,9 +103,10 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         self.processes["save"].start()
 
     def update(self):
-        # Update time, delta_time
+        # Update time, delta_time and cycle
         self.delta_time = self.clock.tick(self.stg.util.fps_limit)
         self.time = pg.time.get_ticks() * 0.001
+        self.cycle = (self.cycle + 1) % 32
 
         # Update mouse position
         self.mouse = pg.mouse.get_pos()
@@ -127,8 +129,9 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
 
     def gc_collection(self):
         # Collect garbage every 2 seconds
-        if not (self.time % 0.080):
-            gc.collect()
+        if not self.cycle:
+            #gc.collect()
+            pass
 
     def run(self):
         # Main Engine loop
