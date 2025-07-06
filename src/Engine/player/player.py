@@ -5,8 +5,8 @@
 # Notes: Handles main menu, settings, play and other menu
 
 # Import packages ------------------------------|
-from genesim_lab.Engine.player.camera import *
-from genesim_lab.Engine.settings import *
+from src.Engine.player.camera import *
+from src.Engine.settings import *
 from ast import literal_eval
 
 

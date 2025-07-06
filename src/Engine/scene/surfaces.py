@@ -5,8 +5,8 @@
 # Notes: Handles main menu, settings, play and other menu
 
 # Import packages ------------------------------|
-from genesim_lab.Engine.world_gen.world import World
-from genesim_lab.Engine.scene.sprite import *
+from src.Engine.world_gen.world import World
+from src.Engine.scene.sprite import *
 from enum import IntEnum
 import numpy as np
 import copy

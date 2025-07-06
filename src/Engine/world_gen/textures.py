@@ -31,7 +31,7 @@ class Textures:
         faces = ['right', 'left', 'top', 'bottom'] + ['front', 'back'][::-1]
         textures = []
         for face in faces:
-            texture = pg.image.load('genesim_lab/Assets/main_game/' + dir_path + f'{face}.{ext}').convert()
+            texture = pg.image.load('src/Assets/main_game/' + dir_path + f'{face}.{ext}').convert()
             if face in ['right', 'left', 'front', 'back']:
                 texture = pg.transform.flip(texture, flip_x=True, flip_y=False)
             else:
@@ -48,7 +48,7 @@ class Textures:
         return texture_cube
 
     def load(self, file_name, is_tex_array=False):
-        texture = pg.image.load(f'genesim_lab/Assets/main_game/{file_name}')
+        texture = pg.image.load(f'src/Assets/main_game/{file_name}')
         texture = pg.transform.flip(texture, flip_x=True, flip_y=False)
 
         if is_tex_array:

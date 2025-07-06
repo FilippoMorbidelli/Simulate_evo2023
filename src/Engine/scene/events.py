@@ -7,7 +7,7 @@
 # Import packages ------------------------------------------------------------------------------------------------------
 import pygame as pg
 from string import digits
-from genesim_lab.Engine.scene.surfaces import GS
+from src.Engine.scene.surfaces import GS
 from pathlib import Path
 
 

@@ -5,8 +5,8 @@
 # Notes: Contains the Engine, Engine start and world_objects generation
 
 # Import packages ------------------------------|
-from genesim_lab.Meshes.base_mesh import BaseMesh
-from genesim_lab.Meshes.chunk_mesh_builder import build_chunk_mesh
+from src.Meshes.base_mesh import BaseMesh
+from src.Meshes.chunk_mesh_builder import build_chunk_mesh
 import numpy as np
 
 

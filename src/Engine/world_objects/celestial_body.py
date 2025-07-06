@@ -6,9 +6,9 @@
 import glm
 
 # Import packages ------------------------------|
-from genesim_lab.Engine.settings import *
-from genesim_lab.Engine.world_objects.world_clock import WorldClock
-from genesim_lab.Meshes.celestial_mesh import SkyBoxMesh, SkyObjMesh
+from src.Engine.settings import *
+from src.Engine.world_objects.world_clock import WorldClock
+from src.Meshes.celestial_mesh import SkyBoxMesh, SkyObjMesh
 
 
 # Import packages ------------------------------|

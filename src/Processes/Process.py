@@ -14,9 +14,9 @@ from numba import types
 from numba.typed import Dict
 from concurrent.futures import ThreadPoolExecutor
 
-from genesim_lab.Engine.sl_manager.SaveManager import load_decoder, save_encoder
-from genesim_lab.Meshes.chunk_mesh_builder import build_chunk_mesh, let_settings_global, define_globals
-from genesim_lab.Engine.world_gen.chunk import ChunkProxy
+from src.Engine.sl_manager.SaveManager import load_decoder, save_encoder
+from src.Meshes.chunk_mesh_builder import build_chunk_mesh, let_settings_global, define_globals
+from src.Engine.world_gen.chunk import ChunkProxy
 
 # All Processes to spawn -------------------------------|
 

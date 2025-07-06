@@ -5,7 +5,7 @@
 # Notes: Handles main menu, settings, play and other menu
 
 # Import packages ------------------------------|
-from genesim_lab.Engine.settings import *
+from src.Engine.settings import *
 from numba.experimental import jitclass
 
 # All surfaces ---------------------------------|

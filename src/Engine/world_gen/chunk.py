@@ -8,8 +8,8 @@
 import random
 from pyglm import glm
 import numpy as np
-from genesim_lab.Meshes.chunk_mesh import ChunkMesh
-from genesim_lab.Engine.settings import Proxy
+from src.Meshes.chunk_mesh import ChunkMesh
+from src.Engine.settings import Proxy
 
 
 # World generator ------------------------------|

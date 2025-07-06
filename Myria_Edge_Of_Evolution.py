@@ -5,14 +5,14 @@
 # Notes: Main module to run simulation Engine
 
 # Import third party and Engine packages ---------|
-from genesim_lab.Engine.scene.surfaces import Scene, init_shaders_2d
-from genesim_lab.Engine.world_gen.shader_program import ShaderProgram
-from genesim_lab.Engine.scene.events import *
-from genesim_lab.Engine.player.player import Player
-from genesim_lab.Processes.Process import LoadProcess, SaveProcess
-from genesim_lab.Engine.world_gen.textures import Textures
-from genesim_lab.Engine.sl_manager.SaveManager import SaveManager
-from genesim_lab.Engine.settings import GameSettings
+from src.Engine.scene.surfaces import Scene, init_shaders_2d
+from src.Engine.world_gen.shader_program import ShaderProgram
+from src.Engine.scene.events import *
+from src.Engine.player.player import Player
+from src.Processes.Process import LoadProcess, SaveProcess
+from src.Engine.world_gen.textures import Textures
+from src.Engine.sl_manager.SaveManager import SaveManager
+from src.Engine.settings import GameSettings
 from multiprocessing import Queue
 
 import moderngl as mgl
@@ -60,7 +60,7 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
         self.cycle = 0
 
         # Keep track of mouse position and lock it inside screen, change cursor to custom one
-        cursor = pg.image.load(f'genesim_lab/assets/other/cursor.svg').convert_alpha()
+        cursor = pg.image.load(f'src/assets/other/cursor.svg').convert_alpha()
         cursor = pg.transform.scale(cursor, (48, 48))
         cursor = pg.cursors.Cursor((0, 0), cursor)
         pg.mouse.set_cursor(cursor)

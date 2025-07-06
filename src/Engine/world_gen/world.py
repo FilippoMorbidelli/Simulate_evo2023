@@ -11,12 +11,12 @@ import time
 import numpy.random as rnd
 from numba import types
 from numba.typed import Dict
-from genesim_lab.Engine.world_gen.chunk import Chunk
-from genesim_lab.Engine.player.voxel_handler import VoxelHandler
-from genesim_lab.Engine.world_objects.voxel_marker import VoxelMarker
-from genesim_lab.Engine.world_objects.celestial_body import Celestial
-from genesim_lab.Engine.world_gen.sparsevoxeloctree import build_svo
-from genesim_lab.Meshes.chunk_mesh_builder import let_settings_global
+from src.Engine.world_gen.chunk import Chunk
+from src.Engine.player.voxel_handler import VoxelHandler
+from src.Engine.world_objects.voxel_marker import VoxelMarker
+from src.Engine.world_objects.celestial_body import Celestial
+from src.Engine.world_gen.sparsevoxeloctree import build_svo
+from src.Meshes.chunk_mesh_builder import let_settings_global
 
 
 # World generator ------------------------------|

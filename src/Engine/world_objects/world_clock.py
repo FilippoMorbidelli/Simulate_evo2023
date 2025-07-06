@@ -5,7 +5,7 @@
 # Notes: Contains the Engine, Engine start and world_objects generation
 
 # Import packages ------------------------------|
-from genesim_lab.Engine.settings import *
+from src.Engine.settings import *
 
 
 # Import packages ------------------------------|

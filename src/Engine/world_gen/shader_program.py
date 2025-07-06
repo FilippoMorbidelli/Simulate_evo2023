@@ -5,7 +5,7 @@
 # Notes:
 
 # Import packages ------------------------------|
-from genesim_lab.Engine.settings import *
+from src.Engine.settings import *
 
 
 # Main -----------------------------------------|
@@ -65,10 +65,10 @@ class ShaderProgram:
         self.skybox['m_invProjView'].write(glm.inverse(self.player.m_proj * m_view))
 
     def get_program(self, shader_name):
-        with open(f'genesim_lab/shaders/{shader_name}.vert') as file:
+        with open(f'src/shaders/{shader_name}.vert') as file:
             vertex_shader = file.read()
 
-        with open(f'genesim_lab/shaders/{shader_name}.frag') as file:
+        with open(f'src/shaders/{shader_name}.frag') as file:
             fragment_shader = file.read()
 
         program = self.ctx.program(vertex_shader=vertex_shader, fragment_shader=fragment_shader)

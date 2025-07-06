@@ -5,8 +5,8 @@
 # Notes:
 
 # Import packages ------------------------------|
-from genesim_lab.Engine.settings import *
-from genesim_lab.Meshes.base_mesh import BaseMesh
+from src.Engine.settings import *
+from src.Meshes.base_mesh import BaseMesh
 
 
 # Main -----------------------------------------|

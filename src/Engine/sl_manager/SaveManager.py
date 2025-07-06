@@ -6,10 +6,10 @@
 # Import third party and Engine packages --------------|
 from pathlib import Path
 from datetime import datetime
-from genesim_lab.Engine.world_gen.world import get_init_regions
-from genesim_lab.Engine.scene.surfaces import SaveLoadMenu
-from genesim_lab.Engine.scene.events import GS
-from genesim_lab.Engine.settings import World
+from src.Engine.world_gen.world import get_init_regions
+from src.Engine.scene.surfaces import SaveLoadMenu
+from src.Engine.scene.events import GS
+from src.Engine.settings import World
 from pyglm import glm
 import re
 import ntpath

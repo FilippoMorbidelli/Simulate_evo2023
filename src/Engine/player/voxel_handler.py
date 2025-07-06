@@ -5,8 +5,8 @@
 # Notes:
 
 # Import packages ------------------------------|
-from genesim_lab.Engine.settings import *
-from genesim_lab.Meshes.chunk_mesh_builder import get_chunk_index
+from src.Engine.settings import *
+from src.Meshes.chunk_mesh_builder import get_chunk_index
 from math import floor
 
 

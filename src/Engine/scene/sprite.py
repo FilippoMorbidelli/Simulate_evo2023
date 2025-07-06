@@ -29,10 +29,10 @@ class GLTextures2D(pg.sprite.Group):
 
     def get_program(self):
         if self.gl_program is None:
-            with open(f'genesim_lab/shaders/2D_sprite.vert') as file:
+            with open(f'src/shaders/2D_sprite.vert') as file:
                 vertex_shader_sprite = file.read()
 
-            with open(f'genesim_lab/shaders/2D_sprite.frag') as file:
+            with open(f'src/shaders/2D_sprite.frag') as file:
                 fragment_shader_sprite = file.read()
 
             self.gl_program = self.gl_context.program(vertex_shader=vertex_shader_sprite,
@@ -128,7 +128,7 @@ class GLTextures2D(pg.sprite.Group):
 class DynamicSprite(pg.sprite.Sprite):
     def __init__(self, app, scene, name, ext, flag):
         super().__init__()
-        self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/{name}.{ext}').convert_alpha()
+        self.sprite = pg.image.load(f'src/assets/{scene}/{name}.{ext}').convert_alpha()
         self.rect = self.sprite.get_rect(topleft=app.mouse)  # Generate sprite rect from main window
         self.rect.size = (48, 48)
         self.image = self.sprite
@@ -148,7 +148,7 @@ class DynamicSprite(pg.sprite.Sprite):
 class OverlaySprite(pg.sprite.Sprite):
     def __init__(self, app, scene, name, ext, flag):
         super().__init__()
-        self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/overlay_{name}.{ext}').convert_alpha()
+        self.sprite = pg.image.load(f'src/assets/{scene}/overlay_{name}.{ext}').convert_alpha()
         self.rect = self.sprite.get_rect(center=(960, 540))  # Generate sprite rect from main window
         self.image = self.sprite
         self.mask = pg.mask.from_surface(self.image)
@@ -168,7 +168,7 @@ class BackgroundSprite(pg.sprite.Sprite):
     def __init__(self, app, scene, button, ext, flag, anchor = (0, 0), name_add = ""):
         super().__init__()
         #self.rect = app.stg.window.rect  # Generate sprite rect from main window
-        self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/background_{button}.{ext}').convert_alpha()
+        self.sprite = pg.image.load(f'src/assets/{scene}/background_{button}.{ext}').convert_alpha()
         self.image = self.sprite
         self.mask = pg.mask.from_surface(self.image)
         wh = self.sprite.get_size()
@@ -189,8 +189,8 @@ class ButtonSprite(pg.sprite.Sprite):
     def __init__(self, app, scene, name, ext, flag, anchor = (0, 0), name_add = "", threshold = 127):
         super().__init__()
         self.app = app
-        self.sprite_F = pg.image.load(f'genesim_lab/assets/{scene}/button_{name}_F.{ext}').convert_alpha()
-        self.sprite_T = pg.image.load(f'genesim_lab/assets/{scene}/button_{name}_T.{ext}').convert_alpha()
+        self.sprite_F = pg.image.load(f'src/assets/{scene}/button_{name}_F.{ext}').convert_alpha()
+        self.sprite_T = pg.image.load(f'src/assets/{scene}/button_{name}_T.{ext}').convert_alpha()
         self.image    = self.sprite_F
         self.mask = pg.mask.from_surface(self.image, threshold)
         wh = self.sprite_F.get_size()
@@ -221,7 +221,7 @@ class StaticAltSprite(pg.sprite.Sprite):
         # Generate rect and load associated textures
         self.sprite_dict = {}
         for a in alts:
-            self.sprite_dict[a] = pg.image.load(f'genesim_lab/assets/{scene}/static_alt_{a}.{ext}').convert_alpha()
+            self.sprite_dict[a] = pg.image.load(f'src/assets/{scene}/static_alt_{a}.{ext}').convert_alpha()
         wh = self.sprite_dict[a].get_size()
         # Sprite render data (set to default sprite)
         self.rect = pg.Rect(xy[0], xy[1], wh[0], wh[1])  # Generate sprite rect from main window
@@ -327,7 +327,7 @@ class MovingSprite(pg.sprite.Sprite):
     def __init__(self, app, scene, name, ext, anchor, mov, rot):
         super().__init__()
         self.app = app
-        self.sprite = pg.image.load(f'genesim_lab/assets/{scene}/mov_{name}.{ext}').convert_alpha()
+        self.sprite = pg.image.load(f'src/assets/{scene}/mov_{name}.{ext}').convert_alpha()
         self.image = self.sprite
         self.mask = pg.mask.from_surface(self.image)
         self.or_rect = pg.Rect(anchor[0], anchor[1], self.sprite.get_width(), self.sprite.get_height())

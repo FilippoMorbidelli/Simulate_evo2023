@@ -5,7 +5,7 @@
 # Notes: Contains the Engine, Engine start and world_objects generation
 
 # Import packages ------------------------------|
-from genesim_lab.Engine.settings import powers
+from src.Engine.settings import powers
 from numba import uint8
 from numba import float32
 from numba import njit, prange

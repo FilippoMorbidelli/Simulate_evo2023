@@ -5,8 +5,8 @@
 # Notes: Contains the Engine, Engine start and world_objects generation
 
 # Import packages ------------------------------|
-from genesim_lab.Engine.settings import *
-from genesim_lab.Meshes.cube_mesh import CubeMesh
+from src.Engine.settings import *
+from src.Meshes.cube_mesh import CubeMesh
 
 
 # Import packages ------------------------------|
