@@ -9,7 +9,8 @@ from src.Engine.scene.surfaces import Scene, init_shaders_2d
 from src.Engine.world_gen.shader_program import ShaderProgram
 from src.Engine.scene.events import *
 from src.Engine.player.player import Player
-from src.Processes.Process import LoadProcess, SaveProcess
+from src.Processes.Process_Load import LoadProcess
+from src.Processes.Process_Save import SaveProcess
 from src.Engine.world_gen.textures import Textures
 from src.Engine.sl_manager.SaveManager import SaveManager
 from src.Engine.settings import GameSettings

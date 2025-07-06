@@ -218,6 +218,11 @@ class MainMenu:
         # Background team logo button
         background_logo = BackgroundSprite(app, "menu/main_menu", "logo", "svg", False)
         app.shader_prog_2D.main_menu.add(background_logo)
+        # Background Game Logo
+        background_main_logo = BackgroundSprite(app, "menu/main_menu", "logo_main", "svg", False, anchor=(1650, 10))
+        app.shader_prog_2D.main_menu.add(background_main_logo)
+        # Background Game Title
+        #--
 
         # Play button
         button_play = ButtonSprite(app, "menu/main_menu", "play", "svg", True)
