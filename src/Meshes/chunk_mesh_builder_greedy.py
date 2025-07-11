@@ -5,29 +5,47 @@
 # Notes: Contains the Engine, Engine start and world_objects generation
 
 # Import packages ------------------------------|
-from numba import uint8
-from numba import prange
-from chunk_mesh_utils import *
+from src.Meshes.chunk_mesh_utils import *
 
 # World generator ------------------------------|
 # New Chunk Mesh builder only greedy with AO!! Copied from Rust fast mesher (https://www.youtube.com/watch?v=qnGoGq7DWMc)
+#-
+def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
+                            nb: np.ndarray,
+                            chunk_pos: List[int32],
+                            format_s: int32,
+                            lod: Lod = Lod.L32) -> Optional[np.ndarray]:
 
+    # If Chunk is empty exit
+    if not np.any(chunk_voxels):
+        return np.empty(1, dtype='uint32')
+
+    # Array containing mesh vertices already packed for GPU
+    vertices = np.empty(CHUNK_VOL * 18 * format_s, dtype='uint32')
+
+    # solid binary for each x,y,z axis (3)
+    axis_cols = np.zeros((3, CHUNK_SIZE_P, CHUNK_SIZE_P), dtype=uint64)
+
+    # cull mask to perform greedy slicing
+    col_face_masks = np.zeros((6, CHUNK_SIZE_P, CHUNK_SIZE_P), dtype=uint64)
+
+#-
 # Main mesh building function
-@njit(fastmath=True, cache=True, nogil=True)
-def build_chunk_mesh(chunks_refs: ChunksRefs, lod: Lod = Lod.L32) -> Optional[ChunkMesh]:
+#@njit(fastmath=True, cache=True, nogil=True)
+def build_chunk_mesh_new(chunks_refs: ChunksRefs, lod: Lod = Lod.L32) -> Optional[ChunkMesh]:
     if chunks_refs.is_all_voxels_same():
         return None
 
     mesh = ChunkMesh()
 
     # solid binary for each x,y,z axis (3)
-    axis_cols = np.zeros((3, CHUNK_SIZE_P, CHUNK_SIZE_P), dtype=np.uint64)
+    axis_cols = np.zeros((3, CHUNK_SIZE_P, CHUNK_SIZE_P), dtype=uint64)
 
     # the cull mask to perform greedy slicing
-    col_face_masks = np.zeros((6, CHUNK_SIZE_P, CHUNK_SIZE_P), dtype=np.uint64)
+    col_face_masks = np.zeros((6, CHUNK_SIZE_P, CHUNK_SIZE_P), dtype=uint64)
 
     # inner chunk voxels
-    chunk = chunks_refs.chunks[vec3_to_index(np.array([1, 1, 1], dtype=np.int32), 3)]
+    chunk = chunks_refs.chunks[vec3_to_index(np.array([1, 1, 1], dtype=int32), 3)]
     assert len(chunk.voxels) == CHUNK_SIZE3 or len(chunk.voxels) == 1
 
     for z in range(CHUNK_SIZE):
@@ -40,19 +58,19 @@ def build_chunk_mesh(chunks_refs: ChunksRefs, lod: Lod = Lod.L32) -> Optional[Ch
     for z in [0, CHUNK_SIZE_P - 1]:
         for y in range(CHUNK_SIZE_P):
             for x in range(CHUNK_SIZE_P):
-                pos = np.array([x, y, z], dtype=np.int32) - 1
+                pos = np.array([x, y, z], dtype=int32) - 1
                 add_voxel_to_axis_cols(chunks_refs.get_block(pos), x, y, z, axis_cols)
 
     for z in range(CHUNK_SIZE_P):
         for y in [0, CHUNK_SIZE_P - 1]:
             for x in range(CHUNK_SIZE_P):
-                pos = np.array([x, y, z], dtype=np.int32) - 1
+                pos = np.array([x, y, z], dtype=int32) - 1
                 add_voxel_to_axis_cols(chunks_refs.get_block(pos), x, y, z, axis_cols)
 
     for z in range(CHUNK_SIZE_P):
         for x in [0, CHUNK_SIZE_P - 1]:
             for y in range(CHUNK_SIZE_P):
-                pos = np.array([x, y, z], dtype=np.int32) - 1
+                pos = np.array([x, y, z], dtype=int32) - 1
                 add_voxel_to_axis_cols(chunks_refs.get_block(pos), x, y, z, axis_cols)
 
     # face culling
@@ -74,7 +92,7 @@ def build_chunk_mesh(chunks_refs: ChunksRefs, lod: Lod = Lod.L32) -> Optional[Ch
                 col &= ~(1 << CHUNK_SIZE)
 
                 while col != 0:
-                    y = trailing_zeros_64(col)
+                    y = trailing_zeros_64(uint64(col))
                     col &= col - 1
 
                     if axis in (0, 1):  # down, up
@@ -138,7 +156,7 @@ def build_chunk_mesh(chunks_refs: ChunksRefs, lod: Lod = Lod.L32) -> Optional[Ch
     return mesh
 
 
-@njit
+#@njit
 def greedy_mesh_binary_plane(data: np.ndarray, lod_size: int) -> List['GreedyQuad']:
     greedy_quads = []
     data = data.copy()

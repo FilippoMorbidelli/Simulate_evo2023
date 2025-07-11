@@ -4,6 +4,12 @@
 # Objectives:
 
 # Import third party and Engine packages --------------|
+# From Src
+from src.Engine.sl_manager.SaveManager import load_decoder
+from src.Meshes.chunk_mesh_builder import build_chunk_mesh, let_settings_global, define_globals
+from src.Engine.world_gen.chunk import ChunkProxy
+from src.Meshes.chunk_mesh_builder_greedy import *
+
 # Import Third-Party
 import multiprocessing as mp
 import numpy as np
@@ -13,12 +19,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from numba import types
-from numba.typed import Dict
-
-# From Src
-from src.Engine.sl_manager.SaveManager import load_decoder
-from src.Meshes.chunk_mesh_builder import build_chunk_mesh, let_settings_global, define_globals
-from src.Engine.world_gen.chunk import ChunkProxy
+from numba.typed import Dict as nDict
 
 # All Processes to spawn -------------------------------|
 class LoadProcess(mp.Process):
@@ -53,7 +54,7 @@ class LoadProcess(mp.Process):
                     send_iter = max(2, world_info.r_vol/16)
 
                     # Create NJit dict with already known voxels
-                    voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
+                    voxels = nDict.empty(key_type=types.int64, value_type=types.uint8[:, :])
                     for r_key, vox in w_vox.items():
                         voxels[r_key] = vox
 
@@ -81,6 +82,9 @@ class LoadProcess(mp.Process):
                         # Vox meshes dict (to send)
                         vox_meshes = dict()
                         vox_meshes_greedy = dict()
+
+                        # TEMP TO REMOVE - NEW IMPLEMENTATION
+
 
                         # Loop over 8 chunks each
                         for cc in range(int(world_info.r_vol/8)):
@@ -129,7 +133,7 @@ def asynch_load_region(util, info, region):
     save_name = asynch_name_from_index(info, region)
 
     loaded = False
-    voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
+    voxels = nDict.empty(key_type=types.int64, value_type=types.uint8[:, :])
     found = list(Path(save_dir).glob(save_name + '*'))
     if found:
         voxels[region] = load_decoder(np.load(str(save_dir / (found[0])))['arr_0'],

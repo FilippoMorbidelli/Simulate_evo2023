@@ -6,7 +6,7 @@
 
 # Import packages ------------------------------|
 import numpy as np
-import glm
+from pyglm import glm
 
 # Import packages ------------------------------|
 def build_svo(app, info, data, region_data):
