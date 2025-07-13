@@ -136,8 +136,7 @@ def asynch_load_region(util, info, region):
     voxels = nDict.empty(key_type=types.int64, value_type=types.uint8[:, :])
     found = list(Path(save_dir).glob(save_name + '*'))
     if found:
-        voxels[region] = load_decoder(np.load(str(save_dir / (found[0])))['arr_0'],
-                                 info.r_vol, info.c_vol)
+        voxels[region] = load_decoder(np.load(str(save_dir / (found[0])))['arr_0'], info.r_vol, info.c_vol)
         loaded = True
 
     return loaded, voxels

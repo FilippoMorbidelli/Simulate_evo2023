@@ -11,50 +11,17 @@ import numpy as np
 from typing import List, Tuple, Optional
 from enum import Enum, IntEnum
 
-# World generator ------------------------------|
+# Utils for mesh gen----------------------------|
 # New Chunk Mesh builder only greedy with AO!! Copied from Rust fast mesher (https://www.youtube.com/watch?v=qnGoGq7DWMc)
 
-# - Constants ----------------------------------|
-CHUNK_VOL = 32 * 32 * 32
-
-CHUNK_SIZE     = 32
-CHUNK_SIZE_I32 = 32
-CHUNK_SIZE_P   = CHUNK_SIZE + 2
-CHUNK_SIZE_P2  = CHUNK_SIZE_P * CHUNK_SIZE_P
-CHUNK_SIZE_P3  = CHUNK_SIZE_P * CHUNK_SIZE_P * CHUNK_SIZE_P
-CHUNK_SIZE2    = CHUNK_SIZE * CHUNK_SIZE
-CHUNK_SIZE2_I32 = CHUNK_SIZE2
-CHUNK_SIZE3    = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE
-
-ADJACENT_CHUNK_DIRECTIONS = np.array([
-    [ 0,  0,  0],
-    [ 0, -1, -1],
-    [-1,  0, -1],
-    [-1,  0,  1],
-    [-1, -1,  0],
-    [-1, -1, -1],
-    [-1,  1, -1],
-    [-1, -1,  1],
-    [-1,  1,  1],
-    [ 1,  0, -1],
-    [ 1, -1, -1],
-    [ 0,  1, -1],
-    [ 1,  1,  1],
-    [ 1, -1,  1],
-    [ 1,  1, -1],
-    [ 1,  1,  0],
-    [ 0,  1,  1],
-    [ 1, -1,  0],
-    [ 0, -1,  1],
-    [ 1,  0,  1],
-    [-1,  1,  0],
-    [-1,  0,  0],
-    [ 1,  0,  0],
-    [ 0, -1,  0],
-    [ 0,  1,  0],
-    [ 0,  0, -1],
-    [ 0,  0,  1]
-], dtype=np.int32)
+# - Constants -
+CHUNK_SIZE  : uint64 = 32
+CHUNK_SIZE2 : uint64 = CHUNK_SIZE * CHUNK_SIZE
+CHUNK_SIZE3 : uint64 = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE
+PAD_SIZE    : uint64 = CHUNK_SIZE + 2
+PAD_SIZE2   : uint64 = PAD_SIZE * PAD_SIZE
+REG_SIZE    : uint64 = 4
+REG_SIZE2   : uint64 = REG_SIZE * REG_SIZE
 
 ADJACENT_AO_DIRS = np.array([
     [-1, -1],
@@ -66,7 +33,7 @@ ADJACENT_AO_DIRS = np.array([
     [ 1, -1],
     [ 1,  0],
     [ 1,  1]
-], dtype=np.int32)
+], dtype = int32)
 
 # - Classes -
 class BlockType(IntEnum):
@@ -74,32 +41,65 @@ class BlockType(IntEnum):
     Grass = 1
     Dirt = 2
 
-
 class FaceDir(Enum):
-    Up = 0
-    Down = 1
+    Down = 0
+    Up = 1
     Left = 2
     Right = 3
     Forward = 4
     Back = 5
 
-    def normal_index(self) -> int:
-        return self.value
+# - Functions -
+#@njit
+def add_voxel_to_axis_cols(b: uint8, x: int, y: int, z: int, axis_cols: np.ndarray):
+    if b != BlockType.Air:
+        axis_cols[0, z, x] |= 1 << y
+        axis_cols[1, y, z] |= 1 << x
+        axis_cols[2, y, x] |= 1 << z
 
-    def air_sample_dir(self) -> np.ndarray:
-        if self == FaceDir.Up:
-            return np.array([0, 1, 0], dtype=int32)
-        elif self == FaceDir.Down:
-            return np.array([0, -1, 0], dtype=int32)
-        elif self == FaceDir.Left:
-            return np.array([-1, 0, 0], dtype=int32)
-        elif self == FaceDir.Right:
-            return np.array([1, 0, 0], dtype=int32)
-        elif self == FaceDir.Forward:
-            return np.array([0, 0, -1], dtype=int32)
-        else:  # Back
-            return np.array([0, 0, 1], dtype=int32)
+#@njit
+def bound_to_face(bound_array: np.ndarray) -> Enum:
+    match bound_array:
+        case (1, 0, 0): return FaceDir.Left
+        case (2, 0, 0): return FaceDir.Right
+        case (0, 1, 0): return FaceDir.Down
+        case (0, 2, 0): return FaceDir.Up
+        case (0, 0, 1): return FaceDir.Back
+        case (0, 0, 2): return FaceDir.Forward
 
+@njit
+def bit_length(v):
+    # Custom method to compute log2(v)
+    # Used to find bit length of v in numba since bit_length method is not implemented
+    r =     (v > 0xFFFFFFFF) << 5; v >>= r
+    shift = (v > 0xFFFF) << 4; v >>= shift; r |= shift
+    shift = (v > 0xFF  ) << 3; v >>= shift; r |= shift
+    shift = (v > 0xF   ) << 2; v >>= shift; r |= shift
+    shift = (v > 0x3   ) << 1; v >>= shift; r |= shift
+
+    return  r | (v >> 1)
+
+@njit
+def get_padded_chunk_optimized(voxels, region_pos, chunk_pos):
+    # Init padded chunk
+    padded = np.zeros((34, 34, 34), dtype=uint8)
+
+    main_chunk = chunk_pos[0] + chunk_pos[1] * REG_SIZE2 + chunk_pos[2] * REG_SIZE
+    #main_reg   =
+
+    # Get the center chunk voxels
+    for z in range(CHUNK_SIZE):
+        z_id = z * CHUNK_SIZE
+        pz_id = (z + 1) * PAD_SIZE
+
+        for y in range(CHUNK_SIZE):
+            chunk_id = 0 + z_id + y * CHUNK_SIZE2
+            padded_id = 1 + pz_id + (y + 1) * PAD_SIZE2
+
+            padded[padded_id : padded_id + CHUNK_SIZE] = voxels[main_chunk][chunk_id : chunk_id + CHUNK_SIZE]
+
+
+#-----------------------------------------------------------------------------------------------------------
     def world_to_sample(self, axis: int, x: int, y: int, lod) -> np.ndarray:
         if self == FaceDir.Up:
             return np.array([x, axis + 1, y], dtype=int32)
@@ -117,17 +117,6 @@ class FaceDir(Enum):
     def reverse_order(self) -> bool:
         return self in [FaceDir.Up, FaceDir.Right, FaceDir.Forward]
 
-    def negate_axis(self) -> int:
-        if self == FaceDir.Up:
-            return -1
-        elif self == FaceDir.Right:
-            return -1
-        elif self == FaceDir.Back:
-            return 1
-        else:
-            return 0
-
-
 class Lod(Enum):
     L32 = 32
     L16 = 16
@@ -140,191 +129,6 @@ class Lod(Enum):
 
     def jump_index(self) -> int:
         return 32 // self.value
-
-
-class ChunkMesh:
-    def __init__(self):
-        self.indices = []
-        self.vertices = []
-
-
-class Direction(Enum):
-    Left = 0
-    Right = 1
-    Down = 2
-    Up = 3
-    Back = 4
-    Forward = 5
-
-    def get_normal(self) -> int:
-        return self.value
-
-    def get_opposite(self) -> 'Direction':
-        if self == Direction.Left:
-            return Direction.Right
-        elif self == Direction.Right:
-            return Direction.Left
-        elif self == Direction.Down:
-            return Direction.Up
-        elif self == Direction.Up:
-            return Direction.Down
-        elif self == Direction.Back:
-            return Direction.Forward
-        else:  # Forward
-            return Direction.Back
-
-
-class Quad:
-    def __init__(self, color, direction: Direction, corners):
-        self.color = color
-        self.direction = direction
-        self.corners = corners
-
-    @classmethod
-    def from_direction(cls, direction: Direction, pos: np.ndarray, color) -> 'Quad':
-        x, y, z = pos
-        if direction == Direction.Left:
-            corners = [
-                [x, y, z],
-                [x, y, z + 1],
-                [x, y + 1, z + 1],
-                [x, y + 1, z]
-            ]
-        elif direction == Direction.Right:
-            corners = [
-                [x, y + 1, z],
-                [x, y + 1, z + 1],
-                [x, y, z + 1],
-                [x, y, z]
-            ]
-        elif direction == Direction.Down:
-            corners = [
-                [x, y, z],
-                [x + 1, y, z],
-                [x + 1, y, z + 1],
-                [x, y, z + 1]
-            ]
-        elif direction == Direction.Up:
-            corners = [
-                [x, y, z + 1],
-                [x + 1, y, z + 1],
-                [x + 1, y, z],
-                [x, y, z]
-            ]
-        elif direction == Direction.Back:
-            corners = [
-                [x, y, z],
-                [x, y + 1, z],
-                [x + 1, y + 1, z],
-                [x + 1, y, z]
-            ]
-        else:  # Forward
-            corners = [
-                [x + 1, y, z],
-                [x + 1, y + 1, z],
-                [x, y + 1, z],
-                [x, y, z]
-            ]
-
-        return cls(color, direction, corners)
-
-class ChunkData: # Class used to temporarily contain voxel
-    def __init__(self, voxels=None):
-        self.voxels = voxels if voxels is not None else np.zeros(CHUNK_SIZE3, dtype='uint8')
-
-    def get_block(self, index: int) -> uint8:
-        if len(self.voxels) == 1:
-            return self.voxels[0]
-        return self.voxels[index]
-
-    def get_block_if_filled(self) -> Optional[uint8]:
-        if len(self.voxels) == 1:
-            return self.voxels[0]
-        return None
-
-    def is_solid(self, index: int) -> bool:
-        return self.voxels[index] != BlockType.Air
-    def is_air(self, index: int) -> bool:
-        return not self.is_solid(index)
-
-
-class ChunksRefs:
-    def __init__(self, chunks: List[ChunkData]):
-        self.chunks = chunks
-
-    # @classmethod
-    # def try_new(cls, world_data: Dict[Tuple[int, int, int], ChunkData],
-    #             middle_chunk: np.ndarray) -> Optional['ChunksRefs']:
-    #     chunks = []
-    #     for i in range(3 * 3 * 3):
-    #         offset = index_to_ivec3_bounds(i, 3) + np.array([-1, -1, -1], dtype=int32)
-    #         chunk_pos = tuple((middle_chunk + offset).tolist())
-    #         if chunk_pos in world_data:
-    #             chunks.append(world_data[chunk_pos])
-    #         else:
-    #             return None
-    #     return cls(chunks)
-
-    def is_all_voxels_same(self) -> bool:
-        first_block = self.chunks[0].get_block_if_filled()
-        if first_block is None:
-            return False
-
-        for chunk in self.chunks[1:]:
-            block = chunk.get_block_if_filled()
-            if block is None or block.block_type != first_block.block_type:
-                return False
-        return True
-
-    def get_block(self, pos: np.ndarray) -> uint8:
-        x = uint32(pos[0] + 32)
-        y = uint32(pos[1] + 32)
-        z = uint32(pos[2] + 32)
-
-        x_chunk, x = x >> 5, x & 0b11111
-        y_chunk, y = y >> 5, y & 0b11111
-        z_chunk, z = z >> 5, z & 0b11111
-
-        chunk_index = vec3_to_index(np.array([x_chunk, y_chunk, z_chunk], dtype=int32), 3)
-        chunk_data = self.chunks[chunk_index]
-        i = vec3_to_index(np.array([x, y, z], dtype=int32), 32)
-        return chunk_data.get_block(i)
-
-    def get_block_no_neighbour(self, pos: np.ndarray) -> uint8:
-        chunk_data = self.chunks[13]
-        i = vec3_to_index(pos, 32)
-        return chunk_data.get_block(i)
-
-    def get_adjacent_blocks(self, pos: np.ndarray) -> np.array([uint8, uint8, uint8, uint8]):
-        current = self.get_block(pos)
-        back = self.get_block(pos + np.array([0 ,  0, -1], dtype=int32))
-        left = self.get_block(pos + np.array([-1,  0,  0], dtype=int32))
-        down = self.get_block(pos + np.array([0 , -1,  0], dtype=int32))
-        return current, back, left, down
-
-    def get_von_neumann(self, pos: np.ndarray) -> Optional[List[Tuple[Direction, uint8]]]:
-        result = [
-            (Direction.Back, self.get_block(pos + np.array([0, 0, -1], dtype=int32))),
-            (Direction.Forward, self.get_block(pos + np.array([0, 0, 1], dtype=int32))),
-            (Direction.Down, self.get_block(pos + np.array([0, -1, 0], dtype=int32))),
-            (Direction.Up, self.get_block(pos + np.array([0, 1, 0], dtype=int32))),
-            (Direction.Left, self.get_block(pos + np.array([-1, 0, 0], dtype=int32))),
-            (Direction.Right, self.get_block(pos + np.array([1, 0, 0], dtype=int32))),
-        ]
-        return result
-
-    def get_2(self, pos: np.ndarray, offset: np.ndarray) -> Tuple[uint8, uint8]:
-        first = self.get_block(pos)
-        second = self.get_block(pos + offset)
-        return first, second
-
-
-class GreedyQuad: # Add Here function to compress and send data correctly
-    def __init__(self, x: int, y: int, w: int, h: int):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
 
     def append_vertices(self, vertices: List[uint32], face_dir: FaceDir, axis: int, lod: Lod, ao: int, block_type: int):
         axis = axis
@@ -370,66 +174,5 @@ class GreedyQuad: # Add Here function to compress and send data correctly
             new_vertices = new_vertices[1:] + [new_vertices[0]]
 
         vertices.extend(new_vertices)
-
-
-# - Utility functions -
-def generate_indices(vertex_count: int) -> List[int]:
-    indices_count = vertex_count // 4
-    indices = []
-    for vert_index in range(indices_count):
-        base = vert_index * 4
-        indices.extend([
-            base, base + 1, base + 2,
-            base, base + 2, base + 3
-        ])
-    return indices
-
-def make_vertex_u32(pos: uint8, ao: int, normal: int, block_type: int) -> int:
-    return (
-        (pos[0] & 0x3F) |
-        ((pos[1] & 0x3F) << 6) |
-        ((pos[2] & 0x3F) << 12) |
-        (ao << 18) |
-        (normal << 21) |
-        (block_type << 25)
-    )
-
-#@njit
-def vec3_to_index(pos: np.ndarray, bounds: int) -> int:
-    x_i = pos[0] % bounds
-    y_i = pos[1] * bounds
-    z_i = pos[2] * (bounds * bounds)
-    return x_i + y_i + z_i
-
-#@njit
-def index_to_ivec3_bounds(i: int, bounds: int) -> np.ndarray:
-    x = i % bounds
-    y = (i // bounds) % bounds
-    z = i // (bounds * bounds)
-    return np.array([x, y, z], dtype=int32)
-
-#@njit
-def index_to_ivec3(i: int) -> np.ndarray:
-    x = i % 32
-    y = (i // 32) % 32
-    z = i // (32 * 32)
-    return np.array([x, y, z], dtype=int32)
-
-#@njit
-def add_voxel_to_axis_cols(b: uint8, x: int, y: int, z: int, axis_cols: np.ndarray):
-    if b != BlockType.Air:
-        axis_cols[0, z, x] |= 1 << y
-        axis_cols[1, y, z] |= 1 << x
-        axis_cols[2, y, x] |= 1 << z
-
-#@njit
-def trailing_zeros_64(value: np.uint64) -> int:
-    if value == 0:
-        return 64
-    count = 0
-    while (value & 1) == 0:
-        count += 1
-        value >>= 1
-    return count
 
 
