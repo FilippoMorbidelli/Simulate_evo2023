@@ -49,7 +49,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
     # Neighbouring Chunks voxels
     # Along z axis
     for z in [0, PADDED_SIZE - 1]:
-        neighbor_id = FaceDir.Forward if z else FaceDir.Back
+        neighbor_id = FaceDir.Back if z else FaceDir.Forward
         z_index = (0 if z else 31) * CHUNK_SIZE
 
         for y in range(CHUNK_SIZE):
@@ -97,7 +97,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
 
     # Greedy meshing planes for every axis (6)
     # cannot use List[Dict[int, Dict[int, np.ndarray]]] due to Numba so trying with NumbaDict but may be a bottleneck!!
-    data = [nDict.empty(key_type=types.uint64, value_type=INNER_DICT_TYPE) for _ in range(6)]
+    data = [nDict.empty(key_type=types.uint32, value_type=INNER_DICT_TYPE) for _ in range(6)]
 
     # Compute Ambient Occlusion
     for axis in range(6):
@@ -110,7 +110,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                 col &= np.uint64(~(np.uint64(1) << CHUNK_SIZE))
 
                 while col != 0:
-                    # py implementation of trailing zeros (uint64)
+                    # py implementation of trailing zeros (uint32)
                     y = bit_length(col & (~col + 1))
                     col &= col - 1 # clear least significant set bit
 
@@ -124,7 +124,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                             voxel_pos: NDArray[int32] = np.array([x, z, y], dtype='int32')
 
                     # compute ambient occlusion
-                    ao_index: uint64 = 0
+                    ao_index = 0
                     for ao_i, ao_offset in enumerate(ADJACENT_AO_DIRS):
                         # ambient occlusion is sampled based on axis(ascent or descent)
                         match axis:
@@ -137,9 +137,9 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                             case FaceDir.Right:
                                 ao_sample_offset = np.array([ 1, ao_offset[1], ao_offset[0]], dtype='int32')
                             case FaceDir.Forward:
-                                ao_sample_offset = np.array([ao_offset[0], ao_offset[1],  1], dtype='int32')
-                            case FaceDir.Back | _:
                                 ao_sample_offset = np.array([ao_offset[0], ao_offset[1], -1], dtype='int32')
+                            case FaceDir.Back | _:
+                                ao_sample_offset = np.array([ao_offset[0], ao_offset[1],  1], dtype='int32')
 
                         ao_voxel_pos = voxel_pos + ao_sample_offset
 
@@ -148,7 +148,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                         if not is_valid_neighbor:
                             ao_block = chunk_voxels[ao_voxel_pos[2] * CHUNK_SIZE + ao_voxel_pos[1] * CHUNK_SIZE2 + ao_voxel_pos[0]]
                         elif is_valid_neighbor == 1:
-                            face = bound_to_face(np.array((ao_voxel_pos < 0) + (ao_voxel_pos > 31)))
+                            face = bound_to_face(np.concatenate((ao_voxel_pos < 0, ao_voxel_pos > 31)))
                             ao_block = neighbors[face, (ao_voxel_pos[2] & 0b11111) * CHUNK_SIZE + (ao_voxel_pos[1] & 0b11111) * CHUNK_SIZE2 + (ao_voxel_pos[0] & 0b11111)]
                         else :
                             ao_block = 0
@@ -156,16 +156,19 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                         if ao_block != BlockType.Air:
                             ao_index |= 1 << ao_i
 
-                    current_voxel = chunk_voxels[voxel_pos[2] * CHUNK_SIZE + voxel_pos[1] * CHUNK_SIZE2 + voxel_pos[0]]
+                    current_voxel = np.uint32(chunk_voxels[voxel_pos[2] * CHUNK_SIZE + voxel_pos[1] * CHUNK_SIZE2 + voxel_pos[0]])
                     block_hash = ao_index | (current_voxel << 9)
 
+                    block_hash = np.uint32(block_hash)
+                    y = np.uint32(y)
+                    x = np.uint32(x)
                     if block_hash not in data[axis]:
-                        data[axis][block_hash] = {}
+                        data[axis][block_hash] = nDict.empty(key_type=types.uint32, value_type=types.uint32[:])
 
                     if uint32(y) not in data[axis][block_hash]:
-                        data[axis][block_hash][y] = {}
+                        data[axis][block_hash][y] = np.zeros(32, dtype='uint32')
 
-                    data[axis][block_hash][y][x] |= 1 << z
+                    data[axis][block_hash][y][x] |= 1 << np.uint32(z)
 
     # Sample planes for greedy meshing
     index = 0
@@ -178,7 +181,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                 quads_from_axis = greedy_mesh_binary_plane(plane, lod) # lod.size()
 
                 for q in quads_from_axis:
-                    append_vertices(vertices, index, q, face, axis_pos, ao, block_type, lod)
+                    index = append_vertices(vertices, index, q, face, axis_pos, ao, block_type, lod)
 
     return vertices[:index] if index else vertices[:1]
 
@@ -235,7 +238,7 @@ def append_vertices(vertices: np.ndarray,
                     section: int,
                     ao: int,
                     block_type: int,
-                    lod: int):
+                    lod: int) -> int:
 
     # retrieve Lod level
     #jump = lod.jump_index()
@@ -250,10 +253,10 @@ def append_vertices(vertices: np.ndarray,
     flip = (v1ao > 0) ^ (v3ao > 0)
 
     # compute each vertex
-    v0 = pack_data(face_to_vec3(face, section, x, y), block_type, face, v1ao, flip)
-    v1 = pack_data(face_to_vec3(face, section, x + w, y), block_type, face, v2ao, flip)
-    v2 = pack_data(face_to_vec3(face, section, x + w, y + h), block_type, face, v3ao, flip)
-    v3 = pack_data(face_to_vec3(face, section, x, y + h), block_type, face, v4ao, flip)
+    v0 = pack_data(*face_to_vec3(face, section, x    , y    ), block_type, face, v1ao, flip)
+    v1 = pack_data(*face_to_vec3(face, section, x + w, y    ), block_type, face, v2ao, flip)
+    v2 = pack_data(*face_to_vec3(face, section, x + w, y + h), block_type, face, v3ao, flip)
+    v3 = pack_data(*face_to_vec3(face, section, x    , y + h), block_type, face, v4ao, flip)
 
     match face:
         case FaceDir.Down:
@@ -271,3 +274,5 @@ def append_vertices(vertices: np.ndarray,
 
     # Compute correct vertices and adds them to array
     index = add_data(vertices, index, new_vertices)
+
+    return index

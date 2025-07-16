@@ -22,7 +22,7 @@ REG_SIZE    : uint64 = 4
 REG_SIZE2   : uint64 = REG_SIZE * REG_SIZE
 
 b_bit, c_bit, d_bit, e_bit, f_bit, g_bit = 6, 6, 8, 3, 2, 1 # Data Packing
-INNER_DICT_TYPE = types.DictType(types.uint32, types.uint8[:, :]) # Numba type
+INNER_DICT_TYPE = types.DictType(types.uint32, types.uint32[:]) # Numba type
 
 ADJACENT_AO_DIRS = np.array([
     [-1, -1],
@@ -47,8 +47,8 @@ class FaceDir(IntEnum):
     Up = 1
     Left = 2
     Right = 3
-    Back = 4
-    Forward = 5
+    Forward = 4
+    Back = 5
 
 # - Functions -
 @njit(fastmath=True, cache=True, nogil=True)
@@ -60,13 +60,16 @@ def add_voxel_to_axis_cols(b: uint8, x: int, y: int, z: int, axis_cols: np.ndarr
 
 @njit(fastmath=True, cache=True, nogil=True)
 def bound_to_face(bound_array: np.ndarray) -> Enum:
-    match bound_array:
-        case (1, 0, 0): return FaceDir.Left
-        case (2, 0, 0): return FaceDir.Right
-        case (0, 1, 0): return FaceDir.Down
-        case (0, 2, 0): return FaceDir.Up
-        case (0, 0, 1): return FaceDir.Back
-        case (0, 0, 2): return FaceDir.Forward
+    for face in range(6):
+        if bound_array[face]:
+            match face:
+                case 0: return FaceDir.Left
+                case 1: return FaceDir.Down
+                case 2: return FaceDir.Forward
+                case 3: return FaceDir.Right
+                case 4: return FaceDir.Up
+                case 5: return FaceDir.Back
+    return FaceDir.Down
 
 @njit(fastmath=True, cache=True, nogil=True)
 def face_to_vec3(face, section: int32, x: int32, y: int32) -> int32:
@@ -79,15 +82,15 @@ def face_to_vec3(face, section: int32, x: int32, y: int32) -> int32:
     elif face == FaceDir.Right:
         return section + 1, y, x
     elif face == FaceDir.Forward:
-        return x, y, section + 1
-    else:  # Back
         return x, y, section
+    else:  # Back
+        return x, y, section + 1
 
 @njit(fastmath=True, cache=True, nogil=True)
 def bit_length(v):
     # Custom method to compute log2(v)
     # Used to find bit length of v in numba since bit_length method is not implemented
-    r =     np.uint64((v > 0xFFFFFFFF) << 5); v >>= r
+    r =     np.uint32((v > 0xFFFFFFFF) << 5); v >>= r
     shift = (v > 0xFFFF) << 4; v >>= shift; r |= shift
     shift = (v > 0xFF  ) << 3; v >>= shift; r |= shift
     shift = (v > 0xF   ) << 2; v >>= shift; r |= shift
