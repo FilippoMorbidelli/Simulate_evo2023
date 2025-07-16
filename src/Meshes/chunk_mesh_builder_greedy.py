@@ -1,22 +1,24 @@
-# Evolution simulation project - chunk generation module
+# Evolution simulation project - chunk mesh generation module
 # Author: Filippo Morbidelli
-# Created on: 20/11/2023
-# Last update: 20/11/2023
-# Notes: Contains the Engine, Engine start and world_objects generation
+# Created on: 16/07/2025
+# Last update: 16/07/2025
 
 # Import packages ------------------------------|
 from src.Meshes.chunk_mesh_utils import *
+
 from numpy.typing import NDArray
 from numba.typed import Dict as nDict
+from typing import List, Optional
 
 # World generator ------------------------------|
 # New Chunk Mesh builder only greedy with AO!! Copied from Rust fast mesher (https://www.youtube.com/watch?v=qnGoGq7DWMc)
 #-
+
+#@njit(fastmath=True, cache=True, nogil=True)
 def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                             neighbors: np.ndarray,
-                            chunk_pos: List[int32],
                             format_s: int32,
-                            lod: Lod = Lod.L32) -> Optional[np.ndarray]:
+                            lod: int = 32) -> Optional[np.ndarray]:
 
     # If Chunk is empty exit
     assert len(chunk_voxels) == CHUNK_SIZE3 or len(chunk_voxels) == 1
@@ -27,10 +29,10 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
     vertices = np.empty(CHUNK_SIZE3 * 18 * format_s, dtype='uint32')
 
     # solid binary for each x,y,z axis (3)
-    axis_cols: NDArray[np.uint64] = np.zeros((3, PAD_SIZE, PAD_SIZE), dtype=uint64)
+    axis_cols: NDArray[np.uint64] = np.zeros((3, PADDED_SIZE, PADDED_SIZE), dtype='uint64')
 
     # cull mask to perform greedy slicing
-    col_face_masks: NDArray[np.uint64] = np.zeros((6, PAD_SIZE, PAD_SIZE), dtype=uint64)
+    col_face_masks: NDArray[np.uint64] = np.zeros((6, PADDED_SIZE, PADDED_SIZE), dtype='uint64')
 
     # Chunk voxels
     for y in range(CHUNK_SIZE):
@@ -46,55 +48,56 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
 
     # Neighbouring Chunks voxels
     # Along z axis
-    for z in [0, PAD_SIZE - 1]:
+    for z in [0, PADDED_SIZE - 1]:
         neighbor_id = FaceDir.Forward if z else FaceDir.Back
-        z_index = z * CHUNK_SIZE
+        z_index = (0 if z else 31) * CHUNK_SIZE
 
-        for y in range(PAD_SIZE):
+        for y in range(CHUNK_SIZE):
             y_index = y * CHUNK_SIZE2
 
-            for x in range(PAD_SIZE):
+            for x in range(CHUNK_SIZE):
                 i = y_index + z_index + x
 
                 add_voxel_to_axis_cols(neighbors[neighbor_id, i], x, y, z, axis_cols)
 
     # Along y axis
-    for y in [0, PAD_SIZE - 1]:
+    for y in [0, PADDED_SIZE - 1]:
         neighbor_id = FaceDir.Up if y else FaceDir.Down
-        y_index = y * CHUNK_SIZE2
+        y_index = (0 if y else 31) * CHUNK_SIZE2
 
-        for z in range(PAD_SIZE):
+        for z in range(CHUNK_SIZE):
             z_index = z * CHUNK_SIZE
 
-            for x in range(PAD_SIZE):
+            for x in range(CHUNK_SIZE):
                 i = y_index + z_index + x
 
                 add_voxel_to_axis_cols(neighbors[neighbor_id, i], x, y, z, axis_cols)
 
     # Along x axis
-    for x in [0, PAD_SIZE - 1]:
+    for x in [0, PADDED_SIZE - 1]:
         neighbor_id = FaceDir.Right if x else FaceDir.Left
+        x_index = (0 if x else 31)
 
-        for z in range(PAD_SIZE):
+        for z in range(CHUNK_SIZE):
             z_index = z * CHUNK_SIZE
 
-            for y in range(PAD_SIZE):
+            for y in range(CHUNK_SIZE):
                 y_index = y * CHUNK_SIZE2
-                i = y_index + z_index + x
+                i = y_index + z_index + x_index
 
                 add_voxel_to_axis_cols(neighbors[neighbor_id, i], x, y, z, axis_cols)
 
     # Face culling
     for axis in range(3):
-        for z in range(PAD_SIZE):
-            for x in range(PAD_SIZE):
+        for z in range(PADDED_SIZE):
+            for x in range(PADDED_SIZE):
                 col = axis_cols[axis, z, x]
                 col_face_masks[2 * axis + 0, z, x] = col & ~(col << 1)
                 col_face_masks[2 * axis + 1, z, x] = col & ~(col >> 1)
 
     # Greedy meshing planes for every axis (6)
     # cannot use List[Dict[int, Dict[int, np.ndarray]]] due to Numba so trying with NumbaDict but may be a bottleneck!!
-    data = [nDict.empty(key_type=uint64, value_type=nDict.empty(key_type=uint32, value_type=uint8[:])) for _ in range(6)]
+    data = [nDict.empty(key_type=types.uint64, value_type=INNER_DICT_TYPE) for _ in range(6)]
 
     # Compute Ambient Occlusion
     for axis in range(6):
@@ -104,39 +107,39 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                 col = col_face_masks[axis, z + 1, x + 1]
                 # removes the right most and left most padding values, because they are invalid
                 col >>= 1
-                col &= ~(1 << CHUNK_SIZE)
+                col &= np.uint64(~(np.uint64(1) << CHUNK_SIZE))
 
                 while col != 0:
                     # py implementation of trailing zeros (uint64)
-                    y = bit_length(col & -col)
+                    y = bit_length(col & (~col + 1))
                     col &= col - 1 # clear least significant set bit
 
                     # get the voxel position based on axis
                     match axis:
                         case FaceDir.Up | FaceDir.Down:
-                            voxel_pos: NDArray[int32] = np.array([x, y, z], dtype=int32)
+                            voxel_pos: NDArray[int32] = np.array([x, y, z], dtype='int32')
                         case FaceDir.Left | FaceDir.Right:
-                            voxel_pos: NDArray[int32] = np.array([y, z, x], dtype=int32)
+                            voxel_pos: NDArray[int32] = np.array([y, z, x], dtype='int32')
                         case FaceDir.Forward | FaceDir.Back | _:
-                            voxel_pos: NDArray[int32] = np.array([x, z, y], dtype=int32)
+                            voxel_pos: NDArray[int32] = np.array([x, z, y], dtype='int32')
 
                     # compute ambient occlusion
-                    ao_index = 0
+                    ao_index: uint64 = 0
                     for ao_i, ao_offset in enumerate(ADJACENT_AO_DIRS):
                         # ambient occlusion is sampled based on axis(ascent or descent)
                         match axis:
                             case FaceDir.Down:
-                                ao_sample_offset = np.array([ao_offset[0], -1, ao_offset[1]], dtype=int32)
+                                ao_sample_offset = np.array([ao_offset[0], -1, ao_offset[1]], dtype='int32')
                             case FaceDir.Up:
-                                ao_sample_offset = np.array([ao_offset[0],  1, ao_offset[1]], dtype=int32)
+                                ao_sample_offset = np.array([ao_offset[0],  1, ao_offset[1]], dtype='int32')
                             case FaceDir.Left:
-                                ao_sample_offset = np.array([-1, ao_offset[1], ao_offset[0]], dtype=int32)
+                                ao_sample_offset = np.array([-1, ao_offset[1], ao_offset[0]], dtype='int32')
                             case FaceDir.Right:
-                                ao_sample_offset = np.array([ 1, ao_offset[1], ao_offset[0]], dtype=int32)
+                                ao_sample_offset = np.array([ 1, ao_offset[1], ao_offset[0]], dtype='int32')
                             case FaceDir.Forward:
-                                ao_sample_offset = np.array([ao_offset[0], ao_offset[1], -1], dtype=int32)
+                                ao_sample_offset = np.array([ao_offset[0], ao_offset[1],  1], dtype='int32')
                             case FaceDir.Back | _:
-                                ao_sample_offset = np.array([ao_offset[0], ao_offset[1],  1], dtype=int32)
+                                ao_sample_offset = np.array([ao_offset[0], ao_offset[1], -1], dtype='int32')
 
                         ao_voxel_pos = voxel_pos + ao_sample_offset
 
@@ -159,34 +162,31 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                     if block_hash not in data[axis]:
                         data[axis][block_hash] = {}
 
-                    if y not in data[axis][block_hash]:
+                    if uint32(y) not in data[axis][block_hash]:
                         data[axis][block_hash][y] = {}
 
                     data[axis][block_hash][y][x] |= 1 << z
 
     # Sample planes for greedy meshing
-    for axis, block_ao_data in enumerate(data):
+    index = 0
+    for face, block_ao_data in enumerate(data):
         for block_hash, axis_plane in block_ao_data.items():
             ao = block_hash & 0b111111111
             block_type = block_hash >> 9
 
             for axis_pos, plane in axis_plane.items():
-                quads_from_axis = greedy_mesh_binary_plane(plane, lod.size())
+                quads_from_axis = greedy_mesh_binary_plane(plane, lod) # lod.size()
 
-                #for q in quads_from_axis:
-                #    q.append_vertices(vertices, axis, axis_pos, lod, ao, block_type)
+                for q in quads_from_axis:
+                    append_vertices(vertices, index, q, face, axis_pos, ao, block_type, lod)
 
-    #mesh.vertices.extend(vertices)
-    #if not mesh.vertices:
-    #    return None
+    return vertices[:index] if index else vertices[:1]
 
-    #mesh.indices = generate_indices(len(mesh.vertices))
-    #return mesh
-
-@njit
-def greedy_mesh_binary_plane(voxel_mask, lod: int) -> List[int32]:
+@njit(fastmath=True, cache=True, nogil=True)
+def greedy_mesh_binary_plane(voxel_mask,
+                             lod: int) -> List[int32]:
     row_length = CHUNK_SIZE
-    greedyQuads = []
+    greedy_quads = []
 
     for row in range(row_length):
         h = 0
@@ -221,134 +221,53 @@ def greedy_mesh_binary_plane(voxel_mask, lod: int) -> List[int32]:
                 w += 1
 
             # Append Quads
-            greedyQuads.append([h, w, trailing_ones, row])
+            greedy_quads.append([h, w, trailing_ones, row])
 
             h += trailing_ones
 
-    return greedyQuads
+    return greedy_quads
 
-#-------------------------------------------------------------------------------
-# Main mesh building function
-#@njit(fastmath=True, cache=True, nogil=True)
-def build_chunk_mesh_new(chunks_refs: ChunksRefs, lod: Lod = Lod.L32) -> Optional[ChunkMesh]:
-    if chunks_refs.is_all_voxels_same():
-        return None
+@njit(fastmath=True, cache=True, nogil=True)
+def append_vertices(vertices: np.ndarray,
+                    index: int,
+                    quad: List[int32],
+                    face: int,
+                    section: int,
+                    ao: int,
+                    block_type: int,
+                    lod: int):
 
-    mesh = ChunkMesh()
+    # retrieve Lod level
+    #jump = lod.jump_index()
+    x, y, w, h = quad
 
-    # solid binary for each x,y,z axis (3)
-    axis_cols = np.zeros((3, CHUNK_SIZE_P, CHUNK_SIZE_P), dtype=uint64)
+    # pack ambient occlusion
+    v1ao = ((ao >> 0) & 1) + ((ao >> 1) & 1) + ((ao >> 3) & 1)
+    v2ao = ((ao >> 3) & 1) + ((ao >> 6) & 1) + ((ao >> 7) & 1)
+    v3ao = ((ao >> 5) & 1) + ((ao >> 8) & 1) + ((ao >> 7) & 1)
+    v4ao = ((ao >> 1) & 1) + ((ao >> 2) & 1) + ((ao >> 5) & 1)
 
-    # the cull mask to perform greedy slicing
-    col_face_masks = np.zeros((6, CHUNK_SIZE_P, CHUNK_SIZE_P), dtype=uint64)
+    flip = (v1ao > 0) ^ (v3ao > 0)
 
-    # inner chunk voxels
-    chunk = chunks_refs.chunks[vec3_to_index(np.array([1, 1, 1], dtype=int32), 3)]
-    assert len(chunk.voxels) == CHUNK_SIZE3 or len(chunk.voxels) == 1
+    # compute each vertex
+    v0 = pack_data(face_to_vec3(face, section, x, y), block_type, face, v1ao, flip)
+    v1 = pack_data(face_to_vec3(face, section, x + w, y), block_type, face, v2ao, flip)
+    v2 = pack_data(face_to_vec3(face, section, x + w, y + h), block_type, face, v3ao, flip)
+    v3 = pack_data(face_to_vec3(face, section, x, y + h), block_type, face, v4ao, flip)
 
-    for z in range(CHUNK_SIZE):
-        for y in range(CHUNK_SIZE):
-            for x in range(CHUNK_SIZE):
-                i = 0 if len(chunk.voxels) == 1 else (z * CHUNK_SIZE + y) * CHUNK_SIZE + x
-                add_voxel_to_axis_cols(chunk.voxels[i], x + 1, y + 1, z + 1, axis_cols)
+    match face:
+        case FaceDir.Down:
+            new_vertices = [v1, v3, v0, v1, v2, v3] if flip else [v0, v2, v3, v0, v1, v2]
+        case FaceDir.Up:
+            new_vertices = [v1, v0, v3, v1, v3, v2] if flip else [v0, v3, v2, v0, v2, v1]
+        case FaceDir.Left:
+            new_vertices = [v3, v1, v0, v3, v2, v1] if flip else [v0, v2, v1, v0, v3, v2]
+        case FaceDir.Right:
+            new_vertices = [v3, v0, v1, v3, v1, v2] if flip else [v0, v1, v2, v0, v2, v3]
+        case FaceDir.Forward:
+            new_vertices = [v3, v1, v0, v3, v2, v1] if flip else [v0, v2, v1, v0, v3, v2]
+        case FaceDir.Back | _:
+            new_vertices = [v3, v0, v1, v3, v1, v2] if flip else [v0, v1, v2, v0, v2, v3]
 
-    # neighbor chunk voxels
-    for z in [0, CHUNK_SIZE_P - 1]:
-        for y in range(CHUNK_SIZE_P):
-            for x in range(CHUNK_SIZE_P):
-                pos = np.array([x, y, z], dtype=int32) - 1
-                add_voxel_to_axis_cols(chunks_refs.get_block(pos), x, y, z, axis_cols)
-
-    for z in range(CHUNK_SIZE_P):
-        for y in [0, CHUNK_SIZE_P - 1]:
-            for x in range(CHUNK_SIZE_P):
-                pos = np.array([x, y, z], dtype=int32) - 1
-                add_voxel_to_axis_cols(chunks_refs.get_block(pos), x, y, z, axis_cols)
-
-    for z in range(CHUNK_SIZE_P):
-        for x in [0, CHUNK_SIZE_P - 1]:
-            for y in range(CHUNK_SIZE_P):
-                pos = np.array([x, y, z], dtype=int32) - 1
-                add_voxel_to_axis_cols(chunks_refs.get_block(pos), x, y, z, axis_cols)
-
-    # face culling
-    for axis in range(3):
-        for z in range(CHUNK_SIZE_P):
-            for x in range(CHUNK_SIZE_P):
-                col = axis_cols[axis, z, x]
-                col_face_masks[2 * axis, z, x] = col & ~(col << 1)
-                col_face_masks[2 * axis + 1, z, x] = col & ~(col >> 1)
-
-    # find faces and build binary planes
-    data = [{} for _ in range(6)]  # List[Dict[int, Dict[int, np.ndarray]]]
-
-    for axis in range(6):
-        for z in range(CHUNK_SIZE):
-            for x in range(CHUNK_SIZE):
-                col = col_face_masks[axis, z + 1, x + 1]
-                col >>= 1
-                col &= ~(1 << CHUNK_SIZE)
-
-                while col != 0:
-                    y = trailing_zeros_64(uint64(col))
-                    col &= col - 1
-
-                    if axis in (0, 1):  # down, up
-                        voxel_pos = np.array([x, y, z], dtype=np.int32)
-                    elif axis in (2, 3):  # left, right
-                        voxel_pos = np.array([y, z, x], dtype=np.int32)
-                    else:  # forward, back
-                        voxel_pos = np.array([x, z, y], dtype=np.int32)
-
-                    # calculate ambient occlusion
-                    ao_index = 0
-                    for ao_i, ao_offset in enumerate(ADJACENT_AO_DIRS):
-                        if axis == 0:  # down
-                            ao_sample_offset = np.array([ao_offset[0], -1, ao_offset[1]], dtype=np.int32)
-                        elif axis == 1:  # up
-                            ao_sample_offset = np.array([ao_offset[0], 1, ao_offset[1]], dtype=np.int32)
-                        elif axis == 2:  # left
-                            ao_sample_offset = np.array([-1, ao_offset[1], ao_offset[0]], dtype=np.int32)
-                        elif axis == 3:  # right
-                            ao_sample_offset = np.array([1, ao_offset[1], ao_offset[0]], dtype=np.int32)
-                        elif axis == 4:  # forward
-                            ao_sample_offset = np.array([ao_offset[0], ao_offset[1], -1], dtype=np.int32)
-                        else:  # back
-                            ao_sample_offset = np.array([ao_offset[0], ao_offset[1], 1], dtype=np.int32)
-
-                        ao_voxel_pos = voxel_pos + ao_sample_offset
-                        ao_block = chunks_refs.get_block(ao_voxel_pos)
-                        if ao_block.is_solid():
-                            ao_index |= 1 << ao_i
-
-                    current_voxel = chunks_refs.get_block_no_neighbour(voxel_pos)
-                    block_hash = ao_index | (current_voxel.block_type.value << 9)
-
-                    if block_hash not in data[axis]:
-                        data[axis][block_hash] = {}
-
-                    if y not in data[axis][block_hash]:
-                        data[axis][block_hash][y] = np.zeros(32, dtype=np.uint32)
-
-                    data[axis][block_hash][y][x] |= 1 << z
-
-    vertices = []
-    for axis, block_ao_data in enumerate(data):
-        facedir = list(FaceDir)[axis]
-
-        for block_ao, axis_plane in block_ao_data.items():
-            ao = block_ao & 0b111111111
-            block_type = block_ao >> 9
-
-            for axis_pos, plane in axis_plane.items():
-                quads_from_axis = greedy_mesh_binary_plane(plane, lod.size())
-
-                for q in quads_from_axis:
-                    q.append_vertices(vertices, facedir, axis_pos, lod, ao, block_type)
-
-    mesh.vertices.extend(vertices)
-    if not mesh.vertices:
-        return None
-
-    mesh.indices = generate_indices(len(mesh.vertices))
-    return mesh
+    # Compute correct vertices and adds them to array
+    index = add_data(vertices, index, new_vertices)

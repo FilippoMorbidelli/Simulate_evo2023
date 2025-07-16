@@ -18,7 +18,6 @@ import time
 # From Third-Party
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from numba import types
 from numba.typed import Dict as nDict
 
 # All Processes to spawn -------------------------------|
@@ -84,7 +83,9 @@ class LoadProcess(mp.Process):
                         vox_meshes_greedy = dict()
 
                         # TEMP TO REMOVE - NEW IMPLEMENTATION
-
+                        build_chunk_mesh_greedy(voxels[r][21],
+                                                voxels[r][[5, 37, 20, 22, 17, 25]],
+                                                format_size)
 
                         # Loop over 8 chunks each
                         for cc in range(int(world_info.r_vol/8)):
