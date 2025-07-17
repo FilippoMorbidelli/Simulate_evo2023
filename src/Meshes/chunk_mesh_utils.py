@@ -22,7 +22,7 @@ REG_SIZE    : uint64 = 4
 REG_SIZE2   : uint64 = REG_SIZE * REG_SIZE
 
 b_bit, c_bit, d_bit, e_bit, f_bit, g_bit = 6, 6, 8, 3, 2, 1 # Data Packing
-INNER_DICT_TYPE = types.DictType(types.uint32, types.uint32[:]) # Numba type
+#INNER_DICT_TYPE = types.DictType(types.uint32, types.uint32[:]) # Numba type
 
 ADJACENT_AO_DIRS = np.array([
     [-1, -1],
@@ -59,20 +59,20 @@ def add_voxel_to_axis_cols(b: uint8, x: int, y: int, z: int, axis_cols: np.ndarr
         axis_cols[2, y, x] |= 1 << z
 
 @njit(fastmath=True, cache=True, nogil=True)
-def bound_to_face(bound_array: np.ndarray) -> Enum:
+def bound_to_face(bound_array: np.ndarray) -> int:
     for face in range(6):
         if bound_array[face]:
             match face:
-                case 0: return FaceDir.Left
-                case 1: return FaceDir.Down
-                case 2: return FaceDir.Forward
-                case 3: return FaceDir.Right
-                case 4: return FaceDir.Up
-                case 5: return FaceDir.Back
-    return FaceDir.Down
+                case 0: return 2 # FaceDir.Left
+                case 1: return 0 # FaceDir.Down
+                case 2: return 4 # FaceDir.Forward
+                case 3: return 3 # FaceDir.Right
+                case 4: return 1 # FaceDir.Up
+                case 5: return 5 # FaceDir.Back
+    return 0 # FaceDir.Down
 
 @njit(fastmath=True, cache=True, nogil=True)
-def face_to_vec3(face, section: int32, x: int32, y: int32) -> int32:
+def face_to_vec3(face, section: int32, x: int32, y: int32):
     if face == FaceDir.Up:
         return x, section + 1, y
     elif face == FaceDir.Down:
@@ -101,7 +101,7 @@ def bit_length(v):
 @njit(fastmath=True, cache=True, nogil=True)
 def pack_data(x, y, z, voxel_id, face_id, ao_id, flip_id):
     # x: 6bit, y: 6bit, z: 6bit, voxel_id: 8bit, face_id: 3bit, ao_id: 2bit, flip_id: 1bit
-    a, b, c, d, e, f, g = x, y, z, voxel_id, face_id, ao_id, flip_id
+    a, b, c, d, e, f, g = np.uint32(x), np.uint32(y), np.uint32(z), voxel_id, face_id, ao_id, flip_id
 
     fg_bit = f_bit + g_bit
     efg_bit = e_bit + fg_bit

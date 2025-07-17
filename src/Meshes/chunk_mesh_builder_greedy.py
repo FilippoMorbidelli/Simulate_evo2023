@@ -14,7 +14,7 @@ from typing import List, Optional
 # New Chunk Mesh builder only greedy with AO!! Copied from Rust fast mesher (https://www.youtube.com/watch?v=qnGoGq7DWMc)
 #-
 
-#@njit(fastmath=True, cache=True, nogil=True)
+@njit(fastmath=True, cache=True, nogil=True)
 def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                             neighbors: np.ndarray,
                             format_s: int32,
@@ -49,7 +49,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
     # Neighbouring Chunks voxels
     # Along z axis
     for z in [0, PADDED_SIZE - 1]:
-        neighbor_id = FaceDir.Back if z else FaceDir.Forward
+        neighbor_id = 5 if z else 4 # Back and Forward
         z_index = (0 if z else 31) * CHUNK_SIZE
 
         for y in range(CHUNK_SIZE):
@@ -62,7 +62,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
 
     # Along y axis
     for y in [0, PADDED_SIZE - 1]:
-        neighbor_id = FaceDir.Up if y else FaceDir.Down
+        neighbor_id = 1 if y else 0 # Up and Down
         y_index = (0 if y else 31) * CHUNK_SIZE2
 
         for z in range(CHUNK_SIZE):
@@ -75,7 +75,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
 
     # Along x axis
     for x in [0, PADDED_SIZE - 1]:
-        neighbor_id = FaceDir.Right if x else FaceDir.Left
+        neighbor_id = 3 if x else 2 # Right and Left
         x_index = (0 if x else 31)
 
         for z in range(CHUNK_SIZE):
@@ -97,7 +97,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
 
     # Greedy meshing planes for every axis (6)
     # cannot use List[Dict[int, Dict[int, np.ndarray]]] due to Numba so trying with NumbaDict but may be a bottleneck!!
-    data = [nDict.empty(key_type=types.uint32, value_type=INNER_DICT_TYPE) for _ in range(6)]
+    data = [nDict.empty(key_type=types.uint32, value_type=types.uint32[:]) for _ in range(6)]
 
     # Compute Ambient Occlusion
     for axis in range(6):
@@ -107,12 +107,12 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                 col = col_face_masks[axis, z + 1, x + 1]
                 # removes the right most and left most padding values, because they are invalid
                 col >>= 1
-                col &= np.uint64(~(np.uint64(1) << CHUNK_SIZE))
+                col &= ~(uint64(1) << CHUNK_SIZE)
 
                 while col != 0:
                     # py implementation of trailing zeros (uint32)
-                    y = bit_length(col & (~col + 1))
-                    col &= col - 1 # clear least significant set bit
+                    y = bit_length(col & (~col + uint64(1)))
+                    col &= col - uint64(1) # clear least significant set bit
 
                     # get the voxel position based on axis
                     match axis:
@@ -158,30 +158,25 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
 
                     current_voxel = np.uint32(chunk_voxels[voxel_pos[2] * CHUNK_SIZE + voxel_pos[1] * CHUNK_SIZE2 + voxel_pos[0]])
                     block_hash = ao_index | (current_voxel << 9)
+                    composite_block_hash = block_hash | (y << 17)
 
-                    block_hash = np.uint32(block_hash)
-                    y = np.uint32(y)
-                    x = np.uint32(x)
-                    if block_hash not in data[axis]:
-                        data[axis][block_hash] = nDict.empty(key_type=types.uint32, value_type=types.uint32[:])
+                    if composite_block_hash not in data[axis]:
+                        data[axis][composite_block_hash] = np.zeros(32, dtype='uint32')
 
-                    if uint32(y) not in data[axis][block_hash]:
-                        data[axis][block_hash][y] = np.zeros(32, dtype='uint32')
-
-                    data[axis][block_hash][y][x] |= 1 << np.uint32(z)
+                    data[axis][composite_block_hash][x] |= np.uint32(1) << np.uint32(z)
 
     # Sample planes for greedy meshing
     index = 0
     for face, block_ao_data in enumerate(data):
-        for block_hash, axis_plane in block_ao_data.items():
-            ao = block_hash & 0b111111111
-            block_type = block_hash >> 9
+        for comp_block_hash, plane in block_ao_data.items():
+            ao         = comp_block_hash & 0b111111111
+            block_type = (comp_block_hash >> 9) & 0b11111111
+            axis_pos   = comp_block_hash >> 17
 
-            for axis_pos, plane in axis_plane.items():
-                quads_from_axis = greedy_mesh_binary_plane(plane, lod) # lod.size()
+            quads_from_axis = greedy_mesh_binary_plane(plane, lod)
 
-                for q in quads_from_axis:
-                    index = append_vertices(vertices, index, q, face, axis_pos, ao, block_type, lod)
+            for q in quads_from_axis:
+                index = append_vertices(vertices, index, q, face, axis_pos, ao, block_type, lod)
 
     return vertices[:index] if index else vertices[:1]
 
