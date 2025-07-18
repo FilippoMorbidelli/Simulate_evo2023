@@ -8,11 +8,11 @@ from src.Meshes.chunk_mesh_utils import *
 
 from numpy.typing import NDArray
 from numba.typed import Dict as nDict
+from numba import types
 from typing import List, Optional
 
 # World generator ------------------------------|
 # New Chunk Mesh builder only greedy with AO!! Copied from Rust fast mesher (https://www.youtube.com/watch?v=qnGoGq7DWMc)
-#-
 
 @njit(fastmath=True, cache=True, nogil=True)
 def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
@@ -58,7 +58,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
             for x in range(CHUNK_SIZE):
                 i = y_index + z_index + x
 
-                add_voxel_to_axis_cols(neighbors[neighbor_id, i], x, y, z, axis_cols)
+                add_voxel_to_axis_cols(neighbors[neighbor_id, i], x + 1, y + 1, z, axis_cols)
 
     # Along y axis
     for y in [0, PADDED_SIZE - 1]:
@@ -71,7 +71,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
             for x in range(CHUNK_SIZE):
                 i = y_index + z_index + x
 
-                add_voxel_to_axis_cols(neighbors[neighbor_id, i], x, y, z, axis_cols)
+                add_voxel_to_axis_cols(neighbors[neighbor_id, i], x + 1, y, z + 1, axis_cols)
 
     # Along x axis
     for x in [0, PADDED_SIZE - 1]:
@@ -85,7 +85,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                 y_index = y * CHUNK_SIZE2
                 i = y_index + z_index + x_index
 
-                add_voxel_to_axis_cols(neighbors[neighbor_id, i], x, y, z, axis_cols)
+                add_voxel_to_axis_cols(neighbors[neighbor_id, i], x, y + 1, z + 1, axis_cols)
 
     # Face culling
     for axis in range(3):
@@ -111,7 +111,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
 
                 while col != 0:
                     # py implementation of trailing zeros (uint32)
-                    y = bit_length(col & (~col + uint64(1)))
+                    y = bit_length(col & ~col + uint64(1))
                     col &= col - uint64(1) # clear least significant set bit
 
                     # get the voxel position based on axis
@@ -167,7 +167,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
 
     # Sample planes for greedy meshing
     index = 0
-    for face, block_ao_data in enumerate(data):
+    for axis, block_ao_data in enumerate(data):
         for comp_block_hash, plane in block_ao_data.items():
             ao         = comp_block_hash & 0b111111111
             block_type = (comp_block_hash >> 9) & 0b11111111
@@ -176,7 +176,7 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
             quads_from_axis = greedy_mesh_binary_plane(plane, lod)
 
             for q in quads_from_axis:
-                index = append_vertices(vertices, index, q, face, axis_pos, ao, block_type, lod)
+                index = append_vertices(vertices, index, q, axis, axis_pos, ao, block_type, lod)
 
     return vertices[:index] if index else vertices[:1]
 
@@ -202,7 +202,7 @@ def greedy_mesh_binary_plane(voxel_mask,
             trailing_ones = bit_length(~(voxel_mask[row] >> h) & (voxel_mask[row] >> h) + 1)
 
             # Create a mask for the height
-            h_as_mask = (1 << trailing_ones) - 1 if trailing_ones > 0 else 0
+            h_as_mask = (1 << trailing_ones) - 1 if trailing_ones < 32 else 0xFFFFFFFF
             mask = h_as_mask << h
 
             # Grow vertically
@@ -253,6 +253,7 @@ def append_vertices(vertices: np.ndarray,
     v2 = pack_data(*face_to_vec3(face, section, x + w, y + h), block_type, face, v3ao, flip)
     v3 = pack_data(*face_to_vec3(face, section, x    , y + h), block_type, face, v4ao, flip)
 
+    # Set correct vertex order considering anisotropy flip
     match face:
         case FaceDir.Down:
             new_vertices = [v1, v3, v0, v1, v2, v3] if flip else [v0, v2, v3, v0, v1, v2]

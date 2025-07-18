@@ -4,8 +4,8 @@
 # Last update: 16/07/2025
 
 # Import packages ------------------------------|
-from numba import njit, uint8, uint64, int32, uint32, types
-from enum import Enum, IntEnum
+from numba import njit, uint8, uint64, int32
+from enum import IntEnum
 
 import numpy as np
 
@@ -13,13 +13,13 @@ import numpy as np
 # New Chunk Mesh builder only greedy with AO!! Copied from Rust fast mesher (https://www.youtube.com/watch?v=qnGoGq7DWMc)
 
 # - Constants -
-CHUNK_SIZE  : uint64 = 32
-CHUNK_SIZE2 : uint64 = CHUNK_SIZE * CHUNK_SIZE
-CHUNK_SIZE3 : uint64 = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE
-PADDED_SIZE    : uint64 = CHUNK_SIZE + 2
-PADDED_SIZE2   : uint64 = PADDED_SIZE * PADDED_SIZE
-REG_SIZE    : uint64 = 4
-REG_SIZE2   : uint64 = REG_SIZE * REG_SIZE
+CHUNK_SIZE   : uint64 = 32
+CHUNK_SIZE2  : uint64 = CHUNK_SIZE * CHUNK_SIZE
+CHUNK_SIZE3  : uint64 = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE
+PADDED_SIZE  : uint64 = CHUNK_SIZE + 2
+PADDED_SIZE2 : uint64 = PADDED_SIZE * PADDED_SIZE
+REG_SIZE     : uint64 = 4
+REG_AREA     : uint64 = REG_SIZE * REG_SIZE
 
 b_bit, c_bit, d_bit, e_bit, f_bit, g_bit = 6, 6, 8, 3, 2, 1 # Data Packing
 #INNER_DICT_TYPE = types.DictType(types.uint32, types.uint32[:]) # Numba type
@@ -34,6 +34,15 @@ ADJACENT_AO_DIRS = np.array([
     [ 1, -1],
     [ 1,  0],
     [ 1,  1]
+], dtype = 'int32')
+
+ADJACENT_CHUNK_DIRS = np.array([
+    [0, -1, 0],
+    [0,  1, 0],
+    [-1, 0, 0],
+    [ 1, 0, 0],
+    [0, 0, -1],
+    [0, 0,  1]
 ], dtype = 'int32')
 
 # - Classes -
@@ -90,7 +99,7 @@ def face_to_vec3(face, section: int32, x: int32, y: int32):
 def bit_length(v):
     # Custom method to compute log2(v)
     # Used to find bit length of v in numba since bit_length method is not implemented
-    r =     np.uint32((v > 0xFFFFFFFF) << 5); v >>= r
+    r = (v > 0xFFFFFFFF) << 5; v >>= r
     shift = (v > 0xFFFF) << 4; v >>= shift; r |= shift
     shift = (v > 0xFF  ) << 3; v >>= shift; r |= shift
     shift = (v > 0xF   ) << 2; v >>= shift; r |= shift
@@ -129,11 +138,24 @@ def add_data(vertex_data, index, vertices):
     return index
 
 @njit(fastmath=True, cache=True, nogil=True)
+def find_neighbors(chunk_pos):
+    NbList = []
+    for _, cdir in enumerate(ADJACENT_CHUNK_DIRS):
+        new_chunk = chunk_pos + cdir
+        if np.sum((new_chunk < 0) | (new_chunk > 4)):
+            new_chunk_index = new_chunk[0] + REG_SIZE * new_chunk[2] + REG_AREA * new_chunk[1]
+            NbList.append(new_chunk_index)
+        else:
+            NbList.append(0) # TBD!!!!
+
+    return NbList
+
+@njit(fastmath=True, cache=True, nogil=True)
 def get_padded_chunk_optimized(voxels, region_pos, chunk_pos):
     # Init padded chunk
     padded = np.zeros((34, 34, 34), dtype=uint8)
 
-    main_chunk = chunk_pos[0] + chunk_pos[1] * REG_SIZE2 + chunk_pos[2] * REG_SIZE
+    main_chunk = chunk_pos[0] + chunk_pos[1] * REG_AREA + chunk_pos[2] * REG_SIZE
     #main_reg   =
 
     # Get the center chunk voxels
@@ -146,19 +168,3 @@ def get_padded_chunk_optimized(voxels, region_pos, chunk_pos):
             padded_id = 1 + pz_id + (y + 1) * PADDED_SIZE2
 
             padded[padded_id : padded_id + CHUNK_SIZE] = voxels[main_chunk][chunk_id : chunk_id + CHUNK_SIZE]
-
-
-#-----------------------------------------------------------------------------------------------------------
-
-class Lod(Enum):
-    L32 = 32
-    L16 = 16
-    L8 = 8
-    L4 = 4
-    L2 = 2
-
-    def size(self) -> int:
-        return self.value
-
-    def jump_index(self) -> int:
-        return 32 // self.value

@@ -253,7 +253,7 @@ class World:
             chunk.is_empty = False
 
             # Build mesh with already computed data
-            chunk.build_mesh(asynch=True, vao_v=vm[c_id], vao_vg=vmg[c_id])
+            chunk.build_mesh(asynch=True, vao_v=vm[c_id])
 
     def update(self):
         # Update Regions

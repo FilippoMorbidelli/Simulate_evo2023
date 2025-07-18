@@ -27,7 +27,7 @@ class ChunkMesh(BaseMesh):
         if not asynch:
             self.vao, self.vao_greedy = self.get_vao()
         else:
-            self.vao, self.vao_greedy = self.asynch_get_vao(vao_v, vao_vg)
+            self.vao = self.asynch_get_vao(vao_v)
 
     def rebuild(self):
         self.vao, self.vao_greedy = self.get_vao()
@@ -68,7 +68,7 @@ class ChunkMesh(BaseMesh):
 
         return vao, vao_greedy
 
-    def asynch_get_vao(self, vertex_data, greedy_data):
+    def asynch_get_vao(self, vertex_data):
 
         # Build normal vbo and vao
         vbo = self.ctx.buffer(vertex_data)
@@ -81,16 +81,16 @@ class ChunkMesh(BaseMesh):
         )
 
         # Build greedy vbo and vao
-        vbo_greedy = self.ctx.buffer(greedy_data)
-        vao_greedy = self.ctx.vertex_array(
-            self.program_greedy,
-            [
-                (vbo_greedy, self.vbo_format, *self.attrs),  # First vbo, dedicated to vertex
-            ],
-            skip_errors=True
-        )
+        #vbo_greedy = self.ctx.buffer(greedy_data)
+        #vao_greedy = self.ctx.vertex_array(
+        #    self.program_greedy,
+        #    [
+        #        (vbo_greedy, self.vbo_format, *self.attrs),  # First vbo, dedicated to vertex
+        #    ],
+        #    skip_errors=True
+        #)
 
-        return vao, vao_greedy
+        return vao#, vao_greedy
 
     def render_greedy(self):
         self.vao_greedy.render()

@@ -82,11 +82,6 @@ class LoadProcess(mp.Process):
                         vox_meshes = dict()
                         vox_meshes_greedy = dict()
 
-                        # TEMP TO REMOVE - NEW IMPLEMENTATION
-                        build_chunk_mesh_greedy(voxels[r][21],
-                                                voxels[r][[5, 37, 20, 22, 17, 25]],
-                                                format_size)
-
                         # Loop over 8 chunks each
                         for cc in range(int(world_info.r_vol/8)):
                             RegPos = np.asarray(r_coord[r])
@@ -106,15 +101,14 @@ class LoadProcess(mp.Process):
                                     chunkPos.append((x, y, z))
 
                                 # Submit Tasks
-                                futures = [executor.submit(build_chunk_mesh, Vox, format_size, cPos, RegPos, voxels)
-                                           for Vox, cPos in zip(voxArray, chunkPos)
+                                futures = [executor.submit(build_chunk_mesh_greedy, voxels[r][ccc], voxels[r][find_neighbors(np.array(cPos))], format_size, 32)
+                                           for ccc, cPos in zip(ccIds, chunkPos)
                                            ]
 
                                 # Get Results
                                 for c in range(8):
-                                    mesh, meshGreedy = futures[c].result()
+                                    mesh = futures[c].result()
                                     vox_meshes[ccIds[c]] = mesh
-                                    vox_meshes_greedy[ccIds[c]] = meshGreedy
 
                             self.rsp_queue.put(["Load", "InProgress", [r, r_coord[r], vox_meshes, vox_meshes_greedy]])
 
