@@ -210,38 +210,38 @@ def greedy_mesh_builder(v_mask, face, voxel, level, gvd, indexGreedy):
                     indexGreedy = add_data(gvd, indexGreedy, v0, v3, v2, v0, v2, v1)
 
                 case 1:  # Bottom
-                    v0 = greedy_pack_data(h, level, row, voxel, face)
-                    v1 = greedy_pack_data(h + trailing_ones, level, row, voxel, face)
+                    v0 = greedy_pack_data(h                , level, row    , voxel, face)
+                    v1 = greedy_pack_data(h + trailing_ones, level, row    , voxel, face)
                     v2 = greedy_pack_data(h + trailing_ones, level, row + w, voxel, face)
-                    v3 = greedy_pack_data(h, level, row + w, voxel, face)
+                    v3 = greedy_pack_data(h                , level, row + w, voxel, face)
                     indexGreedy = add_data(gvd, indexGreedy, v0, v2, v3, v0, v1, v2)
 
                 case 2:  # Right
-                    v0 = greedy_pack_data(level + 1, row, h, voxel, face)
-                    v1 = greedy_pack_data(level + 1, row + w, h, voxel, face)
+                    v0 = greedy_pack_data(level + 1, row    , h                , voxel, face)
+                    v1 = greedy_pack_data(level + 1, row + w, h                , voxel, face)
                     v2 = greedy_pack_data(level + 1, row + w, h + trailing_ones, voxel, face)
-                    v3 = greedy_pack_data(level + 1, row, h + trailing_ones, voxel, face)
+                    v3 = greedy_pack_data(level + 1, row    , h + trailing_ones, voxel, face)
                     indexGreedy = add_data(gvd, indexGreedy, v0, v1, v2, v0, v2, v3)
 
                 case 3:  # Left
-                    v0 = greedy_pack_data(level, row, h, voxel, face)
-                    v1 = greedy_pack_data(level, row + w, h, voxel, face)
+                    v0 = greedy_pack_data(level, row    , h                , voxel, face)
+                    v1 = greedy_pack_data(level, row + w, h                , voxel, face)
                     v2 = greedy_pack_data(level, row + w, h + trailing_ones, voxel, face)
-                    v3 = greedy_pack_data(level, row, h + trailing_ones, voxel, face)
+                    v3 = greedy_pack_data(level, row    , h + trailing_ones, voxel, face)
                     indexGreedy = add_data(gvd, indexGreedy, v0, v2, v1, v0, v3, v2)
 
                 case 4:  # Back
-                    v0 = greedy_pack_data(h, row, level, voxel, face)
-                    v1 = greedy_pack_data(h, row + w, level, voxel, face)
+                    v0 = greedy_pack_data(h                , row    , level, voxel, face)
+                    v1 = greedy_pack_data(h                , row + w, level, voxel, face)
                     v2 = greedy_pack_data(h + trailing_ones, row + w, level, voxel, face)
-                    v3 = greedy_pack_data(h + trailing_ones, row, level, voxel, face)
+                    v3 = greedy_pack_data(h + trailing_ones, row    , level, voxel, face)
                     indexGreedy = add_data(gvd, indexGreedy, v0, v1, v2, v0, v2, v3)
 
                 case 5:  # Forward
-                    v0 = greedy_pack_data(h, row, level + 1, voxel, face)
-                    v1 = greedy_pack_data(h, row + w, level + 1, voxel, face)
+                    v0 = greedy_pack_data(h                , row    , level + 1, voxel, face)
+                    v1 = greedy_pack_data(h                , row + w, level + 1, voxel, face)
                     v2 = greedy_pack_data(h + trailing_ones, row + w, level + 1, voxel, face)
-                    v3 = greedy_pack_data(h + trailing_ones, row, level + 1, voxel, face)
+                    v3 = greedy_pack_data(h + trailing_ones, row    , level + 1, voxel, face)
                     indexGreedy = add_data(gvd, indexGreedy, v0, v2, v1, v0, v3, v2)
 
             h += trailing_ones

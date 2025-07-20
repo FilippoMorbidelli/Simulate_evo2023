@@ -219,7 +219,7 @@ def greedy_mesh_binary_plane(voxel_mask,
                 w += 1
 
             # Append Quads
-            greedy_quads.append([h, w, trailing_ones, row])
+            greedy_quads.append([row, h, w, trailing_ones]) #[h, row, trailing_ones, w])
 
             h += trailing_ones
 
@@ -237,7 +237,7 @@ def append_vertices(vertices: np.ndarray,
 
     # retrieve Lod level
     #jump = lod.jump_index()
-    x, y, w, h = quad
+    h, row, tr_ones, w = quad
 
     # pack ambient occlusion
     v1ao = ((ao >> 0) & 1) + ((ao >> 1) & 1) + ((ao >> 3) & 1)
@@ -248,25 +248,48 @@ def append_vertices(vertices: np.ndarray,
     flip = (v1ao > 0) ^ (v3ao > 0)
 
     # compute each vertex
-    v0 = pack_data(*face_to_vec3(face, section, x    , y    ), block_type, face, v1ao, flip)
-    v1 = pack_data(*face_to_vec3(face, section, x + w, y    ), block_type, face, v2ao, flip)
-    v2 = pack_data(*face_to_vec3(face, section, x + w, y + h), block_type, face, v3ao, flip)
-    v3 = pack_data(*face_to_vec3(face, section, x    , y + h), block_type, face, v4ao, flip)
-
-    # Set correct vertex order considering anisotropy flip
-    match face:
-        case FaceDir.Down:
-            new_vertices = [v1, v3, v0, v1, v2, v3] if flip else [v0, v2, v3, v0, v1, v2]
-        case FaceDir.Up:
-            new_vertices = [v1, v0, v3, v1, v3, v2] if flip else [v0, v3, v2, v0, v2, v1]
-        case FaceDir.Left:
-            new_vertices = [v3, v1, v0, v3, v2, v1] if flip else [v0, v2, v1, v0, v3, v2]
-        case FaceDir.Right:
-            new_vertices = [v3, v0, v1, v3, v1, v2] if flip else [v0, v1, v2, v0, v2, v3]
-        case FaceDir.Forward:
-            new_vertices = [v3, v1, v0, v3, v2, v1] if flip else [v0, v2, v1, v0, v3, v2]
-        case FaceDir.Back | _:
-            new_vertices = [v3, v0, v1, v3, v1, v2] if flip else [v0, v1, v2, v0, v2, v3]
+    if face == FaceDir.Up:
+        v0 = pack_data(h          , section + 1, row    , block_type, face, v1ao, flip)
+        v1 = pack_data(h + tr_ones, section + 1, row    , block_type, face, v2ao, flip)
+        v2 = pack_data(h + tr_ones, section + 1, row + w, block_type, face, v3ao, flip)
+        v3 = pack_data(h          , section + 1, row + w, block_type, face, v4ao, flip)
+        #v0, v1, v2, v3 = [v3, v2, v1, v0] if flip else [v0, v3, v2, v1] # only for ascending faces
+        new_vertices = [v1, v0, v3, v1, v3, v2] if flip else [v0, v3, v2, v0, v2, v1]
+    elif face == FaceDir.Down:
+        v0 = pack_data(h          , section    , row    , block_type, face, v1ao, flip)
+        v1 = pack_data(h + tr_ones, section    , row    , block_type, face, v2ao, flip)
+        v2 = pack_data(h + tr_ones, section    , row + w, block_type, face, v3ao, flip)
+        v3 = pack_data(h          , section    , row + w, block_type, face, v4ao, flip)
+        #v0, v1, v2, v3 = [v1, v2, v3, v0] if flip else [v0, v1, v2, v3]  # only anisotropy flip
+        new_vertices = [v1, v3, v0, v1, v2, v3] if flip else [v0, v2, v3, v0, v1, v2]
+    elif face == FaceDir.Left:
+        v0 = pack_data(section    , row    , h          , block_type, face, v1ao, flip)
+        v1 = pack_data(section    , row + w, h          , block_type, face, v2ao, flip)
+        v2 = pack_data(section    , row + w, h + tr_ones, block_type, face, v3ao, flip)
+        v3 = pack_data(section    , row    , h + tr_ones, block_type, face, v4ao, flip)
+        #v0, v1, v2, v3 = [v1, v2, v3, v0] if flip else [v0, v1, v2, v3]  # only anisotropy flip
+        new_vertices = [v3, v1, v0, v3, v2, v1] if flip else [v0, v2, v1, v0, v3, v2]
+    elif face == FaceDir.Right:
+        v0 = pack_data(section + 1, row    , h          , block_type, face, v1ao, flip)
+        v1 = pack_data(section + 1, row + w, h          , block_type, face, v2ao, flip)
+        v2 = pack_data(section + 1, row + w, h + tr_ones, block_type, face, v3ao, flip)
+        v3 = pack_data(section + 1, row    , h + tr_ones, block_type, face, v4ao, flip)
+        #v0, v1, v2, v3 = [v3, v2, v1, v0] if flip else [v0, v3, v2, v1] # only for ascending faces
+        new_vertices = [v3, v0, v1, v3, v1, v2] if flip else [v0, v1, v2, v0, v2, v3]
+    elif face == FaceDir.Forward:
+        v0 = pack_data(h          , row    , section    , block_type, face, v1ao, flip)
+        v1 = pack_data(h          , row + w, section    , block_type, face, v2ao, flip)
+        v2 = pack_data(h + tr_ones, row + w, section    , block_type, face, v3ao, flip)
+        v3 = pack_data(h + tr_ones, row    , section    , block_type, face, v4ao, flip)
+        #v0, v1, v2, v3 = [v3, v2, v1, v0] if flip else [v0, v3, v2, v1] # only for ascending faces
+        new_vertices = [v3, v1, v0, v3, v2, v1] if flip else [v0, v2, v1, v0, v3, v2]
+    else:  # Back
+        v0 = pack_data(h          , row    , section + 1, block_type, face, v1ao, flip)
+        v1 = pack_data(h          , row + w, section + 1, block_type, face, v2ao, flip)
+        v2 = pack_data(h + tr_ones, row + w, section + 1, block_type, face, v3ao, flip)
+        v3 = pack_data(h + tr_ones, row    , section + 1, block_type, face, v4ao, flip)
+        #v0, v1, v2, v3 = [v1, v2, v3, v0] if flip else [v0, v1, v2, v3]  # only anisotropy flip
+        new_vertices = [v3, v0, v1, v3, v1, v2] if flip else [v0, v1, v2, v0, v2, v3]
 
     # Compute correct vertices and adds them to array
     index = add_data(vertices, index, new_vertices)

@@ -81,21 +81,6 @@ def bound_to_face(bound_array: np.ndarray) -> int:
     return 0 # FaceDir.Down
 
 @njit(fastmath=True, cache=True, nogil=True)
-def face_to_vec3(face, section: int32, x: int32, y: int32):
-    if face == FaceDir.Up:
-        return x, section + 1, y
-    elif face == FaceDir.Down:
-        return x, section, y
-    elif face == FaceDir.Left:
-        return section, y, x
-    elif face == FaceDir.Right:
-        return section + 1, y, x
-    elif face == FaceDir.Forward:
-        return x, y, section
-    else:  # Back
-        return x, y, section + 1
-
-@njit(fastmath=True, cache=True, nogil=True)
 def bit_length(v):
     # Custom method to compute log2(v)
     # Used to find bit length of v in numba since bit_length method is not implemented
@@ -137,12 +122,12 @@ def add_data(vertex_data, index, vertices):
         index += 1
     return index
 
-@njit(fastmath=True, cache=True, nogil=True)
+#@njit(fastmath=True, cache=True, nogil=True)
 def find_neighbors(chunk_pos):
     NbList = []
     for _, cdir in enumerate(ADJACENT_CHUNK_DIRS):
-        new_chunk = chunk_pos + cdir
-        if np.sum((new_chunk < 0) | (new_chunk > 4)):
+        new_chunk = chunk_pos + np.array(cdir)
+        if np.all(new_chunk >= 0) and np.all(new_chunk < 4):
             new_chunk_index = new_chunk[0] + REG_SIZE * new_chunk[2] + REG_AREA * new_chunk[1]
             NbList.append(new_chunk_index)
         else:
