@@ -31,13 +31,16 @@ class World:
         # Load and Save processes status
         self.load_status = "Idle"
         self.save_status = "Idle"
-        let_settings_global(self.info)
 
         # Retrieve frustum
         self.frustum_check = self.app.player.frustum.is_on_frustum
 
         # Instantiate voxel dict in NJit
         self.voxels = Dict.empty(key_type=types.int64, value_type=types.uint8[:, :])
+
+        # Prepare chunks and svo dict
+        self.chunks = dict()
+        self.svo = dict()
 
         # Create or load world
         if load_voxels is None:
@@ -49,12 +52,8 @@ class World:
             for r_id in regions_to_create.keys():
                 self.voxels[r_id] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
 
-            # Prepare chunks and svo dict
-            self.chunks = dict()
-            self.svo = dict()
-
             # Send to Load Process queue the required region to be loaded or created
-            self.app.req_queues["load"].put(["InitWorld", list(regions_to_create.keys()), regions_to_create, {}, self.info, self.app.stg.util])
+            self.app.requestQueues["load"].put(["InitWorld", list(regions_to_create.keys()), regions_to_create, {}, self.info, self.app.stg.util])
             # Update local load process status
             self.load_status = "Occupied"
 
@@ -65,12 +64,8 @@ class World:
             for r_id in load_voxels.keys():
                 self.voxels[r_id] = np.zeros([self.info.r_vol, self.info.c_vol], dtype='uint8')
 
-            # Prepare chunks and svo dict
-            self.chunks = dict()
-            self.svo = dict()
-
             # Send to Load Process queue the required region to be loaded or created
-            self.app.req_queues["load"].put(["InitWorld", list(load_voxels.keys()), load_voxels, {}, self.info, self.app.stg.util])
+            self.app.requestQueues["load"].put(["InitWorld", list(load_voxels.keys()), load_voxels, {}, self.info, self.app.stg.util])
             # Update local load process status
             self.load_status = "Occupied"
 
@@ -123,7 +118,7 @@ class World:
     def update_active_regions(self):
 
         # If no responses are available check if active regions changed
-        if self.app.resp_queue.empty():
+        if self.app.responseQueue.empty():
 
             # Compute new regions
             p_pos = self.app.player.position
@@ -143,7 +138,7 @@ class World:
                 for r in to_delete:
                     to_send_dict[r] = self.voxels[r]
                 # Send to Save Process queue the required region to be loaded or created
-                self.app.req_queues["save"].put(["SaveRegion", to_delete, to_send_dict, self.info, self.app.stg.util])
+                self.app.requestQueues["save"].put(["SaveRegion", to_delete, to_send_dict, self.info, self.app.stg.util])
                 # Update local load process status
                 self.save_status = "Occupied"
 
@@ -164,14 +159,14 @@ class World:
                     for r in new_set.intersection(current_set):
                         to_send_dict[r] = self.voxels[r]
                 # Send to Load Process queue the required region to be loaded or created
-                self.app.req_queues["load"].put(["LoadRegion", to_add, new_reg, to_send_dict, self.info, self.app.stg.util])
+                self.app.requestQueues["load"].put(["LoadRegion", to_add, new_reg, to_send_dict, self.info, self.app.stg.util])
                 # Update local load process status
                 self.load_status = "Occupied"
 
         else:
 
             # Process any response
-            event, status, data = self.app.resp_queue.get()
+            event, status, data = self.app.responseQueue.get()
 
             # Match type of response
             match event:
@@ -212,7 +207,7 @@ class World:
                         # Save Each region
                         for r in self.voxels:
                             # Send Complete save request
-                            self.app.req_queues["save"].put(
+                            self.app.requestQueues["save"].put(
                                 ["SaveRegion", r, {r : self.voxels[r]}, self.info, self.app.stg.util])
                         # Update local load process status
                         self.save_status = "Occupied"

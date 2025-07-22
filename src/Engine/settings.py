@@ -205,39 +205,6 @@ class GameSettings:  # Main settings class
 # Mesh builder util functions ----------------------------------------|
 powers = 1 << np.array(range(32), dtype="int64")
 
-# World Settings for njit --------------------------------------------|
-#spec = [
-#    ("c_size"   , int32), ("c_area"   , int32), ("c_vol"    , int32),
-#    ("off_x"    , int32), ("off_y"    , int32), ("off_z"    , int32),
-#    ("v_x"      , float64), ("v_y"    , float64), ("v_z"    , float64),
-#    ("r_size"   , int32), ("r_area"   , int32), ("rc_size"  , int32),
-#    ("width_rn" , int32), ("height_rn", int32), ("depth_rn" , int32),
-#]
-#
-#@jitclass(spec)
-#class ChunkMeshSettings:
-#    def __init__(self, c_size, c_area, c_vol,
-#                       off_x, off_y, off_z,
-#                       v_x, v_y, v_z,
-#                       r_size, r_area, rc_size,
-#                       width_rn, height_rn, depth_rn):
-        # Manually set each setting needed for mesh creation (GPU)
-#        self.c_size    = c_size
-#        self.c_area    = c_area
-#        self.c_vol     = c_vol
-#        self.off_x     = off_x
-#        self.off_y     = off_y
-#        self.off_z     = off_z
-#        self.v_x       = v_x
-#        self.v_y       = v_y
-#        self.v_z       = v_z
-#        self.r_size    = r_size
-#        self.r_area    = r_area
-#        self.rc_size   = rc_size
-#        self.width_rn  = width_rn
-#        self.height_rn = height_rn
-#        self.depth_rn  = depth_rn
-
 # Settings functions ----------|
 
 # Change Setting Value

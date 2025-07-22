@@ -23,34 +23,34 @@ from numba.typed import Dict as nDict
 # All Processes to spawn -------------------------------|
 class LoadProcess(mp.Process):
 
-    def __init__(self, request_q, response_q):
+    def __init__(self, request_queue, response_queue):
         # Extend class
         super().__init__()
 
         # Init shared data
-        self.rq_queue = request_q
-        self.rsp_queue = response_q
+        self.requestQueue = request_queue
+        self.responseQueue = response_queue
+        #self.local_world = nDict.empty(key_type=types.int64, value_type=types.uint8[:, :])
 
     def run(self):
         while True:
-            if self.rq_queue.empty():
-                # Sleep
+            # Check if any request is present else put to Sleep
+            if self.requestQueue.empty():
                 time.sleep(1)
             else:
                 # Retrieve data to process
-                to_process = self.rq_queue.get()
-                # Check if Kill command
-                if to_process == "Kill":
+                request_data = self.requestQueue.get()
+
+                # Kill command
+                if request_data == "Kill":
                     self.terminate()
                 else:
                     # Unwrap data
-                    command, RToLoad, r_coord, w_vox, world_info, util = to_process
+                    command, RToLoad, r_coord, w_vox, world_info, util = request_data
 
                     # Compute specialized settings
                     stg = (world_info.depth_rn, world_info.width_rn, world_info.height_rn, world_info.w_width,
                            world_info.w_height, world_info.w_width, world_info.r_size, world_info.r_area)
-
-                    send_iter = max(2, world_info.r_vol/16)
 
                     # Create NJit dict with already known voxels
                     voxels = nDict.empty(key_type=types.int64, value_type=types.uint8[:, :])
@@ -69,7 +69,7 @@ class LoadProcess(mp.Process):
                             asynch_build_chunks(voxels, l_voxels, stg, world_info, new=False)
 
                         # Send response to signal that loading has been initialized
-                        self.rsp_queue.put(["Load", "Init", [region, voxels[region]]])
+                        self.responseQueue.put(["Load", "Init", [region, voxels[region]]])
 
                     # Define globals to be used by voxel mesh creator
                     define_globals()
@@ -81,11 +81,6 @@ class LoadProcess(mp.Process):
                         # Vox meshes dict (to send)
                         vox_meshes = dict()
                         vox_meshes_greedy = dict()
-
-                        # TEMP TO REMOVE - NEW IMPLEMENTATION
-                        build_chunk_mesh_greedy(voxels[r][21],
-                                                voxels[r][[5, 37, 20, 22, 17, 25]],
-                                                format_size)
 
                         # Loop over 8 chunks each
                         for cc in range(int(world_info.r_vol/8)):
@@ -106,7 +101,7 @@ class LoadProcess(mp.Process):
                                     chunkPos.append((x, y, z))
 
                                 # Submit Tasks
-                                futures = [executor.submit(build_chunk_mesh_greedy, voxels[r][ccc], voxels[r][find_neighbors(np.array(cPos))], format_size, 32)
+                                futures = [executor.submit(build_chunk_mesh_greedy, voxels[r][ccc], get_neighbors(voxels, np.array(RegPos), np.array(cPos), world_info), format_size, 32)
                                            for ccc, cPos in zip(ccIds, chunkPos)
                                            ]
 
@@ -115,16 +110,16 @@ class LoadProcess(mp.Process):
                                     mesh = futures[c].result()
                                     vox_meshes[ccIds[c]] = mesh
 
-                            self.rsp_queue.put(["Load", "InProgress", [r, r_coord[r], vox_meshes, vox_meshes_greedy]])
+                            self.responseQueue.put(["Load", "InProgress", [r, r_coord[r], vox_meshes, vox_meshes_greedy]])
 
                         # Load response to confirm computation of new region has ended
-                        self.rsp_queue.put(["Load", "DoneRegion", [r, r_coord[r]]])
+                        self.responseQueue.put(["Load", "DoneRegion", [r, r_coord[r]]])
 
                     # Load response to confirm computation of new region has ended
                     if command == "InitWorld":
-                        self.rsp_queue.put(["Load", "InitDone", []])
+                        self.responseQueue.put(["Load", "InitDone", []])
                     else:
-                        self.rsp_queue.put(["Load", "Done", []])
+                        self.responseQueue.put(["Load", "Done", []])
 
 
 def asynch_load_region(util, info, region):

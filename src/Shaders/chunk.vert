@@ -20,7 +20,7 @@ flat out int face_id;
 out vec2 uv;
 out float shading;
 
-const float ao_values[4] = float[4](0.1, 0.25, 0.5, 1.0);
+const float ao_values[4] = float[4](1.0, 0.5, 0.25, 0.1);
 
 const float face_shading[6] = float[6](
         1.0, 0.5,  // Top - Bottom

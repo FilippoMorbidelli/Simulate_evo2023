@@ -90,17 +90,17 @@ class BoxelEngine:  # Voxel Engine inspired from Minecraft
 
         # Create Child Processes and Queues
         self.processes  = dict()
-        self.req_queues = dict()
-        self.resp_queue = Queue() # The response queue is unique since all processes communicate with parent only
+        self.requestQueues = dict()
+        self.responseQueue = Queue() # The response queue is unique since all processes communicate with parent only
 
         # Load region process
-        self.req_queues["load"] = Queue()
-        self.processes["load"] = LoadProcess(self.req_queues["load"], self.resp_queue)
+        self.requestQueues["load"] = Queue()
+        self.processes["load"] = LoadProcess(self.requestQueues["load"], self.responseQueue)
         self.processes["load"].start()
 
         # Save region process
-        self.req_queues["save"] = Queue()
-        self.processes["save"] = SaveProcess(self.req_queues["save"], self.resp_queue)
+        self.requestQueues["save"] = Queue()
+        self.processes["save"] = SaveProcess(self.requestQueues["save"], self.responseQueue)
         self.processes["save"].start()
 
     def update(self):

@@ -59,7 +59,7 @@ class FaceDir(IntEnum):
     Forward = 4
     Back = 5
 
-# - Functions -
+# - Meshing Functions -
 @njit(fastmath=True, cache=True, nogil=True)
 def add_voxel_to_axis_cols(b: uint8, x: int, y: int, z: int, axis_cols: np.ndarray):
     if b != BlockType.Air:
@@ -122,34 +122,58 @@ def add_data(vertex_data, index, vertices):
         index += 1
     return index
 
+# - Other utils functions -
 #@njit(fastmath=True, cache=True, nogil=True)
-def find_neighbors(chunk_pos):
-    NbList = []
+def get_neighbors(voxels, reg_pos, chunk_pos, info):
+    neighbors = np.zeros([6, info.c_vol], dtype="uint8")
+    reg_list, chunk_list = find_neighbors_w_reg(reg_pos, chunk_pos, info)
+    for index in range(6):
+        if int(reg_list[index]) in voxels and reg_list[index] > 0 and chunk_list[index] > 0:
+            neighbors[index] = voxels[int(reg_list[index])][chunk_list[index]]
+
+    return neighbors
+
+
+#@njit(fastmath=True, cache=True, nogil=True)
+def find_neighbors_w_reg(reg_pos, chunk_pos, info):
+    ChunkIDList = []
+    RegionIDList = []
+    RegionID = reg_pos[0] + info.width_rn * reg_pos[2] + info.width_rn * info.depth_rn * reg_pos[1]
+    # Iterate over each of the 6 sides
     for _, cdir in enumerate(ADJACENT_CHUNK_DIRS):
+        # compute adjacent chunk
         new_chunk = chunk_pos + np.array(cdir)
         if np.all(new_chunk >= 0) and np.all(new_chunk < 4):
+            # Same region, different chunk
             new_chunk_index = new_chunk[0] + REG_SIZE * new_chunk[2] + REG_AREA * new_chunk[1]
-            NbList.append(new_chunk_index)
+            ChunkIDList.append(new_chunk_index)
+            RegionIDList.append(RegionID)
+        elif np.sum((new_chunk < 0) | (new_chunk > 4)) == 1:
+            # different region, different chunk
+            new_chunk_index = (new_chunk[0] & 0b11) + REG_SIZE * (new_chunk[2] & 0b11) + REG_AREA * (new_chunk[1] & 0b11)
+            new_region = reg_pos + bound_to_region(np.concatenate((new_chunk < 0, new_chunk > 4)))
+            new_region_index = new_region[0] + info.width_rn * new_region[2] + info.width_rn * info.depth_rn * new_region[1]
+            ChunkIDList.append(new_chunk_index if new_region_index > 0 else 0)
+            RegionIDList.append(new_region_index if new_region_index > 0 else 0)
         else:
-            NbList.append(0) # TBD!!!!
+            # Should not appen
+            ChunkIDList.append(0)
+            RegionIDList.append(0)
 
-    return NbList
+    return RegionIDList, ChunkIDList
+
+def bound_to_region(bound_array: np.ndarray):
+    for face in range(6):
+        if bound_array[face]:
+            match face:
+                case 0: return [-1, 0, 0]
+                case 1: return [0, -1, 0]
+                case 2: return [0, 0, -1]
+                case 3: return [1, 0, 0]
+                case 4: return [0, 1, 0]
+                case 5: return [0, 0, 1]
+    return [0, 0, 0]
 
 @njit(fastmath=True, cache=True, nogil=True)
 def get_padded_chunk_optimized(voxels, region_pos, chunk_pos):
-    # Init padded chunk
-    padded = np.zeros((34, 34, 34), dtype=uint8)
-
-    main_chunk = chunk_pos[0] + chunk_pos[1] * REG_AREA + chunk_pos[2] * REG_SIZE
-    #main_reg   =
-
-    # Get the center chunk voxels
-    for z in range(CHUNK_SIZE):
-        z_id = z * CHUNK_SIZE
-        pz_id = (z + 1) * PADDED_SIZE
-
-        for y in range(CHUNK_SIZE):
-            chunk_id = 0 + z_id + y * CHUNK_SIZE2
-            padded_id = 1 + pz_id + (y + 1) * PADDED_SIZE2
-
-            padded[padded_id : padded_id + CHUNK_SIZE] = voxels[main_chunk][chunk_id : chunk_id + CHUNK_SIZE]
+    pass
