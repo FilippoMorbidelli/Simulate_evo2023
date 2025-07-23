@@ -4,13 +4,13 @@
 # Last update: 16/07/2025
 
 # Import packages ------------------------------|
-from numba import njit, uint8, uint64, int32
+from numba import njit, uint8, uint64
 from enum import IntEnum
 
 import numpy as np
 
 # Utils for mesh gen----------------------------|
-# New Chunk Mesh builder only greedy with AO!! Copied from Rust fast mesher (https://www.youtube.com/watch?v=qnGoGq7DWMc)
+# New Chunk Mesh builder only greedy with AO!! Copied from Rust fast mesher
 
 # - Constants -
 CHUNK_SIZE   : uint64 = 32
@@ -156,7 +156,7 @@ def find_neighbors_w_reg(reg_pos, chunk_pos, info):
             ChunkIDList.append(new_chunk_index if new_region_index > 0 else 0)
             RegionIDList.append(new_region_index if new_region_index > 0 else 0)
         else:
-            # Should not appen
+            # Should not happen
             ChunkIDList.append(0)
             RegionIDList.append(0)
 
@@ -177,3 +177,29 @@ def bound_to_region(bound_array: np.ndarray):
 @njit(fastmath=True, cache=True, nogil=True)
 def get_padded_chunk_optimized(voxels, region_pos, chunk_pos):
     pass
+
+#@njit(fastmath=True, cache=True)
+def get_chunk_index(info, world_voxel_pos):
+    # Unpack voxel position in world coordinates
+    wx, wy, wz = world_voxel_pos
+    wx = int(wx + info.off_xc)
+    wy = int(wy + info.off_yc)
+    wz = int(wz + info.off_zc)
+
+    # Compute region index
+    rx = wx >> info.rcSizeBin
+    ry = wy >> info.rcSizeBin
+    rz = wz >> info.rcSizeBin
+
+    # Compute chunk index
+    cx = (wx & info.rcMask) >> info.cSizeBin
+    cy = (wy & info.rcMask) >> info.cSizeBin
+    cz = (wz & info.rcMask) >> info.cSizeBin
+
+    # Out of region check
+    if rx // info.width_rn or ry // info.height_rn or rz // info.depth_rn:
+        return -1, -1
+
+    r_index = rx + info.width_rn * rz + info.depth_rn * info.width_rn * ry
+    index = cx + info.r_size * cz + info.r_area * cy
+    return int(r_index), int(index)

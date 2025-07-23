@@ -6,7 +6,7 @@
 
 # Import packages ------------------------------|
 from src.Engine.settings import *
-from src.Meshes.chunk_mesh_builder import get_chunk_index
+from src.Meshes.chunk_mesh_utils import get_chunk_index
 from math import floor
 
 
@@ -45,7 +45,7 @@ class VoxelHandler:
                     chunk.is_empty = False
 
     def rebuild_adj_chunk(self, adj_voxel_pos):
-        r_index, index = get_chunk_index(adj_voxel_pos)
+        r_index, index = get_chunk_index(self.w_info, adj_voxel_pos)
         # If chunk exists rebuild it
         if r_index != -1 and self.chunks[r_index][index] is not None:
             self.chunks[r_index][index].mesh.rebuild()

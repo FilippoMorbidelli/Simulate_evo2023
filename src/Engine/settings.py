@@ -175,7 +175,7 @@ class PlayerData:  # Contains settings about player data
 @dataclass(slots=True, order=True)
 class Util:  # Contains settings about util parameters and functions
     fps_limit  : int = 1000  # Limit frame rate to value
-    save_path  : str = "SaveFiles/"  # Path in Game directory containing the save files
+    save_path  : str = "saveFiles/"  # Path in Game directory containing the save files
     curr_save_name : str = ""  # Temporary save name of current loaded game name
 
 

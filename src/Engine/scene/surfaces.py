@@ -227,7 +227,7 @@ class MainMenu:
         # Play button
         button_play = ButtonSprite(app, "menu/main_menu", "play", "svg", True)
         app.shader_prog_2D.main_menu.add(button_play)
-        # Continue button (with SaveFiles)
+        # Continue button (with saveFiles)
         button_continue = ButtonSprite(app, "menu/main_menu", "continue", "svg", True)
         app.shader_prog_2D.main_menu.add(button_continue)
         # Settings button

@@ -17,7 +17,6 @@ class ShaderProgram:
         self.player = app.player
         # ------ Shaders ------ #
         self.chunk = self.get_program(shader_name='chunk')
-        self.chunk_greedy = self.get_program(shader_name='chunk_greedy')
         self.voxel_marker = self.get_program(shader_name='voxel_marker')
         self.celestials = self.get_program(shader_name='celestial')
         self.skybox = self.get_program(shader_name='skybox')
@@ -30,12 +29,6 @@ class ShaderProgram:
         self.chunk['m_model'].write(glm.mat4())
         self.chunk['u_texture_array_0'] = 2
         self.chunk['scale'].write(self.app.stg.world.scale)
-
-        # Chunk occlusion culling query
-        self.chunk_greedy['m_proj'].write(self.player.m_proj)
-        self.chunk_greedy['m_model'].write(glm.mat4())
-        self.chunk_greedy['u_texture_array_0'] = 2
-        self.chunk_greedy['scale'].write(self.app.stg.world.scale)
 
         # Marker
         self.voxel_marker['m_proj'].write(self.player.m_proj)
@@ -54,8 +47,6 @@ class ShaderProgram:
     def update(self, *args):
         # Chunks
         self.chunk['m_view'].write(self.player.m_view)
-        # Chunk occlusion culling query
-        self.chunk_greedy['m_view'].write(self.player.m_view)
         # Marker
         self.voxel_marker['m_view'].write(self.player.m_view)
         # Celestial bodies

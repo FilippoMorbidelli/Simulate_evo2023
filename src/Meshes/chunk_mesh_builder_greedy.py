@@ -8,7 +8,7 @@ from src.Meshes.chunk_mesh_utils import *
 
 from numpy.typing import NDArray
 from numba.typed import Dict as nDict
-from numba import types
+from numba import types, int32
 from typing import List, Optional
 
 # World generator ------------------------------|

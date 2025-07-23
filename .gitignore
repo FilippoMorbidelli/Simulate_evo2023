@@ -3,4 +3,5 @@
 *.iml
 *.nbi
 *.nbc
-SaveFiles/..
+*.npz
+saveFiles/..

@@ -7,8 +7,7 @@
 # Import packages ------------------------------|
 import math
 import numpy as np
-import time
-import numpy.random as rnd
+
 from numba import types
 from numba.typed import Dict
 from src.Engine.world_gen.chunk import Chunk
@@ -16,7 +15,6 @@ from src.Engine.player.voxel_handler import VoxelHandler
 from src.Engine.world_objects.voxel_marker import VoxelMarker
 from src.Engine.world_objects.celestial_body import Celestial
 from src.Engine.world_gen.sparsevoxeloctree import build_svo
-from src.Meshes.chunk_mesh_builder import let_settings_global
 
 
 # World generator ------------------------------|
@@ -182,9 +180,9 @@ class World:
                         self.load_status = status
 
                     elif status == "InProgress":
-                        r_id, r_coord, vm, vmg = data
+                        r_id, r_coord, vm = data
                         # Add Chunks and Meshes
-                        self.asynch_load_region(r_id, r_coord, vm, vmg)
+                        self.asynch_load_region(r_id, r_coord, vm)
                         # Update local load process status
                         self.load_status = status
 
@@ -229,7 +227,7 @@ class World:
                         # Reset local save process status
                         self.save_status = "Idle"
 
-    def asynch_load_region(self, r_id, r_coord, vm, vmg):
+    def asynch_load_region(self, r_id, r_coord, vm):
 
         # Compute region chunk distribution
         w, h, d = r_coord

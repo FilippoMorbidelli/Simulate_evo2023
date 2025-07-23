@@ -5,8 +5,7 @@
 
 # Import third party and Engine packages --------------|
 # From Src
-from src.Engine.sl_manager.SaveManager import load_decoder
-from src.Meshes.chunk_mesh_builder import build_chunk_mesh, let_settings_global, define_globals
+from src.Engine.saveLoadManager.saveManager import load_decoder
 from src.Engine.world_gen.chunk import ChunkProxy
 from src.Meshes.chunk_mesh_builder_greedy import *
 
@@ -71,16 +70,13 @@ class LoadProcess(mp.Process):
                         # Send response to signal that loading has been initialized
                         self.responseQueue.put(["Load", "Init", [region, voxels[region]]])
 
-                    # Define globals to be used by voxel mesh creator
-                    define_globals()
-                    let_settings_global(world_info)
+                    # Update globals useb by voxel mesher
 
                     # Build Chunks Mesh for each region
                     format_size = sum(int(fmt[:1]) for fmt in '1u4'.split())
                     for r in RToLoad:
                         # Vox meshes dict (to send)
                         vox_meshes = dict()
-                        vox_meshes_greedy = dict()
 
                         # Loop over 8 chunks each
                         for cc in range(int(world_info.r_vol/8)):
@@ -110,7 +106,7 @@ class LoadProcess(mp.Process):
                                     mesh = futures[c].result()
                                     vox_meshes[ccIds[c]] = mesh
 
-                            self.responseQueue.put(["Load", "InProgress", [r, r_coord[r], vox_meshes, vox_meshes_greedy]])
+                            self.responseQueue.put(["Load", "InProgress", [r, r_coord[r], vox_meshes]])
 
                         # Load response to confirm computation of new region has ended
                         self.responseQueue.put(["Load", "DoneRegion", [r, r_coord[r]]])
