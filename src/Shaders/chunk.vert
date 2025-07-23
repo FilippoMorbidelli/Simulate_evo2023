@@ -19,6 +19,7 @@ flat out int face_id;
 
 out vec2 uv;
 out float shading;
+//out vec3 frag_pos;
 
 const float ao_values[4] = float[4](1.0, 0.5, 0.25, 0.1);
 
@@ -80,4 +81,6 @@ void main() {
 
     uv = uv_coords[uv_indices[uv_index]];
     shading = face_shading[face_id] * ao_values[ao_id];
+
+    //frag_pos = in_position;
 }

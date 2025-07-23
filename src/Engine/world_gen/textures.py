@@ -53,7 +53,7 @@ class Textures:
 
         if is_tex_array:
             # If voxels are not cubic remember to stretch sides texture!
-            num_layers = 3 * texture.get_height() // texture.get_width()  # 3 textures per layer
+            num_layers = texture.get_height() // texture.get_width()  # 3 textures per layer 3 *
             texture = self.ctx.texture_array(
                 size=(texture.get_width(), texture.get_height() // num_layers, num_layers),
                 components=4,

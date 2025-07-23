@@ -12,15 +12,17 @@ uniform sampler2DArray u_texture_array_0;
 
 in vec2 uv;
 in float shading;
+//in vec3 frag_pos;
 
 flat in int voxel_id;
 flat in int face_id;
 
 void main() {
-    vec2 face_uv = uv;
-    face_uv.x = uv.x / 3.0 - min(face_id, 2) / 3.0;
+    //vec2 quad_scale = vec2(length(dFdx(frag_pos)), length(dFdy(frag_pos)));
+    vec2 face_uv = uv * quad_scale;
+    // face_uv.x = uv.x / 3.0 - min(face_id, 2) / 3.0;
 
-    vec3 tex_col = texture(u_texture_array_0, vec3(face_uv, voxel_id)).rgb;
+    vec3 tex_col = texture(u_texture_array_0, vec3(face_uv, voxel_id * 3.0 + min(face_id, 2))).rgb;
     tex_col = pow(tex_col, gamma);
 
     tex_col *= shading;
