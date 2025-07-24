@@ -182,14 +182,14 @@ def get_padded_chunk_optimized(voxels, region_pos, chunk_pos):
 def get_chunk_index(info, world_voxel_pos):
     # Unpack voxel position in world coordinates
     wx, wy, wz = world_voxel_pos
-    wx = int(wx + info.off_xc)
-    wy = int(wy + info.off_yc)
-    wz = int(wz + info.off_zc)
+    wx = int(wx + info.offset[0] * info.c_size)
+    wy = int(wy + info.offset[1] * info.c_size)
+    wz = int(wz + info.offset[2] * info.c_size)
 
     # Compute region index
-    rx = wx >> info.rcSizeBin
-    ry = wy >> info.rcSizeBin
-    rz = wz >> info.rcSizeBin
+    rx = wx >> info.rcSzBin
+    ry = wy >> info.rcSzBin
+    rz = wz >> info.rcSzBin
 
     # Compute chunk index
     cx = (wx & info.rcMask) >> info.cSizeBin

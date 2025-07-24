@@ -18,7 +18,7 @@ flat in int voxel_id;
 flat in int face_id;
 
 void main() {
-    vec2 face_uv = uv; // * sizes;
+    vec2 face_uv = uv * sizes;
     // face_uv.x = uv.x / 3.0 - min(face_id, 2) / 3.0;
 
     vec3 tex_col = texture(u_texture_array_0, vec3(face_uv, voxel_id * 3.0 + min(face_id, 2))).rgb;

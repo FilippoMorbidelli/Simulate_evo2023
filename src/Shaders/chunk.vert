@@ -4,7 +4,7 @@
 #extension GL_ARB_explicit_uniform_location : require
 
 layout (location = 0) in uint packed_data;
-in uint packed_size;
+layout (location = 1) in uint packed_size;
 
 int x, y, z;
 int ao_id;

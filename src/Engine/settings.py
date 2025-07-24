@@ -201,10 +201,6 @@ class GameSettings:  # Main settings class
         # Addition settings to compute after init
         self.player.pos = glm.vec3(0, 47, 0)
 
-
-# Mesh builder util functions ----------------------------------------|
-powers = 1 << np.array(range(32), dtype="int64")
-
 # Settings functions ----------|
 
 # Change Setting Value

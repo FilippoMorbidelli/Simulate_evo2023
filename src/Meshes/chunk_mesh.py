@@ -8,6 +8,7 @@
 from src.Meshes.base_mesh import BaseMesh
 from src.Meshes.chunk_mesh_utils import get_neighbors
 from src.Meshes.chunk_mesh_builder_greedy import build_chunk_mesh_greedy
+from time import perf_counter
 
 import numpy as np
 
@@ -21,15 +22,15 @@ class ChunkMesh(BaseMesh):
         self.ctx = self.app.ctx
         self.program = self.app.shader_prog_3D.chunk
 
-        self.vbo_format = '1u4'  # All data passed as uint8
-        self.vbo_size_format = '1u2 /i'  # All data passed as uint8
+        # As of now each vertex needs a packed 32 int and another 32 int for quad size due to greedy meshing
+        self.vbo_format = '1u4 1u4'  # All data passed as uint32
         self.format_size = sum(int(fmt[:1]) for fmt in self.vbo_format.split())
-        self.attrs = ('packed_data',)
+        self.attrs = ('packed_data', 'packed_size',)
 
         if not asynch:
             self.vao = self.get_vao()
         else:
-            self.vao = self.asynch_get_vao(*vao)
+            self.vao = self.asynch_get_vao(vao)
 
     def rebuild(self):
         self.vao = self.get_vao()
@@ -40,40 +41,40 @@ class ChunkMesh(BaseMesh):
                                          np.array(self.chunk.index),
                                          self.chunk.info)
 
-        mesh, size = build_chunk_mesh_greedy(chunk_voxels = self.chunk.voxels,
-                                             neighbors = neighbors_voxels,
-                                             format_s = self.format_size,
-                                             lod = 32)
+        # Print for performance review
+        start = perf_counter()
+        mesh = build_chunk_mesh_greedy(chunk_voxels = self.chunk.voxels,
+                                       neighbors = neighbors_voxels,
+                                       format_s = self.format_size,
+                                       lod = 32)
+        end = perf_counter()
+        print(f'{(end - start)*1000:.4f} ms used to compute chunk mesh of {len(mesh)/12} quads')
 
-        return mesh, size
+        return mesh
 
     def get_vao(self):
-        vertex_data, scale_data = self.get_vertex_data()
+        vertex_data = self.get_vertex_data()
 
         # Build normal vbo and vao
         vbo = self.ctx.buffer(vertex_data)
-        vbo_scale = self.ctx.buffer(scale_data)
         vao = self.ctx.vertex_array(
             self.program,
             [
                 (vbo, self.vbo_format, *self.attrs),  # First vbo, dedicated to vertex
-                (vbo_scale, self.vbo_size_format, "packed_size"), # used for quad size in greedy mesh
             ],
             skip_errors=True
         )
 
         return vao
 
-    def asynch_get_vao(self, vertex_data, scale_data):
+    def asynch_get_vao(self, vertex_data):
 
         # Build normal vbo and vao
         vbo = self.ctx.buffer(vertex_data)
-        vbo_scale = self.ctx.buffer(scale_data)
         vao = self.ctx.vertex_array(
             self.program,
             [
                 (vbo, self.vbo_format, *self.attrs),  # First vbo, dedicated to vertex
-                (vbo_scale, self.vbo_size_format, "packed_size"),
             ],
             skip_errors=True
         )

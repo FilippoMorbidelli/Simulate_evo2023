@@ -180,9 +180,9 @@ class World:
                         self.load_status = status
 
                     elif status == "InProgress":
-                        r_id, r_coord, mesh, size = data
+                        r_id, r_coord, mesh = data
                         # Add Chunks and Meshes
-                        self.asynch_load_region(r_id, r_coord, mesh, size)
+                        self.asynch_load_region(r_id, r_coord, mesh)
                         # Update local load process status
                         self.load_status = status
 
@@ -227,7 +227,7 @@ class World:
                         # Reset local save process status
                         self.save_status = "Idle"
 
-    def asynch_load_region(self, r_id, r_coord, mesh, size):
+    def asynch_load_region(self, r_id, r_coord, mesh):
 
         # Compute region chunk distribution
         w, h, d = r_coord
@@ -246,7 +246,7 @@ class World:
             chunk.is_empty = False
 
             # Build mesh with already computed data
-            chunk.build_mesh(asynch=True, vao=[mesh[c_id], size[c_id]])
+            chunk.build_mesh(asynch=True, vao=mesh[c_id])
 
     def update(self):
         # Update Regions
