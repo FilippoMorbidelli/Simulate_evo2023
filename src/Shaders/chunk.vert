@@ -4,6 +4,7 @@
 #extension GL_ARB_explicit_uniform_location : require
 
 layout (location = 0) in uint packed_data;
+in uint packed_size;
 
 int x, y, z;
 int ao_id;
@@ -19,7 +20,7 @@ flat out int face_id;
 
 out vec2 uv;
 out float shading;
-//out vec3 frag_pos;
+out vec2 sizes;
 
 const float ao_values[4] = float[4](1.0, 0.5, 0.25, 0.1);
 
@@ -71,8 +72,13 @@ void unpack(uint packed_data) {
     flip_id = int(packed_data & g_mask);
 }
 
+void unpack_size(uint packed_size){
+    sizes = vec2(packed_size & 63u, packed_size >> 6u);
+}
+
 void main() {
     unpack(packed_data);
+    unpack_size(packed_size);
 
     vec3 in_position = vec3(x, y, z);
     gl_Position = m_proj * m_view * m_model * vec4(in_position * scale, 1.0);
@@ -81,6 +87,4 @@ void main() {
 
     uv = uv_coords[uv_indices[uv_index]];
     shading = face_shading[face_id] * ao_values[ao_id];
-
-    //frag_pos = in_position;
 }

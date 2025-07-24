@@ -39,8 +39,8 @@ class Chunk:
     def set_uniform(self):
         self.mesh.program['m_model'].write(self.m_model)
 
-    def build_mesh(self, asynch=False, vao_v = None):
-        self.mesh = ChunkMesh(self, asynch=asynch, vao = vao_v)
+    def build_mesh(self, asynch=False, vao = None):
+        self.mesh = ChunkMesh(self, asynch=asynch, vao = vao)
 
     def render(self):
         if not self.is_empty:

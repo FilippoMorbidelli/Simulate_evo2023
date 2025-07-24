@@ -77,6 +77,7 @@ class LoadProcess(mp.Process):
                     for r in RToLoad:
                         # Vox meshes dict (to send)
                         vox_meshes = dict()
+                        vox_sizes = dict()
 
                         # Loop over 8 chunks each
                         for cc in range(int(world_info.r_vol/8)):
@@ -103,10 +104,11 @@ class LoadProcess(mp.Process):
 
                                 # Get Results
                                 for c in range(8):
-                                    mesh = futures[c].result()
+                                    mesh, size = futures[c].result()
                                     vox_meshes[ccIds[c]] = mesh
+                                    vox_sizes[ccIds[c]] = size
 
-                            self.responseQueue.put(["Load", "InProgress", [r, r_coord[r], vox_meshes]])
+                            self.responseQueue.put(["Load", "InProgress", [r, r_coord[r], vox_meshes, vox_sizes]])
 
                         # Load response to confirm computation of new region has ended
                         self.responseQueue.put(["Load", "DoneRegion", [r, r_coord[r]]])

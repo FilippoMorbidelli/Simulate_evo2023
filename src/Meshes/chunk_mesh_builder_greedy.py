@@ -18,15 +18,16 @@ from typing import List, Optional
 def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                             neighbors: np.ndarray,
                             format_s: int32,
-                            lod: int = 32) -> Optional[np.ndarray]:
+                            lod: int = 32) -> [Optional[np.ndarray], Optional[np.ndarray]]:
 
     # If Chunk is empty exit
     assert len(chunk_voxels) == CHUNK_SIZE3 or len(chunk_voxels) == 1
     if not np.any(chunk_voxels):
-        return np.empty(1, dtype='uint32')
+        return np.zeros(1, dtype='uint32'),np.zeros(1, dtype='uint16')
 
     # Array containing mesh vertices already packed for GPU
     vertices = np.empty(CHUNK_SIZE3 * 18 * format_s, dtype='uint32')
+    sizes    = np.empty(CHUNK_SIZE3 * 3 * format_s, dtype='uint16')
 
     # solid binary for each x,y,z axis (3)
     axis_cols: NDArray[np.uint64] = np.zeros((3, PADDED_SIZE, PADDED_SIZE), dtype='uint64')
@@ -166,19 +167,20 @@ def build_chunk_mesh_greedy(chunk_voxels: np.ndarray,
                     data[axis][composite_block_hash][x] |= np.uint32(1) << np.uint32(z)
 
     # Sample planes for greedy meshing
-    index = 0
+    indexes = [0, 0]
     for axis, block_ao_data in enumerate(data):
         for comp_block_hash, plane in block_ao_data.items():
             ao         = comp_block_hash & 0b111111111
             block_type = (comp_block_hash >> 9) & 0b11111111
-            axis_pos   = comp_block_hash >> 17
+            axis_slice = comp_block_hash >> 17
 
             quads_from_axis = greedy_mesh_binary_plane(plane, lod)
 
             for q in quads_from_axis:
-                index = append_vertices(vertices, index, q, axis, axis_pos, ao, block_type, lod)
+                indexes = append_vertices(vertices, sizes, indexes, q, axis, axis_slice, ao, block_type, lod)
 
-    return vertices[:index] if index else vertices[:1]
+    index_vert, index_size = indexes
+    return vertices[:index_vert] if index_vert else vertices[:1], sizes[:index_size] if index_size else sizes[:1]
 
 @njit(fastmath=True, cache=True, nogil=True)
 def greedy_mesh_binary_plane(voxel_mask,
@@ -227,13 +229,14 @@ def greedy_mesh_binary_plane(voxel_mask,
 
 @njit(fastmath=True, cache=True, nogil=True)
 def append_vertices(vertices: np.ndarray,
-                    index: int,
+                    sizes: np.ndarray,
+                    indexes: list[int],
                     quad: List[int32],
                     face: int,
                     section: int,
                     ao: int,
                     block_type: int,
-                    lod: int) -> int:
+                    lod: int) -> list[int]:
 
     # retrieve Lod level
     #jump = lod.jump_index()
@@ -255,6 +258,8 @@ def append_vertices(vertices: np.ndarray,
         v3 = pack_data(h          , section + 1, row + w, block_type, 0, v4ao, flip)
         #v0, v1, v2, v3 = [v3, v2, v1, v0] if flip else [v0, v3, v2, v1] # only for ascending faces
         new_vertices = [v1, v0, v3, v1, v3, v2] if flip else [v0, v3, v2, v0, v2, v1]
+        packed_size = tr_ones | w << 6
+        new_sizes = [packed_size, packed_size]
     elif face == FaceDir.Down:
         v0 = pack_data(h          , section    , row    , block_type, 1, v1ao, flip)
         v1 = pack_data(h + tr_ones, section    , row    , block_type, 1, v2ao, flip)
@@ -262,6 +267,8 @@ def append_vertices(vertices: np.ndarray,
         v3 = pack_data(h          , section    , row + w, block_type, 1, v4ao, flip)
         #v0, v1, v2, v3 = [v1, v2, v3, v0] if flip else [v0, v1, v2, v3]  # only anisotropy flip
         new_vertices = [v1, v3, v0, v1, v2, v3] if flip else [v0, v2, v3, v0, v1, v2]
+        packed_size = tr_ones | w << 6
+        new_sizes = [packed_size, packed_size]
     elif face == FaceDir.Left:
         v0 = pack_data(section    , row    , h          , block_type, 3, v1ao, flip)
         v1 = pack_data(section    , row + w, h          , block_type, 3, v2ao, flip)
@@ -269,6 +276,8 @@ def append_vertices(vertices: np.ndarray,
         v3 = pack_data(section    , row    , h + tr_ones, block_type, 3, v4ao, flip)
         #v0, v1, v2, v3 = [v1, v2, v3, v0] if flip else [v0, v1, v2, v3]  # only anisotropy flip
         new_vertices = [v3, v1, v0, v3, v2, v1] if flip else [v0, v2, v1, v0, v3, v2]
+        packed_size = w | tr_ones << 6
+        new_sizes = [packed_size, packed_size]
     elif face == FaceDir.Right:
         v0 = pack_data(section + 1, row    , h          , block_type, 2, v1ao, flip)
         v1 = pack_data(section + 1, row + w, h          , block_type, 2, v2ao, flip)
@@ -276,6 +285,8 @@ def append_vertices(vertices: np.ndarray,
         v3 = pack_data(section + 1, row    , h + tr_ones, block_type, 2, v4ao, flip)
         #v0, v1, v2, v3 = [v3, v2, v1, v0] if flip else [v0, v3, v2, v1] # only for ascending faces
         new_vertices = [v3, v0, v1, v3, v1, v2] if flip else [v0, v1, v2, v0, v2, v3]
+        packed_size = w | tr_ones << 6
+        new_sizes = [packed_size, packed_size]
     elif face == FaceDir.Forward:
         v0 = pack_data(h          , row    , section    , block_type, 5, v1ao, flip)
         v1 = pack_data(h          , row + w, section    , block_type, 5, v2ao, flip)
@@ -283,6 +294,8 @@ def append_vertices(vertices: np.ndarray,
         v3 = pack_data(h + tr_ones, row    , section    , block_type, 5, v4ao, flip)
         #v0, v1, v2, v3 = [v3, v2, v1, v0] if flip else [v0, v3, v2, v1] # only for ascending faces
         new_vertices = [v3, v0, v1, v3, v1, v2] if flip else [v0, v1, v2, v0, v2, v3] # Switched with Back Face
+        packed_size = tr_ones | w << 6
+        new_sizes = [packed_size, packed_size]
     else:  # Back
         v0 = pack_data(h          , row    , section + 1, block_type, 4, v1ao, flip)
         v1 = pack_data(h          , row + w, section + 1, block_type, 4, v2ao, flip)
@@ -290,8 +303,11 @@ def append_vertices(vertices: np.ndarray,
         v3 = pack_data(h + tr_ones, row    , section + 1, block_type, 4, v4ao, flip)
         #v0, v1, v2, v3 = [v1, v2, v3, v0] if flip else [v0, v1, v2, v3]  # only anisotropy flip
         new_vertices = [v3, v1, v0, v3, v2, v1] if flip else [v0, v2, v1, v0, v3, v2] # Switched with Forward Face
+        packed_size = tr_ones | w << 6
+        new_sizes = [packed_size, packed_size]
 
     # Compute correct vertices and adds them to array
-    index = add_data(vertices, index, new_vertices)
+    indexes[0] = add_data(vertices, indexes[0], new_vertices)
+    indexes[1] = add_data(sizes, indexes[1], new_sizes)
 
-    return index
+    return indexes

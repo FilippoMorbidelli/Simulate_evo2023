@@ -22,13 +22,14 @@ class ChunkMesh(BaseMesh):
         self.program = self.app.shader_prog_3D.chunk
 
         self.vbo_format = '1u4'  # All data passed as uint8
+        self.vbo_size_format = '1u2 /i'  # All data passed as uint8
         self.format_size = sum(int(fmt[:1]) for fmt in self.vbo_format.split())
         self.attrs = ('packed_data',)
 
         if not asynch:
             self.vao = self.get_vao()
         else:
-            self.vao = self.asynch_get_vao(vao)
+            self.vao = self.asynch_get_vao(*vao)
 
     def rebuild(self):
         self.vao = self.get_vao()
@@ -39,36 +40,40 @@ class ChunkMesh(BaseMesh):
                                          np.array(self.chunk.index),
                                          self.chunk.info)
 
-        mesh = build_chunk_mesh_greedy(chunk_voxels = self.chunk.voxels,
-                                       neighbors = neighbors_voxels,
-                                       format_s = self.format_size,
-                                       lod = 32)
+        mesh, size = build_chunk_mesh_greedy(chunk_voxels = self.chunk.voxels,
+                                             neighbors = neighbors_voxels,
+                                             format_s = self.format_size,
+                                             lod = 32)
 
-        return mesh
+        return mesh, size
 
     def get_vao(self):
-        vertex_data = self.get_vertex_data()
+        vertex_data, scale_data = self.get_vertex_data()
 
         # Build normal vbo and vao
         vbo = self.ctx.buffer(vertex_data)
+        vbo_scale = self.ctx.buffer(scale_data)
         vao = self.ctx.vertex_array(
             self.program,
             [
                 (vbo, self.vbo_format, *self.attrs),  # First vbo, dedicated to vertex
+                (vbo_scale, self.vbo_size_format, "packed_size"), # used for quad size in greedy mesh
             ],
             skip_errors=True
         )
 
         return vao
 
-    def asynch_get_vao(self, vertex_data):
+    def asynch_get_vao(self, vertex_data, scale_data):
 
         # Build normal vbo and vao
         vbo = self.ctx.buffer(vertex_data)
+        vbo_scale = self.ctx.buffer(scale_data)
         vao = self.ctx.vertex_array(
             self.program,
             [
                 (vbo, self.vbo_format, *self.attrs),  # First vbo, dedicated to vertex
+                (vbo_scale, self.vbo_size_format, "packed_size"),
             ],
             skip_errors=True
         )
